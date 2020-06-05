@@ -19,7 +19,7 @@ G = 6.6743e-11
 '''
 
 
-M_earth = 398600.5e9/scipy.constants.G
+M_earth = 398600.5e9/G
 '''float: Mass of the Earth using the WGS84 convention [kg]
 '''
 
@@ -135,7 +135,7 @@ def cart2kep(x, m=0.0, M_cent=M_sol, radians=True):
     rn = _np_vec_norm(r,axis=0)
     vn = _np_vec_norm(v,axis=0)
 
-    mu = scipy.constants.G*(m + M_cent)
+    mu = G*(m + M_cent)
 
     vr = np.sum( (r/rn)*v , axis=0)
 
@@ -652,7 +652,7 @@ def kep2cart(o, m=0.0, M_cent=M_sol, radians=True):
 
        Angles are by default given as radians, all angles are radians internally in functions, input and output angles can be both radians and degrees depending on the :code:`radians` boolean.
 
-       To use custom units, simply change the definition of :code:`mu = scipy.constants.G*(m + M_cent)` to an input parameter for the function as this is the only unit dependent calculation.
+       To use custom units, simply change the definition of :code:`mu = G*(m + M_cent)` to an input parameter for the function as this is the only unit dependent calculation.
 
     **Orientation of the ellipse in the coordinate system:**
        * For zero inclination :math:`i`: the ellipse is located in the x-y plane.
@@ -728,7 +728,7 @@ def kep2cart(o, m=0.0, M_cent=M_sol, radians=True):
     else:
         input_is_vector = False
 
-    mu = scipy.constants.G*(m + M_cent)
+    mu = G*(m + M_cent)
 
     x = np.empty(o.shape, dtype=o.dtype)
 
@@ -822,7 +822,7 @@ def find_ascending_node_time(a, e, aop, mu0, m, radians=False):
     else:
         one_lap = 360.0
 
-    gravitational_param = scipy.constants.G*(M_earth + m)
+    gravitational_param = G*(M_earth + m)
     mean_motion = np.sqrt(gravitational_param/(a**3.0))/(np.pi*2.0)*one_lap
 
     true_at_asc_node = one_lap - aop
