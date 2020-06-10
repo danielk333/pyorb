@@ -11,7 +11,7 @@ with open('requirements', 'r') as fh:
 
 setuptools.setup(
     name='pyorb',
-    version='0.0.0',
+    version='0.1.0',
     long_description=long_description,
     url='https://github.com/danielk333/pyorb',
     classifiers=[

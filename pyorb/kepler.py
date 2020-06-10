@@ -14,8 +14,17 @@ import numpy as np
 #Local import
 
 
+
 G = 6.6743e-11
 '''float: Newtons gravitational constant [m^3 kg^-1 s^-2]
+
+**Reference**: NIST - http://physics.nist.gov/cgi-bin/cuu/Value?bg
+'''
+
+AU = 1.495978707e11
+'''float: Astronomical Unit [m]
+
+The mean distance between the sun and the earth as defined in "International Astronomical Union, 31 August 2012"
 '''
 
 
@@ -23,8 +32,10 @@ M_earth = 398600.5e9/G
 '''float: Mass of the Earth using the WGS84 convention [kg]
 '''
 
-M_sol = 1.98847e30 #kg
-"""float: The mass of the sun :math:`M_\odot` given in kg, used in kepler transformations
+M_sol = 1.98847e30
+"""float: The mass of the sun :math:`M_\odot` given in kg
+
+**Reference**: The Astronomical Almanac - http://asa.usno.navy.mil/static/files/2014/Astronomical_Constants_2014.pdf
 """
 
 e_lim = 1e-9
@@ -32,18 +43,20 @@ e_lim = 1e-9
 """
 
 i_lim = np.pi*1e-9
-"""float: The limit on inclination below witch an orbit is considered not inclined
+"""float: The limit on inclination in radians below witch an orbit is considered not inclined
 """
 
 
 
-def cart2kep(x, m=0.0, M_cent=M_sol, radians=True):
+def cart_to_kep(cart, mu=M_sol*G, degrees=False):
     '''Converts set of Cartesian state vectors to set of Keplerian orbital elements.
 
     **Units:**
-       All units are SI-units: `SI Units <https://www.nist.gov/pml/weights-and-measures/metric-si/si-units>`_
+       Using default :code:`mu`, all variables are in `SI Units <https://www.nist.gov/pml/weights-and-measures/metric-si/si-units>`_
 
-       Angles are by default given as radians, all angles are radians internally in functions, input and output angles can be both radians and degrees depending on the :code:`radians` boolean.
+       If a standard gravitational parameter :code:`mu` is given in other units, all other input variables should also use the same unit system.
+
+       Angles are by default given as radians, all angles are radians internally in functions, input and output angles can be both radians and degrees depending on the :code:`degrees` boolean.
 
     **Orientation of the ellipse in the coordinate system:**
        * For zero inclination :math:`i`: the ellipse is located in the x-y plane.
@@ -60,8 +73,8 @@ def cart2kep(x, m=0.0, M_cent=M_sol, radians=True):
     
 
     **Constants:**
-       * :mod:`~dpt_tools.e_lim`: Used to determine circular orbits
-       * :mod:`~dpt_tools.i_lim`: Used to determine non-inclined orbits
+       * :mod:`~pyorb.kepler.e_lim`: Used to determine circular orbits
+       * :mod:`~pyorb.kepler.i_lim`: Used to determine non-inclined orbits
 
 
     **Variables:**
@@ -70,72 +83,54 @@ def cart2kep(x, m=0.0, M_cent=M_sol, radians=True):
        * :math:`i`: Inclination
        * :math:`\omega`: Argument of perihelion
        * :math:`\Omega`: Longitude of ascending node
-       * :math:`\\nu`: True anoamly
+       * :math:`\\nu`: True anomaly
 
 
-    :param numpy.ndarray x: Cartesian state vectors where rows 1-6 correspond to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`, :math:`v_y`, :math:`v_z` and columns correspond to different objects.
-    :param float/numpy.ndarray m: Masses of objects. If m is a numpy vector of masses, the gravitational :math:`\mu` parameter will be calculated also as a vector.
-    :param float M_cent: Is the mass of the central massive body, default value is the mass of the sun parameter in :mod:`~dpt_tools.M_sol`
-    :param bool radians: If true radians are used, else all angles are given in degree.
+    :param numpy.ndarray cart: Cartesian state vectors where rows 1-6 correspond to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`, :math:`v_y`, :math:`v_z` and columns correspond to different objects.
+    :param float/numpy.ndarray mu: Standard gravitational parameter of objects. If `mu` is a numpy vector, the element corresponding to each column of `cart` will be used for its element calculation, Default value is in SI units a massless object orbiting the Sun.
+    :param bool degrees: If `true`, degrees are used. Else all angles are given in radians.
 
     :return: Keplerian orbital elements where rows 1-6 correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\omega`, :math:`\Omega`, :math:`\\nu` and columns correspond to different objects.
     :rtype: numpy.ndarray
 
     **Example:**
        
-       Convert 1 AU distance object of Earth mass traveling at 30 km/s tangential velocity to Kepler elements.
+       Convert wat
 
        .. code-block:: python
 
-          import dpt_tools as dpt
-          import numpy as n
-          import scipy.constants as c
-
-          state = n.array([
-            c.au*1.0, #x
-            0, #y
-            0, #z
-            0, #vx
-            30e3, #vy
-            0, #vz
-          ], dtype=n.float)
-
-          orbit = dpt.cart2kep(state, m=5.97237e24, M_cent=1.9885e30, radians=False)
-          print('Orbit: a={} AU, e={}'.format(orbit[0]/c.au, orbit[1]))
-          print('(i, omega, Omega, nu)={} deg '.format(orbit[2:]))
+          import bla
 
 
     *Reference:* Daniel Kastinen Master Thesis: Meteors and Celestial Dynamics
     '''
 
-    if not isinstance(x,np.ndarray):
-        raise TypeError('Input type {} not supported: must be {}'.format( type(x),np.ndarray ))
-    if x.shape[0] != 6:
+    if not isinstance(cart,np.ndarray):
+        raise TypeError('Input type {} not supported: must be {}'.format( type(cart),np.ndarray ))
+    if cart.shape[0] != 6:
         raise ValueError('Input data must have at least 6 variables along axis 0: input shape is {}'.format(x.shape))
     
-    if len(x.shape) < 2:
+    if len(cart.shape) < 2:
         input_is_vector = True
         try:
-            x.shape=(6,1)
+            cart.shape=(6,1)
         except ValueError as e:
             print('Error {} while trying to cast vector into single column.'.format(e))
-            print('Input array shape: {}'.format(x.shape))
+            print('Input array shape: {}'.format(cart.shape))
             raise
     else:
         input_is_vector = False
 
-    ez = np.array([0,0,1], dtype=x.dtype)
-    ex = np.array([1,0,0], dtype=x.dtype)
+    ez = np.array([0,0,1], dtype=cart.dtype)
+    ex = np.array([1,0,0], dtype=cart.dtype)
     
-    o = np.empty(x.shape, dtype=x.dtype)
-    iter_n = x.shape[1]
+    o = np.empty(cart.shape, dtype=cart.dtype)
+    iter_n = cart.shape[1]
 
-    r = x[:3,:]
-    v = x[3:,:]
-    rn = _np_vec_norm(r,axis=0)
-    vn = _np_vec_norm(v,axis=0)
-
-    mu = G*(m + M_cent)
+    r = cart[:3,:]
+    v = cart[3:,:]
+    rn = np.linalg.norm(r,axis=0)
+    vn = np.linalg.norm(v,axis=0)
 
     vr = np.sum( (r/rn)*v , axis=0)
 
@@ -144,9 +139,9 @@ def cart2kep(x, m=0.0, M_cent=M_sol, radians=True):
     o[0,:] = -mu/(2.0*epsilon)
 
     e = 1.0/mu*((vn**2 - mu/rn)*r - (rn*vr)*v)
-    o[1,:] = _np_vec_norm(e,axis=0)
+    o[1,:] = np.linalg.norm(e,axis=0)
 
-    #could implement this with nditers
+    #could implement this with nditers?
     #np.nditer(a, flags=['external_loop'], order='F')
 
     for ind in range(iter_n):
@@ -213,27 +208,27 @@ def cart2kep(x, m=0.0, M_cent=M_sol, radians=True):
         o[4,ind] = asc_node
         o[5,ind] = nu
 
-    if not radians:
+    if degrees:
         o[2:,:] = np.degrees(o[2:,:])
 
     if input_is_vector:
-        x.shape = (6,)
+        cart.shape = (6,)
         o.shape = (6,)
 
     return o
 
 
-def true2eccentric(nu, e, radians=True):
+def true_to_eccentric(nu, e, degrees=True):
     '''Calculates the eccentric anomaly from the true anomaly.
 
     :param float/numpy.ndarray nu: True anomaly.
     :param float/numpy.ndarray e: Eccentricity of ellipse.
-    :param bool radians: If true radians are used, else all angles are given in degrees
+    :param bool degrees: If true degrees are used, else all angles are given in radians
 
     :return: Eccentric anomaly.
     :rtype: numpy.ndarray or float
     '''
-    if not radians:
+    if degrees:
         _nu = np.radians(nu)
     else:
         _nu = nu
@@ -241,23 +236,23 @@ def true2eccentric(nu, e, radians=True):
     E = 2.0*np.arctan( np.sqrt( (1.0 - e)/(1.0 + e) )*np.tan(_nu*0.5) )
     E = np.mod(E + 2.*np.pi,2.*np.pi)
     
-    if not radians:
+    if degrees:
         E = np.degrees(E)
     
     return E
 
 
-def eccentric2true(E, e, radians=True):
+def eccentric_to_true(E, e, degrees=True):
     '''Calculates the true anomaly from the eccentric anomaly.
 
     :param float/numpy.ndarray E: Eccentric anomaly.
     :param float/numpy.ndarray e: Eccentricity of ellipse.
-    :param bool radians: If true radians are used, else all angles are given in degrees
+    :param bool degrees: If true degrees are used, else all angles are given in radians
 
     :return: True anomaly.
     :rtype: numpy.ndarray or float
     '''
-    if not radians:
+    if degrees:
         _E = np.radians(E)
     else:
         _E = E
@@ -265,65 +260,73 @@ def eccentric2true(E, e, radians=True):
     nu = 2.0*np.arctan( np.sqrt( (1.0 + e)/(1.0 - e) )*np.tan(_E*0.5) )
     nu = np.mod(nu + 2.*np.pi, 2.*np.pi)
 
-    if not radians:
+    if degrees:
         nu = np.degrees(nu)
     
     return nu
 
 
-def eccentric2mean(E,e,radians=True):
+def eccentric_to_mean(E, e, degrees=False):
     '''Calculates the mean anomaly from the eccentric anomaly using Kepler equation.
 
     :param float/numpy.ndarray E: Eccentric anomaly.
     :param float/numpy.ndarray e: Eccentricity of ellipse.
-    :param bool radians: If true radians are used, else all angles are given in degrees
+    :param bool degrees: If true degrees are used, else all angles are given in radians
 
     :return: Mean anomaly.
     :rtype: numpy.ndarray or float
     '''
-    return E - e*np.sin(E)
+    if degrees:
+        _E = np.radians(E)
+    else:
+        _E = E
+
+    M = _E - e*np.sin(_E)
+
+    if degrees:
+        M = np.degrees(M)
+    return M
 
 
-def true2mean(nu, e, radians=True):
+def true_to_mean(nu, e, degrees=False):
     '''Transforms true anomaly to mean anomaly.
     
     **Uses:**
-       * :func:`~dpt_tools.true2eccentric`
-       * :func:`~dpt_tools.eccentric2mean`
+       * :func:`~pyorb.kepler.true_to_eccentric`
+       * :func:`~pyorb.kepler.eccentric_to_mean`
 
     :param float/numpy.ndarray nu: True anomaly.
     :param float/numpy.ndarray e: Eccentricity of ellipse.
-    :param bool radians: If true radians are used, else all angles are given in degrees
+    :param bool degrees: If true degrees are used, else all angles are given in radians
     
     :return: Mean anomaly.
     :rtype: numpy.ndarray or float
     '''
-    if not radians:
+    if degrees:
         _nu = np.radians(nu)
     else:
         _nu = nu
 
-    E = true2eccentric(_nu, e, radians=True)
-    M = eccentric2mean(E, e, radians=True)
+    E = true_to_eccentric(_nu, e, degrees=False)
+    M = eccentric_to_mean(E, e, degrees=False)
     
-    if not radians:
+    if degrees:
         M = np.degrees(M)
-
     return M
 
 
-def elliptic_radius(E,a,e,radians=True):
+def elliptic_radius(E, a, e, degrees=False):
     '''Calculates the distance between the left focus point of an ellipse and a point on the ellipse defined by the eccentric anomaly.
 
     :param float/numpy.ndarray E: Eccentric anomaly.
     :param float/numpy.ndarray a: Semi-major axis of ellipse.
     :param float/numpy.ndarray e: Eccentricity of ellipse.
-    :param bool radians: If true radians are used, else all angles are given in degrees
+    :param bool degrees: If true degrees are used, else all angles are given in radians
     
     :return: Radius from left focus point.
     :rtype: numpy.ndarray or float
     '''
-    if not radians:
+    if degrees:
         _E = np.radians(E)
     else:
         _E = E
@@ -410,12 +413,12 @@ def laguerre_solve_kepler(E0, M, e, tol=1e-12, degree=5):
 
     .. code-block:: python
 
-       import dpt_tools as dpt
+       import pyorb.kepler as pykep
        M = 3.14
        e = 0.8
        
        #Use mean anomaly as initial guess
-       E, iterations = dpt.laguerre_solve_kepler(
+       E, iterations = pykep.laguerre_solve_kepler(
           E0 = M,
           M = M,
           e = e,
@@ -437,10 +440,6 @@ def laguerre_solve_kepler(E0, M, e, tol=1e-12, degree=5):
 
     while np.abs(f_eval) >= tol:
         it_num += 1
-        #sqrt_term = np.sqrt(
-        #    ((degree - 1.0)*fp(E))**2
-        #    - degree*(degree - 1)*f(E)*fpp(E)
-        #)
 
         fp_eval = _fp(E)
 
@@ -467,9 +466,9 @@ def laguerre_solve_kepler(E0, M, e, tol=1e-12, degree=5):
 def _get_kepler_guess(M, e):
     '''The different initial guesses for solving the Kepler equation based on input mean anomaly
     
-    :param float M: Mean anomaly.
+    :param float M: Mean anomaly in radians.
     :param float e: Eccentricity of ellipse.
-    :return: Guess for eccentric anomaly.
+    :return: Guess for eccentric anomaly in radians.
     :rtype: float
 
     Reference: Esmaelzadeh, R., & Ghadiri, H. (2014). Appropriate starter for solving the Kepler's equation. International Journal of Computer Applications, 89(7).
@@ -495,9 +494,9 @@ def _get_kepler_guess(M, e):
 def kepler_guess(M, e):
     '''Guess the initial iteration point for newtons method.
     
-    :param float/numpy.ndarray M: Mean anomaly.
+    :param float/numpy.ndarray M: Mean anomaly in radians.
     :param float/numpy.ndarray e: Eccentricity of ellipse.
-    :return: Guess for eccentric anomaly.
+    :return: Guess for eccentric anomaly in radians.
     :rtype: numpy.ndarray or float
 
     *Reference:* Esmaelzadeh, R., & Ghadiri, H. (2014). Appropriate starter for solving the Kepler's equation. International Journal of Computer Applications, 89(7).
@@ -533,23 +532,23 @@ def kepler_guess(M, e):
     return E0
 
 
-def mean2eccentric(M, e, tol=1e-12, radians=True):
+def mean_to_eccentric(M, e, tol=1e-12, degrees=False):
     '''Calculates the eccentric anomaly from the mean anomaly by solving the Kepler equation.
 
     :param float/numpy.ndarray M: Mean anomaly.
     :param float/numpy.ndarray e: Eccentricity of ellipse.
     :param float tol: Numerical tolerance for solving Keplers equation in units of radians.
-    :param bool radians: If true radians are used, else all angles are given in degrees
+    :param bool degrees: If true degrees are used, else all angles are given in radians
     
     :return: True anomaly.
     :rtype: numpy.ndarray or float
 
     **Uses:**
-       * :func:`~dpt_tools._get_kepler_guess`
-       * :func:`~dpt_tools.laguerre_solve_kepler`
+       * :func:`~pyorb.kepler._get_kepler_guess`
+       * :func:`~pyorb.kepler.laguerre_solve_kepler`
     '''
 
-    if not radians:
+    if degrees:
         _M = np.radians(M)
     else:
         _M = M
@@ -588,36 +587,36 @@ def mean2eccentric(M, e, tol=1e-12, radians=True):
         E, it_num = laguerre_solve_kepler(E0, _M, e, tol=tol)
 
 
-    if not radians:
+    if degrees:
         E = np.degrees(E)
 
     return E
 
 
-def mean2true(M, e, tol=1e-12, radians=True):
+def mean_to_true(M, e, tol=1e-12, degrees=False):
     '''Transforms mean anomaly to true anomaly.
     
     **Uses:**
-       * :func:`~dpt_tools.mean2eccentric`
-       * :func:`~dpt_tools.eccentric2true`
+       * :func:`~pyorb.kepler.mean_to_eccentric`
+       * :func:`~pyorb.kepler.eccentric_to_true`
 
     :param float/numpy.ndarray M: Mean anomaly.
     :param float/numpy.ndarray e: Eccentricity of ellipse.
     :param float tol: Numerical tolerance for solving Keplers equation in units of radians.
-    :param bool radians: If true radians are used, else all angles are given in degrees
+    :param bool degrees: If true degrees are used, else all angles are given in radians
     
     :return: True anomaly.
     :rtype: numpy.ndarray or float
     '''
-    if not radians:
+    if degrees:
         _M = np.radians(M)
     else:
         _M = M
 
-    E = mean2eccentric(_M, e, tol=tol, radians=True)
-    nu = eccentric2true(E, e, radians=True)
+    E = mean_to_eccentric(_M, e, tol=tol, degrees=False)
+    nu = eccentric_to_true(E, e, degrees=False)
 
-    if not radians:
+    if degrees:
         nu = np.degrees(nu)
 
     return nu
@@ -644,15 +643,15 @@ def orbital_period(a, mu):
     return 2.0*np.pi*np.sqrt(a**3.0/mu)
 
 
-def kep2cart(o, m=0.0, M_cent=M_sol, radians=True):
+def kep_to_cart(kep, mu=M_sol*G, degrees=False):
     '''Converts set of Keplerian orbital elements to set of Cartesian state vectors.
     
     **Units:**
-       All units are SI-units: `SI Units <https://www.nist.gov/pml/weights-and-measures/metric-si/si-units>`_
+       Using default :code:`mu`, all variables are in `SI Units <https://www.nist.gov/pml/weights-and-measures/metric-si/si-units>`_
 
-       Angles are by default given as radians, all angles are radians internally in functions, input and output angles can be both radians and degrees depending on the :code:`radians` boolean.
+       If a standard gravitational parameter :code:`mu` is given in other units, all other input variables should also use the same unit system.
 
-       To use custom units, simply change the definition of :code:`mu = G*(m + M_cent)` to an input parameter for the function as this is the only unit dependent calculation.
+       Angles are by default given as radians, all angles are radians internally in functions, input and output angles can be both radians and degrees depending on the :code:`degrees` boolean.
 
     **Orientation of the ellipse in the coordinate system:**
        * For zero inclination :math:`i`: the ellipse is located in the x-y plane.
@@ -674,80 +673,61 @@ def kep2cart(o, m=0.0, M_cent=M_sol, radians=True):
        * :math:`\\nu`: True anoamly
 
     **Uses:**
-       * :func:`~dpt_tools.true2eccentric`
-       * :func:`~dpt_tools.elliptic_radius`
+       * :func:`~pyorb.kepler.true_to_eccentric`
+       * :func:`~pyorb.kepler.elliptic_radius`
 
-    :param numpy.ndarray o: Keplerian orbital elements where rows 1-6 correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\omega`, :math:`\Omega`, :math:`\\nu` and columns correspond to different objects.
-    :param float/numpy.ndarray m: Masses of objects. If m is a numpy vector of masses, the gravitational :math:`\mu` parameter will be calculated also as a vector.
-    :param float M_cent: Is the mass of the central massive body, default value is the mass of the sun parameter in :mod:`~dpt_tools.M_sol`
-    :param bool radians: If true radians are used, else all angles are given in degree.
+    :param numpy.ndarray kep: Keplerian orbital elements where rows 1-6 correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\omega`, :math:`\Omega`, :math:`\\nu` and columns correspond to different objects.
+    :param float/numpy.ndarray mu: Standard gravitational parameter of objects. If `mu` is a numpy vector, the element corresponding to each column of `cart` will be used for its element calculation, Default value is in SI units a massless object orbiting the Sun.
+    :param bool degrees: If `true`, degrees are used. Else all angles are given in radians.
 
     :return: Cartesian state vectors where rows 1-6 correspond to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`, :math:`v_y`, :math:`v_z` and columns correspond to different objects.
     :rtype: numpy.ndarray
 
     **Example:**
        
-       Convert Earth J2000.0 orbital parameters to Cartesian position.
+       Convert ??
 
        .. code-block:: python
 
-          import dpt_tools as dpt
-          import numpy as n
-          import scipy.constants as c
-
-          #Periapsis approx 3 Jan
-          orbit = n.array([
-            c.au*1.000001018, #a
-            0.0167086, #e
-            7.155, #i
-            288.1, #omega
-            174.9, #Omega
-            0.0, #nu
-          ], dtype=n.float)
-
-          state = dpt.kep2cart(orbit, m=5.97237e24, M_cent=1.9885e30, radians=False)
-          print('Position: {} AU '.format(state[:3]/c.au))
-          print('Velocity: {} km/s '.format(state[3:]/1e3))
+          import pyorb
 
 
     *Reference:* Daniel Kastinen Master Thesis: Meteors and Celestial Dynamics, "Orbital Motion" by A.E. Roy.
     '''
-    if not isinstance(o,np.ndarray):
-        raise TypeError('Input type {} not supported: must be {}'.format( type(o),np.ndarray ))
-    if o.shape[0] != 6:
-        raise ValueError('Input data must have at least 6 variables along axis 0: input shape is {}'.format(o.shape))
+    if not isinstance(kep, np.ndarray):
+        raise TypeError('Input type {} not supported: must be {}'.format( type(kep),np.ndarray ))
+    if kep.shape[0] != 6:
+        raise ValueError('Input data must have at least 6 variables along axis 0: input shape is {}'.format(kep.shape))
     
-    if len(o.shape) < 2:
+    if len(kep.shape) < 2:
         input_is_vector = True
         try:
-            o.shape=(6,1)
+            kep.shape=(6,1)
         except ValueError as e:
             print('Error {} while trying to cast vector into single column.'.format(e))
-            print('Input array shape: {}'.format(o.shape))
+            print('Input array shape: {}'.format(kep.shape))
             raise
     else:
         input_is_vector = False
 
-    mu = G*(m + M_cent)
+    x = np.empty(kep.shape, dtype=kep.dtype)
 
-    x = np.empty(o.shape, dtype=o.dtype)
+    if degrees:
+        kep[2:,:] = np.radians(kep[2:,:])
 
-    if not radians:
-        o[2:,:] = np.radians(o[2:,:])
-
-    nu = o[5,:]
-    omega = o[3,:]
-    asc_node = o[4,:]
-    inc = o[2,:]
+    nu = kep[5,:]
+    omega = kep[3,:]
+    asc_node = kep[4,:]
+    inc = kep[2,:]
     wf = nu + omega
-    e = o[1,:]
-    a = o[0,:]
+    e = kep[1,:]
+    a = kep[0,:]
 
-    Ecc = true2eccentric(nu,e,radians=True)
+    Ecc = true_to_eccentric(nu,e,degrees=False)
 
-    rn = elliptic_radius(Ecc,a,e,radians=True)
+    rn = elliptic_radius(Ecc,a,e,degrees=False)
 
-    r = np.zeros( (3, o.shape[1]), dtype=o.dtype )
+    r = np.zeros( (3, kep.shape[1]), dtype=kep.dtype )
     r[0,:] = np.cos(wf)
     r[1,:] = np.sin(wf)
     r = rn*r
@@ -759,7 +739,7 @@ def kep2cart(o, m=0.0, M_cent=M_sol, radians=True):
     cos_w = np.cos(omega)
     sin_w = np.sin(omega)
 
-    #order is important not to change varaibles before they are used
+    #order is important not to change variables before they are used
     x_tmp = r[0,:].copy()
     r[2,:] = r[1,:]*sin_i
     r[0,:] = cos_Omega*r[0,:] - sin_Omega*r[1,:]*cos_i
@@ -775,7 +755,7 @@ def kep2cart(o, m=0.0, M_cent=M_sol, radians=True):
     n = np.sqrt(mu/a**3)
     nar = n*a/rn
     
-    v = np.zeros( (3, o.shape[1]), dtype=o.dtype )
+    v = np.zeros( (3, kep.shape[1]), dtype=kep.dtype )
     bcos_E = b*np.cos(Ecc)
     asin_E = a*np.sin(Ecc)
 
@@ -790,49 +770,13 @@ def kep2cart(o, m=0.0, M_cent=M_sol, radians=True):
 
     if input_is_vector:
         x.shape = (6,)
-        o.shape = (6,)
-        if not radians:
-            o[2:] = np.degrees(o[2:])
+        kep.shape = (6,)
+        if degrees:
+            kep[2:] = np.degrees(kep[2:])
     else:
-        if not radians:
-            o[2:,:] = np.degrees(o[2:,:])
+        if degrees:
+            kep[2:,:] = np.degrees(kep[2:,:])
 
 
     return x
-
-
-def ascending_node_from_statevector(sv, m, **kw):
-    '''
-    keywords include
-      M_cent = 'central mass'
-    '''
-    cart = np.r_[sv['pos'], sv['vel']]
-    a, e, inc, aop, raan, mu0p = cart2kep(cart, m=m, M_cent=M_earth, radians=False, **kw)
-    mu0 = true2mean(mu0p, e, radians=False)
-
-    ttan = find_ascending_node_time(a, e, aop, mu0, m, radians=False)
-    return sec * ttan
-
-
-def find_ascending_node_time(a, e, aop, mu0, m, radians=False):
-    '''Find the time past the crossing of the ascending node.
-    '''
-    if radians:
-        one_lap = np.pi*2.0
-    else:
-        one_lap = 360.0
-
-    gravitational_param = G*(M_earth + m)
-    mean_motion = np.sqrt(gravitational_param/(a**3.0))/(np.pi*2.0)*one_lap
-
-    true_at_asc_node = one_lap - aop
-    mean_at_asc_node = true2mean(true_at_asc_node, e, radians=radians)
-
-    md = mean_at_asc_node - mu0
-    if md > 0:
-        md -= one_lap
-
-    time_from_asc_node = -md/mean_motion
-
-    return time_from_asc_node
 
