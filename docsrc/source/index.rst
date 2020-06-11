@@ -11,7 +11,31 @@ PyOrb
 
 PyOrb is a python implementation of Kepler orbital elements and related functions. Nothing more, nothing less.
 
-.. include:: ../../README.rst
+
+Getting started
+-----------------
+
+To install
+
+.. code-block:: bash
+
+   pip install pyorb
+
+or 
+
+.. code-block:: bash
+
+   git clone git@github.com:danielk333/pyorb.git
+   cd pyorb
+   pip install .
+
+Then get started with this quick "getting started" guide
+
+.. toctree::
+   :maxdepth: 2
+
+   start
+
 
 Examples
 ---------
