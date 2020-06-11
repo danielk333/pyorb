@@ -1,9 +1,6 @@
 # Compiled source #
 ###################
 
-#for githubpages
-docs/
-
 #Sublime
 *.sublime*
 
