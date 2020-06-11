@@ -10,3 +10,5 @@ Modules
    :toctree: _autodoc/pyorb
 
    pyorb.kepler
+   pyorb.orbit
+   pyorb.unit

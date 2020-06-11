@@ -644,7 +644,7 @@ def orbital_period(a, mu):
 
 
 def semi_major_axis(P, mu):
-    '''Calculates the orbital semi-major axis of an Keplerian orbit based on the orbital period :math:`a = \mu^{\\frac{1}{3}}\left(\\frac{P}{2\pi}\right)^{\\frac{2}{3}}`.
+    '''Calculates the orbital semi-major axis of an Keplerian orbit based on the orbital period :math:`a = \mu^{\\frac{1}{3}}(\\frac{P}{2\pi})^{\\frac{2}{3}}`.
     
     :param float/numpy.ndarray P: Orbital period
     :param float mu: Standard gravitation parameter :math:`\mu = G(m_1 + m_2)` of the orbit.

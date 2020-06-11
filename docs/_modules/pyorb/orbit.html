@@ -1,0 +1,607 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pyorb.orbit &#8212; PyOrb 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PyOrb 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pyorb.orbit</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyorb.orbit</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="sd">&#39;&#39;&#39;Orbit class definition</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1">#Python standard import</span>
+
+
+<span class="c1">#Third party import</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<span class="c1">#Local import</span>
+<span class="kn">from</span> <span class="nn">.kepler</span> <span class="k">import</span> <span class="n">G</span> <span class="k">as</span> <span class="n">G_SI</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">kepler</span> <span class="k">as</span> <span class="n">functions</span>
+
+
+
+<div class="viewcode-block" id="Orbit"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.orbit.Orbit.html#pyorb.orbit.Orbit">[docs]</a><span class="k">class</span> <span class="nc">Orbit</span><span class="p">:</span>
+
+    <span class="n">CARTESIAN</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;vx&#39;</span><span class="p">,</span> <span class="s1">&#39;vy&#39;</span><span class="p">,</span> <span class="s1">&#39;vz&#39;</span><span class="p">]</span>
+    <span class="n">KEPLER</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="s1">&#39;omega&#39;</span><span class="p">,</span> <span class="s1">&#39;Omega&#39;</span><span class="p">,</span> <span class="s1">&#39;anom&#39;</span><span class="p">]</span>
+    <span class="n">ANOMALY</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;eccentric&#39;</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">]</span>
+    
+<div class="viewcode-block" id="Orbit.__init__"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.orbit.Orbit.__init__.html#pyorb.orbit.Orbit.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="n">G_SI</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tol</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tol&#39;</span><span class="p">,</span> <span class="mf">1e-12</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">M0</span> <span class="o">=</span> <span class="n">M0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epoch</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;epoch&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">degrees</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;degrees&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;true&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Orbit</span><span class="o">.</span><span class="n">ANOMALY</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Anomaly type &quot;</span><span class="si">{self.type}</span><span class="s1">&quot; not recognized&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="mi">6</span><span class="p">,),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="mi">6</span><span class="p">,),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_true_anomaly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eccentric_anomaly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mean_anomaly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span> <span class="o">=</span> <span class="kc">False</span></div>
+    
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">str_</span>  <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="n">f</span><span class="s1">&#39;</span><span class="si">{kkey:&lt;5}</span><span class="s1">: </span><span class="si">{kval:&lt;.4e}</span><span class="s1">   </span><span class="si">{ckey:&lt;2}</span><span class="s1">: </span><span class="si">{cval:&lt;.4e}</span><span class="s1">&#39;</span> 
+            <span class="k">for</span> <span class="n">kval</span><span class="p">,</span> <span class="n">kkey</span><span class="p">,</span> <span class="n">cval</span><span class="p">,</span> <span class="n">ckey</span> <span class="ow">in</span> 
+            <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">,</span> <span class="n">Orbit</span><span class="o">.</span><span class="n">KEPLER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">,</span> <span class="n">Orbit</span><span class="o">.</span><span class="n">CARTESIAN</span><span class="p">)</span>
+        <span class="p">])</span>
+        <span class="k">return</span> <span class="n">str_</span>
+
+    <span class="k">def</span> <span class="nf">_cart_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calculate_cartesian</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_kep_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calculate_kepler</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Orbit.cartesian_vector"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.orbit.Orbit.cartesian_vector.html#pyorb.orbit.Orbit.cartesian_vector">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">cartesian_vector</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">elems</span><span class="p">,</span> <span class="n">M0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">M0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">cartesian</span> <span class="o">=</span> <span class="n">elems</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="Orbit.cartesian_elements"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.orbit.Orbit.cartesian_elements.html#pyorb.orbit.Orbit.cartesian_elements">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">cartesian_elements</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">vz</span><span class="p">,</span> <span class="n">M0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">M0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">vx</span><span class="o">=</span><span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="o">=</span><span class="n">vy</span><span class="p">,</span> <span class="n">vz</span><span class="o">=</span><span class="n">vz</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="Orbit.kepler_vector"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.orbit.Orbit.kepler_vector.html#pyorb.orbit.Orbit.kepler_vector">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">kepler_vector</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">elems</span><span class="p">,</span> <span class="n">M0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">M0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">kepler</span> <span class="o">=</span> <span class="n">elems</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="Orbit.kepler_elements"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.orbit.Orbit.kepler_elements.html#pyorb.orbit.Orbit.kepler_elements">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">kepler_elements</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">Omega</span><span class="p">,</span> <span class="n">anom</span><span class="p">,</span> <span class="n">M0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">M0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="n">e</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">omega</span><span class="o">=</span><span class="n">omega</span><span class="p">,</span> <span class="n">Omega</span><span class="o">=</span><span class="n">Omega</span><span class="p">,</span> <span class="n">anom</span><span class="o">=</span><span class="n">anom</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="Orbit.propagate"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.orbit.Orbit.propagate.html#pyorb.orbit.Orbit.propagate">[docs]</a>    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Orbit.update"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.orbit.Orbit.update.html#pyorb.orbit.Orbit.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">cart_updated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">kep_updated</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="s1">&#39;cartesian&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;cartesian&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="s1">&#39;kepler&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;kepler&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span>
+
+        <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">Orbit</span><span class="o">.</span><span class="n">CARTESIAN</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="n">cart_updated</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">Orbit</span><span class="o">.</span><span class="n">KEPLER</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">cart_updated</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot update both cartesian and Keplerian elements simultaneously.&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="n">kep_updated</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">cart_updated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">kep_updated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Orbit.calculate_cartesian"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.orbit.Orbit.calculate_cartesian.html#pyorb.orbit.Orbit.calculate_cartesian">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_cartesian</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Some kepler elements not set &quot;</span><span class="si">{self._kep}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+            <span class="n">kep_tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">kep_tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calc_true_anomaly</span><span class="p">()</span>
+            <span class="n">kep_tmp</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_true_anomaly</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">kep_to_cart</span><span class="p">(</span>
+            <span class="n">kep_tmp</span><span class="p">,</span>
+            <span class="n">mu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">),</span>
+            <span class="n">degrees</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Orbit.calculate_kepler"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.orbit.Orbit.calculate_kepler.html#pyorb.orbit.Orbit.calculate_kepler">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_kepler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Some cartesian elements not set &quot;</span><span class="si">{self._cart}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">cart_to_kep</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">,</span>
+            <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">),</span>
+            <span class="n">degrees</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;eccentric&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">true_to_eccentric</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> 
+                <span class="n">degrees</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span> 
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">true_to_mean</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> 
+                <span class="n">degrees</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span> 
+            <span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">r</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+    <span class="nd">@r</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">r</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">v</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+    <span class="nd">@v</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">v</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span> <span class="o">=</span> <span class="n">value</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cartesian</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="nd">@cartesian</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">cartesian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span> <span class="o">=</span> <span class="n">value</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nd">@x</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="nd">@y</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">z</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="nd">@z</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="nd">@vx</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">vx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+    <span class="nd">@vy</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">vy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+    <span class="nd">@vz</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">vz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cart</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">kepler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="nd">@kepler</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">kepler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__kep_calculated</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span> <span class="o">=</span> <span class="n">value</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">a</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nd">@a</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">e</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="nd">@e</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">e</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">i</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="nd">@i</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">i</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">omega</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="nd">@omega</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">omega</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Omega</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+    <span class="nd">@Omega</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">Omega</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">anom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+    <span class="nd">@anom</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">anom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+
+<div class="viewcode-block" id="Orbit.calc_true_anomaly"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.orbit.Orbit.calc_true_anomaly.html#pyorb.orbit.Orbit.calc_true_anomaly">[docs]</a>    <span class="k">def</span> <span class="nf">calc_true_anomaly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;eccentric&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_true_anomaly</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">eccentric_to_true</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">anom</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> 
+                <span class="n">degrees</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_true_anomaly</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">mean_to_true</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">anom</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span>
+                <span class="n">tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span>
+                <span class="n">degrees</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_true_anomaly</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">anom</span></div>
+
+
+<div class="viewcode-block" id="Orbit.calc_mean_anomaly"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.orbit.Orbit.calc_mean_anomaly.html#pyorb.orbit.Orbit.calc_mean_anomaly">[docs]</a>    <span class="k">def</span> <span class="nf">calc_mean_anomaly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;eccentric&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mean_anomaly</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">eccentric_to_mean</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">anom</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> 
+                <span class="n">degrees</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mean_anomaly</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">true_to_mean</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">anom</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span>
+                <span class="n">degrees</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mean_anomaly</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">anom</span></div>
+
+
+
+<div class="viewcode-block" id="Orbit.calc_eccentric_anomaly"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.orbit.Orbit.calc_eccentric_anomaly.html#pyorb.orbit.Orbit.calc_eccentric_anomaly">[docs]</a>    <span class="k">def</span> <span class="nf">calc_eccentric_anomaly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eccentric_anomaly</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">mean_to_eccentric</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">anom</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span>
+                <span class="n">tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span>
+                <span class="n">degrees</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eccentric_anomaly</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">true_to_eccentric</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">anom</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span>
+                <span class="n">degrees</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eccentric_anomaly</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">anom</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">eccentric_anomaly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Eccentric Anomaly</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;eccentric&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">anom</span>
+
+        <span class="c1">#save it as a local variable to allow speedy get in case someone </span>
+        <span class="c1">#wants to repeatedly access the value without recalculation</span>
+        <span class="c1">#</span>
+        <span class="c1">#But then its on the users head if something changes since this does </span>
+        <span class="c1">#not get updated until someone calls calc_eccentric_anomaly</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_eccentric_anomaly</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eccentric_anomaly</span>
+
+    <span class="nd">@eccentric_anomaly</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">eccentric_anomaly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;eccentric&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">anom</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">anom</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">eccentric_to_true</span><span class="p">(</span>
+                <span class="n">value</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> 
+                <span class="n">degrees</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span> 
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">anom</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">eccentric_to_mean</span><span class="p">(</span>
+                <span class="n">value</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> 
+                <span class="n">degrees</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span> 
+            <span class="p">)</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">true_anomaly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;true Anomaly</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">anom</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_true_anomaly</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_true_anomaly</span>
+
+    <span class="nd">@true_anomaly</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">true_anomaly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">anom</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;eccentric&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">anom</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">true_to_eccentric</span><span class="p">(</span>
+                <span class="n">value</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> 
+                <span class="n">degrees</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span> 
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">anom</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">true_to_mean</span><span class="p">(</span>
+                <span class="n">value</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> 
+                <span class="n">degrees</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span> 
+            <span class="p">)</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">period</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Orbital period</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kep_check</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">functions</span><span class="o">.</span><span class="n">orbital_period</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">))</span>
+
+    <span class="nd">@period</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">period</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">semi_major_axis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">))</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Orbital speed</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cart_calculated</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">functions</span><span class="o">.</span><span class="n">orbital_speed</span><span class="p">(</span>
+                <span class="n">functions</span><span class="o">.</span><span class="n">elliptic_radius</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">eccentric_anomaly</span><span class="p">,</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span> 
+                    <span class="n">degrees</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
+                <span class="p">),</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+
+    <span class="nd">@speed</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">*=</span> <span class="n">value</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mean_anomaly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Mean Anomaly</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">anom</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_mean_anomaly</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mean_anomaly</span>
+
+    <span class="nd">@mean_anomaly</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">mean_anomaly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">anom</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">anom</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">mean_to_true</span><span class="p">(</span>
+                <span class="n">value</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span>
+                <span class="n">tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span>
+                <span class="n">degrees</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;eccentric&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">anom</span> <span class="o">=</span> <span class="n">functions</span><span class="o">.</span><span class="n">mean_to_eccentric</span><span class="p">(</span>
+                <span class="n">value</span><span class="p">,</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">,</span>
+                <span class="n">tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span>
+                <span class="n">degrees</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
+            <span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PyOrb 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pyorb.orbit</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020-2020, Daniel Kastinen.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.0.
+    </div>
+  </body>
+</html>
