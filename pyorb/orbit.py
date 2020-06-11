@@ -45,6 +45,14 @@ class Orbit:
         self.__kep_calculated = False
     
 
+    def __str__(self):
+        str_  = '\n'.join([
+            f'{kkey:<5}: {kval:<.4e}   {ckey:<2}: {cval:<.4e}' 
+            for kval, kkey, cval, ckey in 
+            zip(self._kep, Orbit.KEPLER, self._cart, Orbit.CARTESIAN)
+        ])
+        return str_
+
     def _cart_check(self):
         if not self.__cart_calculated:
             self.calculate_cartesian()
@@ -163,6 +171,26 @@ class Orbit:
                 degrees = self.degrees, 
             )
 
+
+    @property
+    def r(self):
+        self._cart_check()
+        return self._cart[:3]
+    @r.setter
+    def r(self, value):
+        self.__kep_calculated = False
+        self.__cart_calculated = True
+        self._cart[:3] = value
+
+    @property
+    def v(self):
+        self._cart_check()
+        return self._cart[3:]
+    @v.setter
+    def v(self, value):
+        self.__kep_calculated = False
+        self.__cart_calculated = True
+        self._cart[3:] = value
 
 
     @property
@@ -420,6 +448,41 @@ class Orbit:
                 self.e, 
                 degrees = self.degrees, 
             )
+
+
+    @property
+    def period(self):
+        '''Orbital period
+        '''
+        self._kep_check()
+        return functions.orbital_period(self.a, self.G*(self.M0 + self.m))
+
+    @period.setter
+    def period(self):
+        self.a = functions.semi_major_axis(self.period, self.G*(self.M0 + self.m))
+
+
+    @property
+    def speed(self):
+        '''Orbital speed
+        '''
+        if not self.__cart_calculated:
+            return functions.orbital_speed(
+                functions.elliptic_radius(
+                    self.eccentric_anomaly, 
+                    self.a, 
+                    self.e, 
+                    degrees=self.degrees,
+                ), 
+                self.a, 
+                self.G*(self.M0 + self.m),
+            )
+        else:
+            return np.linalg.norm(self.v)
+
+    @speed.setter
+    def speed(self, value):
+        self.v *= value/np.linalg.norm(self.v)
 
 
     @property
