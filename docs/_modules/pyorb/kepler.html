@@ -1,0 +1,885 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pyorb.kepler &#8212; PyOrb 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PyOrb 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pyorb.kepler</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyorb.kepler</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="sd">&#39;&#39;&#39;Functions related to Keplerian orbital elements.</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1">#Python standard import</span>
+
+
+<span class="c1">#Third party import</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<span class="c1">#Local import</span>
+
+
+
+<span class="n">G</span> <span class="o">=</span> <span class="mf">6.6743e-11</span>
+<span class="sd">&#39;&#39;&#39;float: Newtons gravitational constant [m^3 kg^-1 s^-2]</span>
+
+<span class="sd">**Reference**: NIST - http://physics.nist.gov/cgi-bin/cuu/Value?bg</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="n">AU</span> <span class="o">=</span> <span class="mf">1.495978707e11</span>
+<span class="sd">&#39;&#39;&#39;float: Astronomical Unit [m]</span>
+
+<span class="sd">The mean distance between the sun and the earth as defined in &quot;International Astronomical Union, 31 August 2012&quot;</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<span class="n">M_earth</span> <span class="o">=</span> <span class="mf">398600.5e9</span><span class="o">/</span><span class="n">G</span>
+<span class="sd">&#39;&#39;&#39;float: Mass of the Earth using the WGS84 convention [kg]</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="n">M_sol</span> <span class="o">=</span> <span class="mf">1.98847e30</span>
+<span class="sd">&quot;&quot;&quot;float: The mass of the sun :math:`M_\odot` given in kg</span>
+
+<span class="sd">**Reference**: The Astronomical Almanac - http://asa.usno.navy.mil/static/files/2014/Astronomical_Constants_2014.pdf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">e_lim</span> <span class="o">=</span> <span class="mf">1e-9</span>
+<span class="sd">&quot;&quot;&quot;float: The limit on eccentricity below witch an orbit is considered circular</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">i_lim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mf">1e-9</span>
+<span class="sd">&quot;&quot;&quot;float: The limit on inclination in radians below witch an orbit is considered not inclined</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+
+<div class="viewcode-block" id="cart_to_kep"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.cart_to_kep.html#pyorb.kepler.cart_to_kep">[docs]</a><span class="k">def</span> <span class="nf">cart_to_kep</span><span class="p">(</span><span class="n">cart</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">M_sol</span><span class="o">*</span><span class="n">G</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Converts set of Cartesian state vectors to set of Keplerian orbital elements.</span>
+
+<span class="sd">    **Units:**</span>
+<span class="sd">       Using default :code:`mu`, all variables are in `SI Units &lt;https://www.nist.gov/pml/weights-and-measures/metric-si/si-units&gt;`_</span>
+
+<span class="sd">       If a standard gravitational parameter :code:`mu` is given in other units, all other input variables should also use the same unit system.</span>
+
+<span class="sd">       Angles are by default given as radians, all angles are radians internally in functions, input and output angles can be both radians and degrees depending on the :code:`degrees` boolean.</span>
+
+<span class="sd">    **Orientation of the ellipse in the coordinate system:**</span>
+<span class="sd">       * For zero inclination :math:`i`: the ellipse is located in the x-y plane.</span>
+<span class="sd">       * The direction of motion as True anoamly :math:`\\nu`: increases for a zero inclination :math:`i`: orbit is anti-coockwise, i.e. from +x towards +y.</span>
+<span class="sd">       * If the eccentricity :math:`e`: is increased, the periapsis will lie in +x direction.</span>
+<span class="sd">       * If the inclination :math:`i`: is increased, the ellipse will rotate around the x-axis, so that +y is rotated toward +z.</span>
+<span class="sd">       * An increase in Longitude of ascending node :math:`\Omega`: corresponds to a rotation around the z-axis so that +x is rotated toward +y.</span>
+<span class="sd">       * Changing argument of perihelion :math:`\omega`: will not change the plane of the orbit, it will rotate the orbit in the plane.</span>
+<span class="sd">       * The periapsis is shifted in the direction of motion.</span>
+<span class="sd">       * True anomaly measures from the +x axis, i.e :math:`\\nu = 0` is located at periapsis and :math:`\\nu = \pi` at apoapsis.</span>
+<span class="sd">       * All anomalies and orientation angles reach between 0 and :math:`2\pi`</span>
+
+<span class="sd">       *Reference:* &quot;Orbital Motion&quot; by A.E. Roy.</span>
+<span class="sd">    </span>
+
+<span class="sd">    **Constants:**</span>
+<span class="sd">       * :mod:`~pyorb.kepler.e_lim`: Used to determine circular orbits</span>
+<span class="sd">       * :mod:`~pyorb.kepler.i_lim`: Used to determine non-inclined orbits</span>
+
+
+<span class="sd">    **Variables:**</span>
+<span class="sd">       * :math:`a`: Semi-major axis</span>
+<span class="sd">       * :math:`e`: Eccentricity</span>
+<span class="sd">       * :math:`i`: Inclination</span>
+<span class="sd">       * :math:`\omega`: Argument of perihelion</span>
+<span class="sd">       * :math:`\Omega`: Longitude of ascending node</span>
+<span class="sd">       * :math:`\\nu`: True anomaly</span>
+
+
+<span class="sd">    :param numpy.ndarray cart: Cartesian state vectors where rows 1-6 correspond to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`, :math:`v_y`, :math:`v_z` and columns correspond to different objects.</span>
+<span class="sd">    :param float/numpy.ndarray mu: Standard gravitational parameter of objects. If `mu` is a numpy vector, the element corresponding to each column of `cart` will be used for its element calculation, Default value is in SI units a massless object orbiting the Sun.</span>
+<span class="sd">    :param bool degrees: If `true`, degrees are used. Else all angles are given in radians.</span>
+
+<span class="sd">    :return: Keplerian orbital elements where rows 1-6 correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\omega`, :math:`\Omega`, :math:`\\nu` and columns correspond to different objects.</span>
+<span class="sd">    :rtype: numpy.ndarray</span>
+
+<span class="sd">    **Example:**</span>
+<span class="sd">       </span>
+<span class="sd">       Convert wat</span>
+
+<span class="sd">       .. code-block:: python</span>
+
+<span class="sd">          import bla</span>
+
+
+<span class="sd">    *Reference:* Daniel Kastinen Master Thesis: Meteors and Celestial Dynamics</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cart</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input type </span><span class="si">{}</span><span class="s1"> not supported: must be </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span><span class="n">cart</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">))</span>
+    <span class="k">if</span> <span class="n">cart</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input data must have at least 6 variables along axis 0: input shape is </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cart</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">input_is_vector</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cart</span><span class="o">.</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error </span><span class="si">{}</span><span class="s1"> while trying to cast vector into single column.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Input array shape: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cart</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+            <span class="k">raise</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">input_is_vector</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">ez</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">cart</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">ex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">cart</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    
+    <span class="n">o</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">cart</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">cart</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">iter_n</span> <span class="o">=</span> <span class="n">cart</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">cart</span><span class="p">[:</span><span class="mi">3</span><span class="p">,:]</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">cart</span><span class="p">[</span><span class="mi">3</span><span class="p">:,:]</span>
+    <span class="n">rn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">vn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">vr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="p">(</span><span class="n">r</span><span class="o">/</span><span class="n">rn</span><span class="p">)</span><span class="o">*</span><span class="n">v</span> <span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="n">vn</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="mf">0.5</span> <span class="o">-</span> <span class="n">mu</span><span class="o">/</span><span class="n">rn</span>
+
+    <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">=</span> <span class="o">-</span><span class="n">mu</span><span class="o">/</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">epsilon</span><span class="p">)</span>
+
+    <span class="n">e</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">mu</span><span class="o">*</span><span class="p">((</span><span class="n">vn</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">mu</span><span class="o">/</span><span class="n">rn</span><span class="p">)</span><span class="o">*</span><span class="n">r</span> <span class="o">-</span> <span class="p">(</span><span class="n">rn</span><span class="o">*</span><span class="n">vr</span><span class="p">)</span><span class="o">*</span><span class="n">v</span><span class="p">)</span>
+    <span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1">#could implement this with nditers?</span>
+    <span class="c1">#np.nditer(a, flags=[&#39;external_loop&#39;], order=&#39;F&#39;)</span>
+
+    <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iter_n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">ind</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">ind</span><span class="p">]</span>
+
+        <span class="n">h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span> <span class="n">r</span><span class="p">[:,</span> <span class="n">ind</span><span class="p">],</span> <span class="n">v</span><span class="p">[:,</span> <span class="n">ind</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">hn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="n">inc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="n">hn</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">inc</span> <span class="o">&lt;</span> <span class="n">i_lim</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">ex</span>
+            <span class="n">nn</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">ez</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+            <span class="n">nn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">inc</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">i_lim</span><span class="p">:</span>
+            <span class="n">asc_node</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">elif</span> <span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">asc_node</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">nn</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">asc_node</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">nn</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="n">ind</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">e_lim</span><span class="p">:</span>
+            <span class="n">omega</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tmp_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">e</span><span class="p">[:,</span> <span class="n">ind</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">nn</span><span class="o">*</span><span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">ind</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">tmp_ratio</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+                <span class="n">tmp_ratio</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="k">elif</span> <span class="n">tmp_ratio</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">:</span>
+                <span class="n">tmp_ratio</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+
+            <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="n">ind</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="n">omega</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">tmp_ratio</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">omega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">tmp_ratio</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">ind</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">e_lim</span><span class="p">:</span>
+            <span class="n">tmp_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">e</span><span class="p">[:,</span><span class="n">ind</span><span class="p">]</span><span class="o">*</span><span class="n">r</span><span class="p">[:,</span><span class="n">ind</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">ind</span><span class="p">]</span><span class="o">*</span><span class="n">rn</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">tmp_ratio</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+                <span class="n">tmp_ratio</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="k">elif</span> <span class="n">tmp_ratio</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">:</span>
+                <span class="n">tmp_ratio</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+
+            <span class="k">if</span> <span class="n">vr</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="n">nu</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">tmp_ratio</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">nu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">tmp_ratio</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tmp_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">n</span><span class="o">/</span><span class="n">nn</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">r</span><span class="p">[:,</span><span class="n">ind</span><span class="p">]</span><span class="o">/</span><span class="n">rn</span><span class="p">[</span><span class="n">ind</span><span class="p">]),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">tmp_ratio</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+                <span class="n">tmp_ratio</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="k">elif</span> <span class="n">tmp_ratio</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">:</span>
+                <span class="n">tmp_ratio</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+            <span class="n">nu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">tmp_ratio</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="n">ind</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">inc</span> <span class="o">&gt;=</span> <span class="n">i_lim</span><span class="p">)</span> <span class="ow">or</span> \
+                    <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="n">ind</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">inc</span> <span class="o">&lt;</span> <span class="n">i_lim</span><span class="p">):</span>
+                <span class="n">nu</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">nu</span>
+
+        <span class="n">o</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">inc</span>
+        <span class="n">o</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">omega</span>
+        <span class="n">o</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">asc_node</span>
+        <span class="n">o</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">nu</span>
+
+    <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="n">o</span><span class="p">[</span><span class="mi">2</span><span class="p">:,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">2</span><span class="p">:,:])</span>
+
+    <span class="k">if</span> <span class="n">input_is_vector</span><span class="p">:</span>
+        <span class="n">cart</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">6</span><span class="p">,)</span>
+        <span class="n">o</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">6</span><span class="p">,)</span>
+
+    <span class="k">return</span> <span class="n">o</span></div>
+
+
+<div class="viewcode-block" id="true_to_eccentric"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.true_to_eccentric.html#pyorb.kepler.true_to_eccentric">[docs]</a><span class="k">def</span> <span class="nf">true_to_eccentric</span><span class="p">(</span><span class="n">nu</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Calculates the eccentric anomaly from the true anomaly.</span>
+
+<span class="sd">    :param float/numpy.ndarray nu: True anomaly.</span>
+<span class="sd">    :param float/numpy.ndarray e: Eccentricity of ellipse.</span>
+<span class="sd">    :param bool degrees: If true degrees are used, else all angles are given in radians</span>
+
+<span class="sd">    :return: Eccentric anomaly.</span>
+<span class="sd">    :rtype: numpy.ndarray or float</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="n">_nu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">nu</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_nu</span> <span class="o">=</span> <span class="n">nu</span>
+
+    <span class="n">E</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">e</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">e</span><span class="p">)</span> <span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">_nu</span><span class="o">*</span><span class="mf">0.5</span><span class="p">)</span> <span class="p">)</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">E</span> <span class="o">+</span> <span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">E</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">E</span></div>
+
+
+<div class="viewcode-block" id="eccentric_to_true"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.eccentric_to_true.html#pyorb.kepler.eccentric_to_true">[docs]</a><span class="k">def</span> <span class="nf">eccentric_to_true</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Calculates the true anomaly from the eccentric anomaly.</span>
+
+<span class="sd">    :param float/numpy.ndarray E: Eccentric anomaly.</span>
+<span class="sd">    :param float/numpy.ndarray e: Eccentricity of ellipse.</span>
+<span class="sd">    :param bool degrees: If true degrees are used, else all angles are given in radians</span>
+
+<span class="sd">    :return: True anomaly.</span>
+<span class="sd">    :rtype: numpy.ndarray or float</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="n">_E</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">E</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_E</span> <span class="o">=</span> <span class="n">E</span>
+
+    <span class="n">nu</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">e</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">e</span><span class="p">)</span> <span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">_E</span><span class="o">*</span><span class="mf">0.5</span><span class="p">)</span> <span class="p">)</span>
+    <span class="n">nu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">nu</span> <span class="o">+</span> <span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="n">nu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">nu</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">nu</span></div>
+
+
+<div class="viewcode-block" id="eccentric_to_mean"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.eccentric_to_mean.html#pyorb.kepler.eccentric_to_mean">[docs]</a><span class="k">def</span> <span class="nf">eccentric_to_mean</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Calculates the mean anomaly from the eccentric anomaly using Kepler equation.</span>
+
+<span class="sd">    :param float/numpy.ndarray E: Eccentric anomaly.</span>
+<span class="sd">    :param float/numpy.ndarray e: Eccentricity of ellipse.</span>
+<span class="sd">    :param bool degrees: If true degrees are used, else all angles are given in radians</span>
+
+<span class="sd">    :return: Mean anomaly.</span>
+<span class="sd">    :rtype: numpy.ndarray or float</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="n">_E</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">E</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_E</span> <span class="o">=</span> <span class="n">E</span>
+
+    <span class="n">M</span> <span class="o">=</span> <span class="n">_E</span> <span class="o">-</span> <span class="n">e</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">_E</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">M</span></div>
+
+
+<div class="viewcode-block" id="true_to_mean"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.true_to_mean.html#pyorb.kepler.true_to_mean">[docs]</a><span class="k">def</span> <span class="nf">true_to_mean</span><span class="p">(</span><span class="n">nu</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Transforms true anomaly to mean anomaly.</span>
+<span class="sd">    </span>
+<span class="sd">    **Uses:**</span>
+<span class="sd">       * :func:`~pyorb.kepler.true_to_eccentric`</span>
+<span class="sd">       * :func:`~pyorb.kepler.eccentric_to_mean`</span>
+
+<span class="sd">    :param float/numpy.ndarray nu: True anomaly.</span>
+<span class="sd">    :param float/numpy.ndarray e: Eccentricity of ellipse.</span>
+<span class="sd">    :param bool degrees: If true degrees are used, else all angles are given in radians</span>
+<span class="sd">    </span>
+<span class="sd">    :return: Mean anomaly.</span>
+<span class="sd">    :rtype: numpy.ndarray or float</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="n">_nu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">nu</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_nu</span> <span class="o">=</span> <span class="n">nu</span>
+
+    <span class="n">E</span> <span class="o">=</span> <span class="n">true_to_eccentric</span><span class="p">(</span><span class="n">_nu</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">eccentric_to_mean</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">M</span></div>
+
+
+<div class="viewcode-block" id="elliptic_radius"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.elliptic_radius.html#pyorb.kepler.elliptic_radius">[docs]</a><span class="k">def</span> <span class="nf">elliptic_radius</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Calculates the distance between the left focus point of an ellipse and a point on the ellipse defined by the eccentric anomaly.</span>
+
+<span class="sd">    :param float/numpy.ndarray E: Eccentric anomaly.</span>
+<span class="sd">    :param float/numpy.ndarray a: Semi-major axis of ellipse.</span>
+<span class="sd">    :param float/numpy.ndarray e: Eccentricity of ellipse.</span>
+<span class="sd">    :param bool degrees: If true degrees are used, else all angles are given in radians</span>
+<span class="sd">    </span>
+<span class="sd">    :return: Radius from left focus point.</span>
+<span class="sd">    :rtype: numpy.ndarray or float</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="n">_E</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">E</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_E</span> <span class="o">=</span> <span class="n">E</span>
+
+    <span class="k">return</span> <span class="n">a</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">e</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span> <span class="n">_E</span> <span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="rot_mat_z"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.rot_mat_z.html#pyorb.kepler.rot_mat_z">[docs]</a><span class="k">def</span> <span class="nf">rot_mat_z</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Generates the 3D transformation matrix for rotation around Z-axis.</span>
+<span class="sd">    </span>
+<span class="sd">    :param float theta: Angle to rotate.</span>
+<span class="sd">    :param numpy.dtype dtype: The data-type of the output matrix.</span>
+
+<span class="sd">    :return: Rotation matrix</span>
+<span class="sd">    :rtype: (3,3) numpy.ndarray</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">R</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">R</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">R</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">R</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">R</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">return</span> <span class="n">R</span></div>
+
+
+<div class="viewcode-block" id="rot_mat_x"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.rot_mat_x.html#pyorb.kepler.rot_mat_x">[docs]</a><span class="k">def</span> <span class="nf">rot_mat_x</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Generates the 3D transformation matrix for rotation around X-axis.</span>
+<span class="sd">    </span>
+<span class="sd">    :param float theta: Angle to rotate.</span>
+<span class="sd">    :param numpy.dtype dtype: The data-type of the output matrix.</span>
+
+<span class="sd">    :return: Rotation matrix</span>
+<span class="sd">    :rtype: (3,3) numpy.ndarray</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">R</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">R</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">R</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">R</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">R</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">return</span> <span class="n">R</span></div>
+
+
+<div class="viewcode-block" id="rot_mat_y"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.rot_mat_y.html#pyorb.kepler.rot_mat_y">[docs]</a><span class="k">def</span> <span class="nf">rot_mat_y</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Generates the 3D transformation matrix for rotation around Y-axis.</span>
+<span class="sd">    </span>
+<span class="sd">    :param float theta: Angle to rotate.</span>
+<span class="sd">    :param numpy.dtype dtype: The data-type of the output matrix.</span>
+
+<span class="sd">    :return: Rotation matrix</span>
+<span class="sd">    :rtype: (3,3) numpy.ndarray</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">R</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">R</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">R</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">R</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">R</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">return</span> <span class="n">R</span></div>
+
+
+
+<div class="viewcode-block" id="laguerre_solve_kepler"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.laguerre_solve_kepler.html#pyorb.kepler.laguerre_solve_kepler">[docs]</a><span class="k">def</span> <span class="nf">laguerre_solve_kepler</span><span class="p">(</span><span class="n">E0</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Solve the Kepler equation using the The Laguerre Algorithm, a algorithm that guarantees global convergence.</span>
+<span class="sd">    Adjusted for solving only real roots (non-hyperbolic orbits)</span>
+<span class="sd">    </span>
+<span class="sd">    Absolute numerical tolerance is defined as :math:`|f(E)| &lt; tol` where :math:`f(E) = M - E + e \sin(E)`.</span>
+
+<span class="sd">    # TODO: implement hyperbolic solving.</span>
+
+<span class="sd">    *Note:* Choice of polynomial degree does not matter significantly for convergence rate.</span>
+
+<span class="sd">    :param float M: Initial guess for eccentric anomaly.</span>
+<span class="sd">    :param float M: Mean anomaly.</span>
+<span class="sd">    :param float e: Eccentricity of ellipse.</span>
+<span class="sd">    :param float tol: Absolute numerical tolerance eccentric anomaly.</span>
+<span class="sd">    :param int degree: Polynomial degree in derivation of Laguerre Algorithm.</span>
+<span class="sd">    :return: Eccentric anomaly and number of iterations.</span>
+<span class="sd">    :rtype: tuple of (float, int)</span>
+
+<span class="sd">    *Reference:* Conway, B. A. (1986). An improved algorithm due to Laguerre for the solution of Kepler&#39;s equation. Celestial mechanics, 39(2), 199-211.</span>
+
+<span class="sd">    **Example:**</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">       import pyorb.kepler as pykep</span>
+<span class="sd">       M = 3.14</span>
+<span class="sd">       e = 0.8</span>
+<span class="sd">       </span>
+<span class="sd">       #Use mean anomaly as initial guess</span>
+<span class="sd">       E, iterations = pykep.laguerre_solve_kepler(</span>
+<span class="sd">          E0 = M,</span>
+<span class="sd">          M = M,</span>
+<span class="sd">          e = e,</span>
+<span class="sd">          tol = 1e-12,</span>
+<span class="sd">       )</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">degree</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">degree</span><span class="p">)</span>
+
+    <span class="n">_f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">E</span><span class="p">:</span> <span class="n">M</span> <span class="o">-</span> <span class="n">E</span> <span class="o">+</span> <span class="n">e</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">E</span><span class="p">)</span>
+    <span class="n">_fp</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">E</span><span class="p">:</span> <span class="n">e</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">E</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span>
+    <span class="n">_fpp</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">E</span><span class="p">:</span> <span class="o">-</span><span class="n">e</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">E</span><span class="p">)</span>
+
+    <span class="n">E</span> <span class="o">=</span> <span class="n">E0</span>
+
+    <span class="n">f_eval</span> <span class="o">=</span> <span class="n">_f</span><span class="p">(</span><span class="n">E</span><span class="p">)</span>
+
+    <span class="n">it_num</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">while</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">f_eval</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">tol</span><span class="p">:</span>
+        <span class="n">it_num</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">fp_eval</span> <span class="o">=</span> <span class="n">_fp</span><span class="p">(</span><span class="n">E</span><span class="p">)</span>
+
+        <span class="n">sqrt_term</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">degree</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">fp_eval</span><span class="o">**</span><span class="mi">2</span>
+            <span class="o">-</span> <span class="n">degree</span><span class="o">*</span><span class="p">(</span><span class="n">degree</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span><span class="o">*</span><span class="n">f_eval</span><span class="o">*</span><span class="n">_fpp</span><span class="p">(</span><span class="n">E</span><span class="p">)</span>
+        <span class="p">))</span>
+
+        <span class="n">denom_p</span> <span class="o">=</span> <span class="n">fp_eval</span> <span class="o">+</span> <span class="n">sqrt_term</span>
+        <span class="n">denom_m</span> <span class="o">=</span> <span class="n">fp_eval</span> <span class="o">-</span> <span class="n">sqrt_term</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">denom_p</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">denom_m</span><span class="p">):</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">degree</span><span class="o">*</span><span class="n">f_eval</span><span class="o">/</span><span class="n">denom_p</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">degree</span><span class="o">*</span><span class="n">f_eval</span><span class="o">/</span><span class="n">denom_m</span>
+
+        <span class="n">E</span> <span class="o">=</span> <span class="n">E</span> <span class="o">-</span> <span class="n">delta</span>
+
+        <span class="n">f_eval</span> <span class="o">=</span> <span class="n">_f</span><span class="p">(</span><span class="n">E</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">E</span><span class="p">,</span> <span class="n">it_num</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_kepler_guess</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;The different initial guesses for solving the Kepler equation based on input mean anomaly</span>
+<span class="sd">    </span>
+<span class="sd">    :param float M: Mean anomaly in radians.</span>
+<span class="sd">    :param float e: Eccentricity of ellipse.</span>
+<span class="sd">    :return: Guess for eccentric anomaly in radians.</span>
+<span class="sd">    :rtype: float</span>
+
+<span class="sd">    Reference: Esmaelzadeh, R., &amp; Ghadiri, H. (2014). Appropriate starter for solving the Kepler&#39;s equation. International Journal of Computer Applications, 89(7).</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">M</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">:</span>
+        <span class="n">_M</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">M</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_M</span> <span class="o">=</span> <span class="n">M</span>
+
+    <span class="k">if</span> <span class="n">_M</span> <span class="o">&lt;</span> <span class="mf">0.25</span><span class="p">:</span>
+        <span class="n">E0</span> <span class="o">=</span> <span class="n">_M</span> <span class="o">+</span> <span class="n">e</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">_M</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">_M</span> <span class="o">+</span> <span class="n">e</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">_M</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">_M</span> <span class="o">&lt;</span> <span class="mf">2.0</span><span class="p">:</span>
+        <span class="n">E0</span> <span class="o">=</span> <span class="n">_M</span> <span class="o">+</span> <span class="n">e</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">E0</span> <span class="o">=</span> <span class="n">_M</span> <span class="o">+</span> <span class="p">(</span><span class="n">e</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">_M</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">e</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">M</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">:</span>
+        <span class="n">E0</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">E0</span>
+
+    <span class="k">return</span> <span class="n">E0</span>
+
+
+<div class="viewcode-block" id="kepler_guess"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.kepler_guess.html#pyorb.kepler.kepler_guess">[docs]</a><span class="k">def</span> <span class="nf">kepler_guess</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Guess the initial iteration point for newtons method.</span>
+<span class="sd">    </span>
+<span class="sd">    :param float/numpy.ndarray M: Mean anomaly in radians.</span>
+<span class="sd">    :param float/numpy.ndarray e: Eccentricity of ellipse.</span>
+<span class="sd">    :return: Guess for eccentric anomaly in radians.</span>
+<span class="sd">    :rtype: numpy.ndarray or float</span>
+
+<span class="sd">    *Reference:* Esmaelzadeh, R., &amp; Ghadiri, H. (2014). Appropriate starter for solving the Kepler&#39;s equation. International Journal of Computer Applications, 89(7).</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">*</span><span class="n">M</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">M</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">M</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">*</span><span class="n">e</span>
+        <span class="k">if</span> <span class="n">M</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">e</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input dimensions does not agree&#39;</span><span class="p">)</span>
+
+        <span class="n">E0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">M</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">M</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="n">out_it</span> <span class="o">=</span> <span class="n">E0</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">Mit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nditer</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+        <span class="n">eit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nditer</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="n">Eit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nditer</span><span class="p">(</span><span class="n">E0</span><span class="p">,</span> <span class="n">op_flags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;readwrite&#39;</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">out_it</span><span class="p">):</span>
+            <span class="n">Mc</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">Mit</span><span class="p">)</span>
+            <span class="n">ec</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">eit</span><span class="p">)</span>
+            <span class="n">Ec</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">Eit</span><span class="p">)</span>
+
+            <span class="n">E_calc</span> <span class="o">=</span> <span class="n">_get_kepler_guess</span><span class="p">(</span><span class="n">Mc</span><span class="p">,</span> <span class="n">ec</span><span class="p">)</span>
+
+            <span class="n">Ec</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_calc</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">E0</span> <span class="o">=</span> <span class="n">_get_kepler_guess</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">E0</span></div>
+
+
+<div class="viewcode-block" id="mean_to_eccentric"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.mean_to_eccentric.html#pyorb.kepler.mean_to_eccentric">[docs]</a><span class="k">def</span> <span class="nf">mean_to_eccentric</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Calculates the eccentric anomaly from the mean anomaly by solving the Kepler equation.</span>
+
+<span class="sd">    :param float/numpy.ndarray M: Mean anomaly.</span>
+<span class="sd">    :param float/numpy.ndarray e: Eccentricity of ellipse.</span>
+<span class="sd">    :param float tol: Numerical tolerance for solving Keplers equation in units of radians.</span>
+<span class="sd">    :param bool degrees: If true degrees are used, else all angles are given in radians</span>
+<span class="sd">    </span>
+<span class="sd">    :return: True anomaly.</span>
+<span class="sd">    :rtype: numpy.ndarray or float</span>
+
+<span class="sd">    **Uses:**</span>
+<span class="sd">       * :func:`~pyorb.kepler._get_kepler_guess`</span>
+<span class="sd">       * :func:`~pyorb.kepler.laguerre_solve_kepler`</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="n">_M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_M</span> <span class="o">=</span> <span class="n">M</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_M</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_M</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">_M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">*</span><span class="n">_M</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">_M</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">_M</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">*</span><span class="n">e</span>
+        <span class="k">if</span> <span class="n">_M</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">e</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input dimensions does not agree&#39;</span><span class="p">)</span>
+
+
+        <span class="n">E</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">_M</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">_M</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="n">out_it</span> <span class="o">=</span> <span class="n">E</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">Mit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nditer</span><span class="p">(</span><span class="n">_M</span><span class="p">)</span>
+        <span class="n">eit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nditer</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="n">Eit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nditer</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">op_flags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;readwrite&#39;</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">out_it</span><span class="p">):</span>
+            <span class="n">Mc</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">Mit</span><span class="p">)</span>
+            <span class="n">ec</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">eit</span><span class="p">)</span>
+            <span class="n">Ec</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">Eit</span><span class="p">)</span>
+
+            <span class="n">E0</span> <span class="o">=</span> <span class="n">_get_kepler_guess</span><span class="p">(</span><span class="n">Mc</span><span class="p">,</span> <span class="n">ec</span><span class="p">)</span>
+            <span class="n">E_calc</span><span class="p">,</span> <span class="n">it_num</span> <span class="o">=</span> <span class="n">laguerre_solve_kepler</span><span class="p">(</span><span class="n">E0</span><span class="p">,</span> <span class="n">Mc</span><span class="p">,</span> <span class="n">ec</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+
+            <span class="n">Ec</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">E_calc</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">e</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">M</span>
+
+        <span class="n">E0</span> <span class="o">=</span> <span class="n">_get_kepler_guess</span><span class="p">(</span><span class="n">_M</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+        <span class="n">E</span><span class="p">,</span> <span class="n">it_num</span> <span class="o">=</span> <span class="n">laguerre_solve_kepler</span><span class="p">(</span><span class="n">E0</span><span class="p">,</span> <span class="n">_M</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+
+
+    <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">E</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">E</span></div>
+
+
+<div class="viewcode-block" id="mean_to_true"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.mean_to_true.html#pyorb.kepler.mean_to_true">[docs]</a><span class="k">def</span> <span class="nf">mean_to_true</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Transforms mean anomaly to true anomaly.</span>
+<span class="sd">    </span>
+<span class="sd">    **Uses:**</span>
+<span class="sd">       * :func:`~pyorb.kepler.mean_to_eccentric`</span>
+<span class="sd">       * :func:`~pyorb.kepler.eccentric_to_true`</span>
+
+<span class="sd">    :param float/numpy.ndarray M: Mean anomaly.</span>
+<span class="sd">    :param float/numpy.ndarray e: Eccentricity of ellipse.</span>
+<span class="sd">    :param float tol: Numerical tolerance for solving Keplers equation in units of radians.</span>
+<span class="sd">    :param bool degrees: If true degrees are used, else all angles are given in radians</span>
+<span class="sd">    </span>
+<span class="sd">    :return: True anomaly.</span>
+<span class="sd">    :rtype: numpy.ndarray or float</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="n">_M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_M</span> <span class="o">=</span> <span class="n">M</span>
+
+    <span class="n">E</span> <span class="o">=</span> <span class="n">mean_to_eccentric</span><span class="p">(</span><span class="n">_M</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">nu</span> <span class="o">=</span> <span class="n">eccentric_to_true</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="n">nu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">nu</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">nu</span></div>
+
+
+<div class="viewcode-block" id="orbital_speed"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.orbital_speed.html#pyorb.kepler.orbital_speed">[docs]</a><span class="k">def</span> <span class="nf">orbital_speed</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">mu</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Calculates the orbital speed at a given radius for an Keplerian orbit :math:`v = \sqrt{\mu \left (\\frac{2}{r} - \\frac{1}{a} \\right )}`.</span>
+<span class="sd">    </span>
+<span class="sd">    :param float/numpy.ndarray r: Radius from the pericenter.</span>
+<span class="sd">    :param float/numpy.ndarray a: Semi-major axis of ellipse.</span>
+<span class="sd">    :param float mu: Standard gravitation parameter :math:`\mu = G(m_1 + m_2)` of the orbit.</span>
+<span class="sd">    :return: Orbital speed.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mu</span><span class="o">*</span><span class="p">(</span><span class="mf">2.0</span><span class="o">/</span><span class="n">r</span> <span class="o">-</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">a</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="orbital_period"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.orbital_period.html#pyorb.kepler.orbital_period">[docs]</a><span class="k">def</span> <span class="nf">orbital_period</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">mu</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Calculates the orbital period of an Keplerian orbit based on the semi-major axis :math:`P = 2\pi\sqrt{\\frac{a^3}{\mu}}`.</span>
+<span class="sd">    </span>
+<span class="sd">    :param float/numpy.ndarray a: Semi-major axis of ellipse.</span>
+<span class="sd">    :param float mu: Standard gravitation parameter :math:`\mu = G(m_1 + m_2)` of the orbit.</span>
+<span class="sd">    :return: Orbital period.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="o">**</span><span class="mf">3.0</span><span class="o">/</span><span class="n">mu</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="semi_major_axis"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.semi_major_axis.html#pyorb.kepler.semi_major_axis">[docs]</a><span class="k">def</span> <span class="nf">semi_major_axis</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">mu</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Calculates the orbital semi-major axis of an Keplerian orbit based on the orbital period :math:`a = \mu^{\\frac{1}{3}}\left(\\frac{P}{2\pi}\right)^{\\frac{2}{3}}`.</span>
+<span class="sd">    </span>
+<span class="sd">    :param float/numpy.ndarray P: Orbital period</span>
+<span class="sd">    :param float mu: Standard gravitation parameter :math:`\mu = G(m_1 + m_2)` of the orbit.</span>
+<span class="sd">    :return: semi-major axis.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">cbrt</span><span class="p">((</span><span class="n">P</span><span class="o">/</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">mu</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">a</span></div>
+
+
+<div class="viewcode-block" id="kep_to_cart"><a class="viewcode-back" href="../../_autodoc/pyorb/pyorb.kepler.kep_to_cart.html#pyorb.kepler.kep_to_cart">[docs]</a><span class="k">def</span> <span class="nf">kep_to_cart</span><span class="p">(</span><span class="n">kep</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">M_sol</span><span class="o">*</span><span class="n">G</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Converts set of Keplerian orbital elements to set of Cartesian state vectors.</span>
+<span class="sd">    </span>
+<span class="sd">    **Units:**</span>
+<span class="sd">       Using default :code:`mu`, all variables are in `SI Units &lt;https://www.nist.gov/pml/weights-and-measures/metric-si/si-units&gt;`_</span>
+
+<span class="sd">       If a standard gravitational parameter :code:`mu` is given in other units, all other input variables should also use the same unit system.</span>
+
+<span class="sd">       Angles are by default given as radians, all angles are radians internally in functions, input and output angles can be both radians and degrees depending on the :code:`degrees` boolean.</span>
+
+<span class="sd">    **Orientation of the ellipse in the coordinate system:**</span>
+<span class="sd">       * For zero inclination :math:`i`: the ellipse is located in the x-y plane.</span>
+<span class="sd">       * The direction of motion as True anoamly :math:`\\nu`: increases for a zero inclination :math:`i`: orbit is anti-coockwise, i.e. from +x towards +y.</span>
+<span class="sd">       * If the eccentricity :math:`e`: is increased, the periapsis will lie in +x direction.</span>
+<span class="sd">       * If the inclination :math:`i`: is increased, the ellipse will rotate around the x-axis, so that +y is rotated toward +z.</span>
+<span class="sd">       * An increase in Longitude of ascending node :math:`\Omega`: corresponds to a rotation around the z-axis so that +x is rotated toward +y.</span>
+<span class="sd">       * Changing argument of perihelion :math:`\omega`: will not change the plane of the orbit, it will rotate the orbit in the plane.</span>
+<span class="sd">       * The periapsis is shifted in the direction of motion.</span>
+
+<span class="sd">       *Reference:* &quot;Orbital Motion&quot; by A.E. Roy.</span>
+
+<span class="sd">    **Variables:**</span>
+<span class="sd">       * :math:`a`: Semi-major axis</span>
+<span class="sd">       * :math:`e`: Eccentricity</span>
+<span class="sd">       * :math:`i`: Inclination</span>
+<span class="sd">       * :math:`\omega`: Argument of perihelion</span>
+<span class="sd">       * :math:`\Omega`: Longitude of ascending node</span>
+<span class="sd">       * :math:`\\nu`: True anoamly</span>
+
+<span class="sd">    **Uses:**</span>
+<span class="sd">       * :func:`~pyorb.kepler.true_to_eccentric`</span>
+<span class="sd">       * :func:`~pyorb.kepler.elliptic_radius`</span>
+
+<span class="sd">    :param numpy.ndarray kep: Keplerian orbital elements where rows 1-6 correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\omega`, :math:`\Omega`, :math:`\\nu` and columns correspond to different objects.</span>
+<span class="sd">    :param float/numpy.ndarray mu: Standard gravitational parameter of objects. If `mu` is a numpy vector, the element corresponding to each column of `cart` will be used for its element calculation, Default value is in SI units a massless object orbiting the Sun.</span>
+<span class="sd">    :param bool degrees: If `true`, degrees are used. Else all angles are given in radians.</span>
+
+<span class="sd">    :return: Cartesian state vectors where rows 1-6 correspond to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`, :math:`v_y`, :math:`v_z` and columns correspond to different objects.</span>
+<span class="sd">    :rtype: numpy.ndarray</span>
+
+<span class="sd">    **Example:**</span>
+<span class="sd">       </span>
+<span class="sd">       Convert ??</span>
+
+<span class="sd">       .. code-block:: python</span>
+
+<span class="sd">          import pyorb</span>
+
+
+<span class="sd">    *Reference:* Daniel Kastinen Master Thesis: Meteors and Celestial Dynamics, &quot;Orbital Motion&quot; by A.E. Roy.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kep</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input type </span><span class="si">{}</span><span class="s1"> not supported: must be </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span><span class="n">kep</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">))</span>
+    <span class="k">if</span> <span class="n">kep</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Input data must have at least 6 variables along axis 0: input shape is </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kep</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kep</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">input_is_vector</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">kep</span><span class="o">.</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error </span><span class="si">{}</span><span class="s1"> while trying to cast vector into single column.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Input array shape: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kep</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+            <span class="k">raise</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">input_is_vector</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">kep</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">kep</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+        <span class="n">kep</span><span class="p">[</span><span class="mi">2</span><span class="p">:,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">kep</span><span class="p">[</span><span class="mi">2</span><span class="p">:,:])</span>
+
+    <span class="n">nu</span> <span class="o">=</span> <span class="n">kep</span><span class="p">[</span><span class="mi">5</span><span class="p">,:]</span>
+    <span class="n">omega</span> <span class="o">=</span> <span class="n">kep</span><span class="p">[</span><span class="mi">3</span><span class="p">,:]</span>
+    <span class="n">asc_node</span> <span class="o">=</span> <span class="n">kep</span><span class="p">[</span><span class="mi">4</span><span class="p">,:]</span>
+    <span class="n">inc</span> <span class="o">=</span> <span class="n">kep</span><span class="p">[</span><span class="mi">2</span><span class="p">,:]</span>
+    <span class="n">wf</span> <span class="o">=</span> <span class="n">nu</span> <span class="o">+</span> <span class="n">omega</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">kep</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">kep</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span>
+
+    <span class="n">Ecc</span> <span class="o">=</span> <span class="n">true_to_eccentric</span><span class="p">(</span><span class="n">nu</span><span class="p">,</span><span class="n">e</span><span class="p">,</span><span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">rn</span> <span class="o">=</span> <span class="n">elliptic_radius</span><span class="p">(</span><span class="n">Ecc</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">e</span><span class="p">,</span><span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">kep</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">kep</span><span class="o">.</span><span class="n">dtype</span> <span class="p">)</span>
+    <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">wf</span><span class="p">)</span>
+    <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">wf</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">rn</span><span class="o">*</span><span class="n">r</span>
+
+    <span class="n">cos_Omega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">asc_node</span><span class="p">)</span>
+    <span class="n">sin_Omega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">asc_node</span><span class="p">)</span>
+    <span class="n">cos_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">inc</span><span class="p">)</span>
+    <span class="n">sin_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">inc</span><span class="p">)</span>
+    <span class="n">cos_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">omega</span><span class="p">)</span>
+    <span class="n">sin_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">omega</span><span class="p">)</span>
+
+    <span class="c1">#order is important not to change variables before they are used</span>
+    <span class="n">x_tmp</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span><span class="o">*</span><span class="n">sin_i</span>
+    <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">cos_Omega</span><span class="o">*</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">-</span> <span class="n">sin_Omega</span><span class="o">*</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span><span class="o">*</span><span class="n">cos_i</span>
+    <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">sin_Omega</span><span class="o">*</span><span class="n">x_tmp</span>  <span class="o">+</span> <span class="n">cos_Omega</span><span class="o">*</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span><span class="o">*</span><span class="n">cos_i</span>
+
+    <span class="n">l1</span> <span class="o">=</span> <span class="n">cos_Omega</span><span class="o">*</span><span class="n">cos_w</span> <span class="o">-</span> <span class="n">sin_Omega</span><span class="o">*</span><span class="n">sin_w</span><span class="o">*</span><span class="n">cos_i</span>
+    <span class="n">l2</span> <span class="o">=</span> <span class="o">-</span><span class="n">cos_Omega</span><span class="o">*</span><span class="n">sin_w</span> <span class="o">-</span> <span class="n">sin_Omega</span><span class="o">*</span><span class="n">cos_w</span><span class="o">*</span><span class="n">cos_i</span>
+    <span class="n">m1</span> <span class="o">=</span> <span class="n">sin_Omega</span><span class="o">*</span><span class="n">cos_w</span> <span class="o">+</span> <span class="n">cos_Omega</span><span class="o">*</span><span class="n">sin_w</span><span class="o">*</span><span class="n">cos_i</span>
+    <span class="n">m2</span> <span class="o">=</span> <span class="o">-</span><span class="n">sin_Omega</span><span class="o">*</span><span class="n">sin_w</span> <span class="o">+</span> <span class="n">cos_Omega</span><span class="o">*</span><span class="n">cos_w</span><span class="o">*</span><span class="n">cos_i</span>
+    <span class="n">n1</span> <span class="o">=</span> <span class="n">sin_w</span><span class="o">*</span><span class="n">sin_i</span>
+    <span class="n">n2</span> <span class="o">=</span> <span class="n">cos_w</span><span class="o">*</span><span class="n">sin_i</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">e</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mu</span><span class="o">/</span><span class="n">a</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">nar</span> <span class="o">=</span> <span class="n">n</span><span class="o">*</span><span class="n">a</span><span class="o">/</span><span class="n">rn</span>
+    
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">kep</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">kep</span><span class="o">.</span><span class="n">dtype</span> <span class="p">)</span>
+    <span class="n">bcos_E</span> <span class="o">=</span> <span class="n">b</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">Ecc</span><span class="p">)</span>
+    <span class="n">asin_E</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">Ecc</span><span class="p">)</span>
+
+    <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">l2</span><span class="o">*</span><span class="n">bcos_E</span> <span class="o">-</span> <span class="n">l1</span><span class="o">*</span><span class="n">asin_E</span>
+    <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">m2</span><span class="o">*</span><span class="n">bcos_E</span> <span class="o">-</span> <span class="n">m1</span><span class="o">*</span><span class="n">asin_E</span>
+    <span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">n2</span><span class="o">*</span><span class="n">bcos_E</span> <span class="o">-</span> <span class="n">n1</span><span class="o">*</span><span class="n">asin_E</span>
+
+    <span class="n">v</span> <span class="o">=</span> <span class="n">nar</span><span class="o">*</span><span class="n">v</span>
+
+    <span class="n">x</span><span class="p">[:</span><span class="mi">3</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">r</span>
+    <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">:,:]</span> <span class="o">=</span> <span class="n">v</span>
+
+    <span class="k">if</span> <span class="n">input_is_vector</span><span class="p">:</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">6</span><span class="p">,)</span>
+        <span class="n">kep</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">6</span><span class="p">,)</span>
+        <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+            <span class="n">kep</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">kep</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">degrees</span><span class="p">:</span>
+            <span class="n">kep</span><span class="p">[</span><span class="mi">2</span><span class="p">:,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">kep</span><span class="p">[</span><span class="mi">2</span><span class="p">:,:])</span>
+
+
+    <span class="k">return</span> <span class="n">x</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PyOrb 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pyorb.kepler</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020-2020, Daniel Kastinen.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.0.
+    </div>
+  </body>
+</html>

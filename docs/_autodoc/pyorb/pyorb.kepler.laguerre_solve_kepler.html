@@ -1,0 +1,166 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>laguerre_solve_kepler &#8212; PyOrb 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="mean_to_eccentric" href="pyorb.kepler.mean_to_eccentric.html" />
+    <link rel="prev" title="kepler_guess" href="pyorb.kepler.kepler_guess.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pyorb.kepler.mean_to_eccentric.html" title="mean_to_eccentric"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pyorb.kepler.kepler_guess.html" title="kepler_guess"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PyOrb 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="pyorb.kepler.html" accesskey="U">Module summary</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">laguerre_solve_kepler</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="laguerre-solve-kepler">
+<h1>laguerre_solve_kepler<a class="headerlink" href="#laguerre-solve-kepler" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">laguerre_solve_kepler</p>
+<dl class="py function">
+<dt id="pyorb.kepler.laguerre_solve_kepler">
+<code class="sig-prename descclassname">pyorb.kepler.</code><code class="sig-name descname">laguerre_solve_kepler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">E0</span></em>, <em class="sig-param"><span class="n">M</span></em>, <em class="sig-param"><span class="n">e</span></em>, <em class="sig-param"><span class="n">tol</span><span class="o">=</span><span class="default_value">1e-12</span></em>, <em class="sig-param"><span class="n">degree</span><span class="o">=</span><span class="default_value">5</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/kepler.html#laguerre_solve_kepler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyorb.kepler.laguerre_solve_kepler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solve the Kepler equation using the The Laguerre Algorithm, a algorithm that guarantees global convergence.
+Adjusted for solving only real roots (non-hyperbolic orbits)</p>
+<p>Absolute numerical tolerance is defined as <span class="math notranslate nohighlight">\(|f(E)| &lt; tol\)</span> where <span class="math notranslate nohighlight">\(f(E) = M - E + e \sin(E)\)</span>.</p>
+<p># TODO: implement hyperbolic solving.</p>
+<p><em>Note:</em> Choice of polynomial degree does not matter significantly for convergence rate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>M</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Initial guess for eccentric anomaly.</p></li>
+<li><p><strong>M</strong> – Mean anomaly.</p></li>
+<li><p><strong>e</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Eccentricity of ellipse.</p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Absolute numerical tolerance eccentric anomaly.</p></li>
+<li><p><strong>degree</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Polynomial degree in derivation of Laguerre Algorithm.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Eccentric anomaly and number of iterations.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple of (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)">float</a>, <a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.10)">int</a>)</p>
+</dd>
+</dl>
+<p><em>Reference:</em> Conway, B. A. (1986). An improved algorithm due to Laguerre for the solution of Kepler’s equation. Celestial mechanics, 39(2), 199-211.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyorb.kepler</span> <span class="kn">as</span> <span class="nn">pykep</span>
+<span class="n">M</span> <span class="o">=</span> <span class="mf">3.14</span>
+<span class="n">e</span> <span class="o">=</span> <span class="mf">0.8</span>
+
+<span class="c1">#Use mean anomaly as initial guess</span>
+<span class="n">E</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">=</span> <span class="n">pykep</span><span class="o">.</span><span class="n">laguerre_solve_kepler</span><span class="p">(</span>
+   <span class="n">E0</span> <span class="o">=</span> <span class="n">M</span><span class="p">,</span>
+   <span class="n">M</span> <span class="o">=</span> <span class="n">M</span><span class="p">,</span>
+   <span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="p">,</span>
+   <span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pyorb.kepler.kepler_guess.html"
+                        title="previous chapter">kepler_guess</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pyorb.kepler.mean_to_eccentric.html"
+                        title="next chapter">mean_to_eccentric</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/_autodoc/pyorb/pyorb.kepler.laguerre_solve_kepler.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pyorb.kepler.mean_to_eccentric.html" title="mean_to_eccentric"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pyorb.kepler.kepler_guess.html" title="kepler_guess"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PyOrb 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="pyorb.kepler.html" >Module summary</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">laguerre_solve_kepler</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020-2020, Daniel Kastinen.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.0.
+    </div>
+  </body>
+</html>
