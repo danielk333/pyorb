@@ -52,6 +52,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'sphinx_gallery.gen_gallery',
+    'sphinx_execute_code',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -220,7 +221,5 @@ autosummary_generate_overwrite = True
 # Intersphinx configuration
 # -----------------------------------------------------------------------------
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/dev', None),
     'numpy': ('https://docs.scipy.org/doc/numpy', None),
-    'matplotlib': ('https://matplotlib.org', None),
 }

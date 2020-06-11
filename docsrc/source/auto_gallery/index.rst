@@ -13,7 +13,7 @@ This is all the examples and tutorials
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Description for this tutorial">
+    <div class="sphx-glr-thumbcontainer" tooltip="Get started tutorial">
 
 .. only:: html
 

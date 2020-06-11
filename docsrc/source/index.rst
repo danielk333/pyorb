@@ -11,7 +11,7 @@ PyOrb
 
 PyOrb is a python implementation of Kepler orbital elements and related functions. Nothing more, nothing less.
 
-.. include:: ../../README
+.. include:: ../../README.rst
 
 Examples
 ---------

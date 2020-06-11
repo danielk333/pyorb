@@ -12,8 +12,6 @@
 Get started tutorial
 =========================
 
-Description for this tutorial
-
 
 
 
@@ -100,7 +98,6 @@ Description for this tutorial
 
 
     import pyorb
-
 
     #We first create a standard orbit around the sun in SI units
     orb = pyorb.Orbit(M0 = pyorb.M_sol)
@@ -191,7 +188,7 @@ Description for this tutorial
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.026 seconds)
+   **Total running time of the script:** ( 0 minutes  0.006 seconds)
 
 
 .. _sphx_glr_download_auto_gallery_create_orbit.py:
