@@ -16,13 +16,13 @@ PyOrb is a python implementation of Kepler orbital elements and related function
 Examples
 ---------
 
-Example gallery of the functionality
+Example gallery of the different modular functionality of the toolbox.
 
 .. toctree::
-   :glob:
    :maxdepth: 2
 
-   examples/*
+   auto_gallery/index
+
 
 
 API Reference

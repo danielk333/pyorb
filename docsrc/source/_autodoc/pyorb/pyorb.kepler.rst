@@ -1,5 +1,5 @@
-kepler
-======
+
+
 
 .. automodule:: pyorb.kepler
 
@@ -16,27 +16,23 @@ Module summary
 .. autosummary::
     :toctree: .
     
-    ascending_node_from_statevector
+    cart_to_kep
     
-    cart2kep
+    eccentric_to_mean
     
-    eccentric2mean
-    
-    eccentric2true
+    eccentric_to_true
     
     elliptic_radius
     
-    find_ascending_node_time
-    
-    kep2cart
+    kep_to_cart
     
     kepler_guess
     
     laguerre_solve_kepler
     
-    mean2eccentric
+    mean_to_eccentric
     
-    mean2true
+    mean_to_true
     
     orbital_period
     
@@ -48,9 +44,11 @@ Module summary
     
     rot_mat_z
     
-    true2eccentric
+    semi_major_axis
     
-    true2mean
+    true_to_eccentric
+    
+    true_to_mean
     
 
 
@@ -64,22 +62,17 @@ Contents
 .. rubric:: Functions
 
 
-.. autofunction:: ascending_node_from_statevector
+.. autofunction:: cart_to_kep
    :noindex:
 
 
 
-.. autofunction:: cart2kep
+.. autofunction:: eccentric_to_mean
    :noindex:
 
 
 
-.. autofunction:: eccentric2mean
-   :noindex:
-
-
-
-.. autofunction:: eccentric2true
+.. autofunction:: eccentric_to_true
    :noindex:
 
 
@@ -89,12 +82,7 @@ Contents
 
 
 
-.. autofunction:: find_ascending_node_time
-   :noindex:
-
-
-
-.. autofunction:: kep2cart
+.. autofunction:: kep_to_cart
    :noindex:
 
 
@@ -109,12 +97,12 @@ Contents
 
 
 
-.. autofunction:: mean2eccentric
+.. autofunction:: mean_to_eccentric
    :noindex:
 
 
 
-.. autofunction:: mean2true
+.. autofunction:: mean_to_true
    :noindex:
 
 
@@ -144,12 +132,17 @@ Contents
 
 
 
-.. autofunction:: true2eccentric
+.. autofunction:: semi_major_axis
    :noindex:
 
 
 
-.. autofunction:: true2mean
+.. autofunction:: true_to_eccentric
+   :noindex:
+
+
+
+.. autofunction:: true_to_mean
    :noindex:
 
 
