@@ -1,0 +1,184 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>kep_to_cart &#8212; PyOrb 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="kepler_guess" href="pyorb.kepler.kepler_guess.html" />
+    <link rel="prev" title="elliptic_radius" href="pyorb.kepler.elliptic_radius.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pyorb.kepler.kepler_guess.html" title="kepler_guess"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pyorb.kepler.elliptic_radius.html" title="elliptic_radius"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PyOrb 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="pyorb.kepler.html" accesskey="U">Module summary</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">kep_to_cart</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="kep-to-cart">
+<h1>kep_to_cart<a class="headerlink" href="#kep-to-cart" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">kep_to_cart</p>
+<dl class="py function">
+<dt id="pyorb.kepler.kep_to_cart">
+<code class="sig-prename descclassname">pyorb.kepler.</code><code class="sig-name descname">kep_to_cart</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kep</span></em>, <em class="sig-param"><span class="n">mu</span><span class="o">=</span><span class="default_value">1.3271645320999998e+20</span></em>, <em class="sig-param"><span class="n">degrees</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/kepler.html#kep_to_cart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyorb.kepler.kep_to_cart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts set of Keplerian orbital elements to set of Cartesian state vectors.</p>
+<dl>
+<dt><strong>Units:</strong></dt><dd><p>Using default <code class="code docutils literal notranslate"><span class="pre">mu</span></code>, all variables are in <a class="reference external" href="https://www.nist.gov/pml/weights-and-measures/metric-si/si-units">SI Units</a></p>
+<p>If a standard gravitational parameter <code class="code docutils literal notranslate"><span class="pre">mu</span></code> is given in other units, all other input variables should also use the same unit system.</p>
+<p>Angles are by default given as radians, all angles are radians internally in functions, input and output angles can be both radians and degrees depending on the <code class="code docutils literal notranslate"><span class="pre">degrees</span></code> boolean.</p>
+</dd>
+<dt><strong>Orientation of the ellipse in the coordinate system:</strong></dt><dd><ul class="simple">
+<li><p>For zero inclination <span class="math notranslate nohighlight">\(i\)</span>: the ellipse is located in the x-y plane.</p></li>
+<li><p>The direction of motion as True anoamly <span class="math notranslate nohighlight">\(\nu\)</span>: increases for a zero inclination <span class="math notranslate nohighlight">\(i\)</span>: orbit is anti-coockwise, i.e. from +x towards +y.</p></li>
+<li><p>If the eccentricity <span class="math notranslate nohighlight">\(e\)</span>: is increased, the periapsis will lie in +x direction.</p></li>
+<li><p>If the inclination <span class="math notranslate nohighlight">\(i\)</span>: is increased, the ellipse will rotate around the x-axis, so that +y is rotated toward +z.</p></li>
+<li><p>An increase in Longitude of ascending node <span class="math notranslate nohighlight">\(\Omega\)</span>: corresponds to a rotation around the z-axis so that +x is rotated toward +y.</p></li>
+<li><p>Changing argument of perihelion <span class="math notranslate nohighlight">\(\omega\)</span>: will not change the plane of the orbit, it will rotate the orbit in the plane.</p></li>
+<li><p>The periapsis is shifted in the direction of motion.</p></li>
+</ul>
+<p><em>Reference:</em> “Orbital Motion” by A.E. Roy.</p>
+</dd>
+<dt><strong>Variables:</strong></dt><dd><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(a\)</span>: Semi-major axis</p></li>
+<li><p><span class="math notranslate nohighlight">\(e\)</span>: Eccentricity</p></li>
+<li><p><span class="math notranslate nohighlight">\(i\)</span>: Inclination</p></li>
+<li><p><span class="math notranslate nohighlight">\(\omega\)</span>: Argument of perihelion</p></li>
+<li><p><span class="math notranslate nohighlight">\(\Omega\)</span>: Longitude of ascending node</p></li>
+<li><p><span class="math notranslate nohighlight">\(\nu\)</span>: True anoamly</p></li>
+</ul>
+</dd>
+<dt><strong>Uses:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="pyorb.kepler.true_to_eccentric.html#pyorb.kepler.true_to_eccentric" title="pyorb.kepler.true_to_eccentric"><code class="xref py py-func docutils literal notranslate"><span class="pre">true_to_eccentric()</span></code></a></p></li>
+<li><p><a class="reference internal" href="pyorb.kepler.elliptic_radius.html#pyorb.kepler.elliptic_radius" title="pyorb.kepler.elliptic_radius"><code class="xref py py-func docutils literal notranslate"><span class="pre">elliptic_radius()</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kep</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><em>numpy.ndarray</em></a>) – Keplerian orbital elements where rows 1-6 correspond to <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(e\)</span>, <span class="math notranslate nohighlight">\(i\)</span>, <span class="math notranslate nohighlight">\(\omega\)</span>, <span class="math notranslate nohighlight">\(\Omega\)</span>, <span class="math notranslate nohighlight">\(\nu\)</span> and columns correspond to different objects.</p></li>
+<li><p><strong>mu</strong> (<em>float/numpy.ndarray</em>) – Standard gravitational parameter of objects. If <cite>mu</cite> is a numpy vector, the element corresponding to each column of <cite>cart</cite> will be used for its element calculation, Default value is in SI units a massless object orbiting the Sun.</p></li>
+<li><p><strong>degrees</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If <cite>true</cite>, degrees are used. Else all angles are given in radians.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Cartesian state vectors where rows 1-6 correspond to <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, <span class="math notranslate nohighlight">\(z\)</span>, <span class="math notranslate nohighlight">\(v_x\)</span>, <span class="math notranslate nohighlight">\(v_y\)</span>, <span class="math notranslate nohighlight">\(v_z\)</span> and columns correspond to different objects.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a></p>
+</dd>
+</dl>
+<p><strong>Example:</strong></p>
+<blockquote>
+<div><p>Convert ??</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyorb</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p><em>Reference:</em> Daniel Kastinen Master Thesis: Meteors and Celestial Dynamics, “Orbital Motion” by A.E. Roy.</p>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pyorb.kepler.elliptic_radius.html"
+                        title="previous chapter">elliptic_radius</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pyorb.kepler.kepler_guess.html"
+                        title="next chapter">kepler_guess</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/_autodoc/pyorb/pyorb.kepler.kep_to_cart.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pyorb.kepler.kepler_guess.html" title="kepler_guess"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pyorb.kepler.elliptic_radius.html" title="elliptic_radius"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PyOrb 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="pyorb.kepler.html" >Module summary</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">kep_to_cart</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020-2020, Daniel Kastinen.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.0.
+    </div>
+  </body>
+</html>
