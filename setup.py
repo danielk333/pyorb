@@ -1,4 +1,5 @@
 import setuptools
+import pyorb
 
 with open('README.rst', 'r') as fh:
     long_description = fh.read()
@@ -11,7 +12,7 @@ with open('requirements', 'r') as fh:
 
 setuptools.setup(
     name='pyorb',
-    version='0.1.0',
+    version=pyorb.__version__,
     long_description=long_description,
     url='https://github.com/danielk333/pyorb',
     classifiers=[

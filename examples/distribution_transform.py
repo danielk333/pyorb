@@ -23,10 +23,11 @@ orb.add(num=1000, a=pyorb.AU, e=0, i=0, omega=0, Omega=0, anom=0)
 orb.calculate_cartesian()
 
 #Add a symmetric Gaussian distribution in the plane on the velocity
-#std = 5km/s
 std = 3e3
 orb.vx += np.random.randn(orb.num)*std
 orb.vy += np.random.randn(orb.num)*std
+
+#now when we call any Keplerian element, the distribution in kepler space will be calculated automatically
 
 fig, axes = plt.subplots(1, 2, figsize=(10,6))
 axes[0].plot(orb.vx*1e-3, orb.vy*1e-3,'.')
