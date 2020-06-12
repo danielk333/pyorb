@@ -22,7 +22,12 @@ print(orb.e)
 print(orb)
 print(orb[14])
 
+print(orb._cart[0,:])
 print(orb.x)
+
+print(orb.eccentric_anomaly)
+orb.eccentric_anomaly = np.linspace(0,360,num=len(orb))
+print(orb.anom)
 
 # orb.update(inds=[2,3,4], anom=[0,45,90])
 # for o in orb[2:5]:

@@ -68,37 +68,6 @@ class Orbit:
             np.logical_not(self.__kep_calculated),
         )
 
-    @classmethod
-    def cartesian_vector(cls, elems, M0, **kwargs):
-        obj = cls(M0, **kwargs)
-        if len(elems.shape) == 1:
-            elems.shape = (6,1)
-        obj.cartesian = elems
-        return obj
-
-
-    @classmethod
-    def cartesian_elements(cls, x, y, z, vx, vy, vz, M0, **kwargs):
-        obj = cls(M0, **kwargs)
-        obj.update(x=x, y=y, z=z, vx=vx, vy=vy, vz=vz)
-        return obj
-
-
-    @classmethod
-    def kepler_vector(cls, elems, M0, **kwargs):
-        obj = cls(M0, **kwargs)
-        if len(elems.shape) == 1:
-            elems.shape = (6,1)
-        obj.kepler = elems
-        return obj
-
-
-    @classmethod
-    def kepler_elements(cls, a, e, i, omega, Omega, anom, M0, **kwargs):
-        obj = cls(M0, **kwargs)
-        obj.update(a=a, e=e, i=i, omega=omega, Omega=Omega, anom=anom)
-        return obj
-
 
     def __getitem__(self, inds):
         tmp_orb = Orbit(
@@ -120,6 +89,10 @@ class Orbit:
             tmp_orb.m = np.array([tmp_orb.m], dtype=self.dtype)
             
         return tmp_orb
+
+
+    def __len__(self):
+        return self.num
 
 
     def __iter__(self):
