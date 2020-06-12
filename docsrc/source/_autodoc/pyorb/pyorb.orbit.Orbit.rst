@@ -16,7 +16,6 @@ Orbit
       ~Orbit.__init__
       ~Orbit.add
       ~Orbit.allocate
-      ~Orbit.append
       ~Orbit.calc_eccentric_anomaly
       ~Orbit.calc_mean_anomaly
       ~Orbit.calc_true_anomaly
@@ -46,13 +45,14 @@ Orbit
       ~Orbit.i
       ~Orbit.kepler
       ~Orbit.mean_anomaly
+      ~Orbit.mean_motion
       ~Orbit.num
       ~Orbit.omega
       ~Orbit.period
       ~Orbit.r
-      ~Orbit.speed
       ~Orbit.true_anomaly
       ~Orbit.v
+      ~Orbit.velocity
       ~Orbit.vx
       ~Orbit.vy
       ~Orbit.vz
