@@ -20,5 +20,6 @@ help:
 
 github:
 	@make html
-	@rm -r ../docs/*
+	@rm -r ../docs
+	@mkdir ../docs
 	@cp -a build/html/. ../docs
