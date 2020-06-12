@@ -559,7 +559,7 @@ def mean_to_eccentric(M, e, tol=1e-12, degrees=False):
         if not isinstance(e, np.ndarray):
             e = np.ones(_M.shape, dtype=_M.dtype)*e
         if _M.shape != e.shape:
-            raise TypeError('Input dimensions does not agree')
+            raise TypeError(f'Input dimensions does not agree M:{_M.shape} != e:{e.shape}')
 
 
         E = np.empty(_M.shape, dtype=_M.dtype)
