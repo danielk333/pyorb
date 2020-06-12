@@ -55,27 +55,6 @@ This is all the examples and tutorials
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Distribution transformation">
-
-.. only:: html
-
- .. figure:: /auto_gallery/images/thumb/sphx_glr_distribution_transform_thumb.png
-     :alt: Distribution transformation
-
-     :ref:`sphx_glr_auto_gallery_distribution_transform.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_gallery/distribution_transform
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Array support">
 
 .. only:: html
@@ -94,6 +73,27 @@ This is all the examples and tutorials
    :hidden:
 
    /auto_gallery/array_orbits
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Distribution transformation">
+
+.. only:: html
+
+ .. figure:: /auto_gallery/images/thumb/sphx_glr_distribution_transform_thumb.png
+     :alt: Distribution transformation
+
+     :ref:`sphx_glr_auto_gallery_distribution_transform.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_gallery/distribution_transform
 
 .. raw:: html
 
