@@ -18,7 +18,7 @@ To install
 Example
 ---------
 
-.. execute_code:: python
+.. code-block:: python
     :linenos:
 
     import pyorb
