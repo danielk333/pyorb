@@ -80,7 +80,7 @@ Propagation
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.598 seconds)
+   **Total running time of the script:** ( 0 minutes  3.511 seconds)
 
 
 .. _sphx_glr_download_auto_gallery_propagation.py:

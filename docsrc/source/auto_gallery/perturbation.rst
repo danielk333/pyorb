@@ -95,7 +95,7 @@ Perturbation by modifying elements
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.295 seconds)
+   **Total running time of the script:** ( 0 minutes  1.272 seconds)
 
 
 .. _sphx_glr_download_auto_gallery_perturbation.py:

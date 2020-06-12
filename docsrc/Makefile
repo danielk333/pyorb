@@ -24,6 +24,7 @@ wipe:
 	@rm source/_autodoc -r
 
 github:
+	@make wipe
 	@make html
 	@rm -r ../docs
 	@mkdir ../docs
