@@ -723,3 +723,6 @@ class Orbit:
     @velocity.setter
     def velocity(self, value):
         self.v *= value/np.linalg.norm(self.v, axis=0)
+
+
+Orbit.speed = Orbit.velocity
