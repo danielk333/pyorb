@@ -118,7 +118,6 @@ class Orbit:
         **Note**: Cannot add objects with BOTH cartesian and Keplerian elements.
 
         :param int num: Number of orbits to add, defaults to 1
-        :param \*\*kwargs: See "Keyword arguments"
         :return: None
 
         :Keyword arguments:
@@ -203,7 +202,6 @@ class Orbit:
         **Note**: Cannot update BOTH cartesian and Keplerian elements.
 
         :param int/list/numpy.ndarray/slice inds: Incidences of orbits to update, defaults to all
-        :param \*\*kwargs: See "Keyword arguments"
         :return: None
 
         :Keyword arguments:

@@ -627,7 +627,7 @@ def orbital_speed(r, a, mu):
     
     :param float/numpy.ndarray r: Radius from the pericenter.
     :param float/numpy.ndarray a: Semi-major axis of ellipse.
-    :param float mu: Standard gravitation parameter :math:`\mu = G(m_1 + m_2)` of the orbit.
+    :param float/numpy.ndarray mu: Standard gravitation parameter :math:`\mu = G(m_1 + m_2)` of the orbit.
     :return: Orbital speed.
     '''
     return np.sqrt(mu*(2.0/r - 1.0/a))
@@ -637,7 +637,7 @@ def orbital_period(a, mu):
     '''Calculates the orbital period of an Keplerian orbit based on the semi-major axis :math:`P = 2\pi\sqrt{\\frac{a^3}{\mu}}`.
     
     :param float/numpy.ndarray a: Semi-major axis of ellipse.
-    :param float mu: Standard gravitation parameter :math:`\mu = G(m_1 + m_2)` of the orbit.
+    :param float/numpy.ndarray mu: Standard gravitation parameter :math:`\mu = G(m_1 + m_2)` of the orbit.
     :return: Orbital period.
     '''
     return 2.0*np.pi*np.sqrt(a**3.0/mu)
@@ -647,7 +647,7 @@ def semi_major_axis(P, mu):
     '''Calculates the orbital semi-major axis of an Keplerian orbit based on the orbital period :math:`a = \mu^{\\frac{1}{3}}(\\frac{P}{2\pi})^{\\frac{2}{3}}`.
     
     :param float/numpy.ndarray P: Orbital period
-    :param float mu: Standard gravitation parameter :math:`\mu = G(m_1 + m_2)` of the orbit.
+    :param float/numpy.ndarray mu: Standard gravitation parameter :math:`\mu = G(m_1 + m_2)` of the orbit.
     :return: semi-major axis.
     '''
     np.cbrt((P/(2.0*np.pi))**2*mu)
