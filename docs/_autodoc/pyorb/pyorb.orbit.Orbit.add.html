@@ -6,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ascending_node_from_statevector &#8212; PyOrb 0.1.0 documentation</title>
+    <title>Orbit.add &#8212; PyOrb 0.1.0 documentation</title>
     <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
@@ -22,6 +22,8 @@
     <script src="../../_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Orbit.allocate" href="pyorb.orbit.Orbit.allocate.html" />
+    <link rel="prev" title="Orbit.__init__" href="pyorb.orbit.Orbit.__init__.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <!--[if lt IE 9]>
     <script src="_static/css3-mediaqueries.js"></script>
@@ -36,8 +38,17 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="pyorb.orbit.Orbit.allocate.html" title="Orbit.allocate"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pyorb.orbit.Orbit.__init__.html" title="Orbit.__init__"
+             accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../index.html">PyOrb 0.1.0 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">ascending_node_from_statevector</a></li> 
+          <li class="nav-item nav-item-1"><a href="../../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="pyorb.orbit.html" >Module summary</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="pyorb.orbit.Orbit.html" accesskey="U">Orbit</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Orbit.add</a></li> 
       </ul>
     </div>  
 
@@ -46,9 +57,32 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="ascending-node-from-statevector">
-<h1>ascending_node_from_statevector<a class="headerlink" href="#ascending-node-from-statevector" title="Permalink to this headline">¶</a></h1>
-<p class="rubric">ascending_node_from_statevector</p>
+  <div class="section" id="orbit-add">
+<h1>Orbit.add<a class="headerlink" href="#orbit-add" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Orbit.add</p>
+<dl class="py method">
+<dt id="pyorb.orbit.Orbit.add">
+<code class="sig-prename descclassname">Orbit.</code><code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyorb.orbit.Orbit.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds orbits to this instance</p>
+<p><strong>Note</strong>: Cannot add objects with BOTH cartesian and Keplerian elements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num</strong> (<em>int</em>) – Number of orbits to add, defaults to 1</p></li>
+<li><p><strong>**kwargs</strong> – See “Keyword arguments”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Keyword arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>Any valid Cartesian or Keplerian variable name can be given as a key to update that parameter.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 
@@ -58,10 +92,16 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pyorb.orbit.Orbit.__init__.html"
+                        title="previous chapter">Orbit.__init__</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pyorb.orbit.Orbit.allocate.html"
+                        title="next chapter">Orbit.allocate</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../../_sources/_autodoc/pyorb/pyorb.kepler.ascending_node_from_statevector.rst.txt"
+      <li><a href="../../_sources/_autodoc/pyorb/pyorb.orbit.Orbit.add.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -88,8 +128,17 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="pyorb.orbit.Orbit.allocate.html" title="Orbit.allocate"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pyorb.orbit.Orbit.__init__.html" title="Orbit.__init__"
+             >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../index.html">PyOrb 0.1.0 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">ascending_node_from_statevector</a></li> 
+          <li class="nav-item nav-item-1"><a href="../../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="pyorb.orbit.html" >Module summary</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="pyorb.orbit.Orbit.html" >Orbit</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Orbit.add</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

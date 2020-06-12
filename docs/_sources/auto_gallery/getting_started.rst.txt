@@ -35,11 +35,13 @@ Get started tutorial
     omega: 0.0000e+00   vx: nan
     Omega: 0.0000e+00   vy: nan
     anom : 0.0000e+00   vz: nan
-    Orbital period: 365.2513758445099 days
+    Orbital period: [365.25137584] days
 
 
-    Orbit X-position is 149597870.70000002 km
-    Orbit velocity vector is [-0.         29.78514217  0.        ] km/s
+    Orbit X-position is [1.49597871e+08] km
+    Orbit velocity vector is [[-0.        ]
+     [29.78514217]
+     [ 0.        ]] km/s
     a    : 1.4960e+11   x : 1.4960e+11
     e    : 0.0000e+00   y : 0.0000e+00
     i    : 0.0000e+00   z : 0.0000e+00
@@ -56,8 +58,12 @@ Get started tutorial
     anom : 0.0000e+00   vz: 0.0000e+00
 
 
-    New kepler elements [1.82841842e+11 1.00000000e-01 0.00000000e+00 0.00000000e+00
-     0.00000000e+00 0.00000000e+00]
+    New kepler elements [[1.82841842e+11]
+     [1.00000000e-01]
+     [0.00000000e+00]
+     [0.00000000e+00]
+     [0.00000000e+00]
+     [0.00000000e+00]]
     a    : 1.8284e+11   x : 1.6456e+11
     e    : 1.0000e-01   y : 0.0000e+00
     i    : 0.0000e+00   z : 0.0000e+00
@@ -74,7 +80,7 @@ Get started tutorial
     omega: 0.0000e+00   vx: -0.0000e+00
     Omega: 0.0000e+00   vy: 1.9910e-07
     anom : 0.0000e+00   vz: 0.0000e+00
-    Orbital period: 365.2513758445099 days
+    Orbital period: [365.25137584] days
 
     Astronomical gravitation constant: 39.47812018693255 AU^3 Msol^-1 y^-2
     a    : 1.0000e+00   x : 1.0000e+00
@@ -83,7 +89,7 @@ Get started tutorial
     omega: 0.0000e+00   vx: -0.0000e+00
     Omega: 0.0000e+00   vy: 6.2832e+00
     anom : 0.0000e+00   vz: 0.0000e+00
-    Orbital period: 1.0000037668569743 years
+    Orbital period: [1.00000377] years
     Orbital speed: 6.283161639408344 AU/y
 
 
@@ -188,7 +194,7 @@ Get started tutorial
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.005 seconds)
+   **Total running time of the script:** ( 0 minutes  0.007 seconds)
 
 
 .. _sphx_glr_download_auto_gallery_getting_started.py:

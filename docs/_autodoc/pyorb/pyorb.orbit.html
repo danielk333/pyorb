@@ -77,11 +77,137 @@
 <dl class="py class">
 <dt>
 <em class="property">class </em><code class="sig-prename descclassname">pyorb.orbit.</code><code class="sig-name descname">Orbit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">M0</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit"><span class="viewcode-link">[source]</span></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/dev/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">Omega</code></dt>
+<dd><p>Longitude of the ascending node</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">a</code></dt>
+<dd><p>Semi-major axis</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.add"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Adds orbits to this instance</p>
+<p><strong>Note</strong>: Cannot add objects with BOTH cartesian and Keplerian elements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num</strong> (<em>int</em>) – Number of orbits to add, defaults to 1</p></li>
+<li><p><strong>**kwargs</strong> – See “Keyword arguments”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Keyword arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>Any valid Cartesian or Keplerian variable name can be given as a key to update that parameter.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">allocate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.allocate"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Changes the current allocation of orbits to a fixed number.</p>
+<p><strong>Warning</strong>: This method overrides all currently stored data to allocate new space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>num</strong> (<em>int</em>) – Number of orbits to change allocation to</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">anom</code></dt>
+<dd><p>The orbital anomaly, depending on <code class="code docutils literal notranslate"><span class="pre">self.type</span></code> it is either the True, Eccentric or Mean anomaly</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">calc_eccentric_anomaly</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inds</span><span class="o">=</span><span class="default_value">slice(None, None, None)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.calc_eccentric_anomaly"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Calculates the eccentric anomaly and stores it in <code class="code docutils literal notranslate"><span class="pre">self._eccentric_anomaly</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">calc_mean_anomaly</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inds</span><span class="o">=</span><span class="default_value">slice(None, None, None)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.calc_mean_anomaly"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Calculates the mean anomaly and stores it in <code class="code docutils literal notranslate"><span class="pre">self._mean_anomaly</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">calc_true_anomaly</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inds</span><span class="o">=</span><span class="default_value">slice(None, None, None)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.calc_true_anomaly"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Calculates the true anomaly and stores it in <code class="code docutils literal notranslate"><span class="pre">self._true_anomaly</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">calculate_cartesian</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inds</span><span class="o">=</span><span class="default_value">slice(None, None, None)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.calculate_cartesian"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Calculates Cartesian elements based on Keplerian elements</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>inds</strong> (<em>int/list/numpy.ndarray/slice</em>) – Incidences of orbits to calculate, defaults to all</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">calculate_kepler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inds</span><span class="o">=</span><span class="default_value">slice(None, None, None)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.calculate_kepler"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Calculates Keplerian elements based on Cartesian elements</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>inds</strong> (<em>int/list/numpy.ndarray/slice</em>) – Incidences of orbits to calculate, defaults to all</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">cartesian</code></dt>
+<dd><p>Cartesian state vector</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">e</code></dt>
+<dd><p>Eccentricity</p>
+</dd></dl>
+
 <dl class="py method">
 <dt>
 <em class="property">property </em><code class="sig-name descname">eccentric_anomaly</code></dt>
 <dd><p>Eccentric Anomaly</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">i</code></dt>
+<dd><p>Inclination</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">kepler</code></dt>
+<dd><p>Keplerian state vector</p>
 </dd></dl>
 
 <dl class="py method">
@@ -92,8 +218,26 @@
 
 <dl class="py method">
 <dt>
+<em class="property">property </em><code class="sig-name descname">num</code></dt>
+<dd><p>Number of orbits</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">omega</code></dt>
+<dd><p>Argument of perihelion</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
 <em class="property">property </em><code class="sig-name descname">period</code></dt>
 <dd><p>Orbital period</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">r</code></dt>
+<dd><p>Position vector</p>
 </dd></dl>
 
 <dl class="py method">
@@ -106,6 +250,72 @@
 <dt>
 <em class="property">property </em><code class="sig-name descname">true_anomaly</code></dt>
 <dd><p>true Anomaly</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inds</span><span class="o">=</span><span class="default_value">slice(None, None, None)</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.update"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Calculates Keplerian elements based on Cartesian elements</p>
+<p><strong>Note</strong>: Cannot update BOTH cartesian and Keplerian elements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inds</strong> (<em>int/list/numpy.ndarray/slice</em>) – Incidences of orbits to update, defaults to all</p></li>
+<li><p><strong>**kwargs</strong> – See “Keyword arguments”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Keyword arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>Any valid Cartesian or Keplerian variable name can be given as a key to update that parameter.</p></li>
+<li><p>Mass can also be updated this way but this requires manual execution of either <code class="code docutils literal notranslate"><span class="pre">calculate_cartesian</span></code> or <code class="code docutils literal notranslate"><span class="pre">calculate_kepler</span></code> depending on which are to remain constant.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">v</code></dt>
+<dd><p>Velocity vector</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">vx</code></dt>
+<dd><p>Velocity X-component</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">vy</code></dt>
+<dd><p>Velocity Y-component</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">vz</code></dt>
+<dd><p>Velocity Z-component</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">x</code></dt>
+<dd><p>X Position</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">y</code></dt>
+<dd><p>Y Position</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">z</code></dt>
+<dd><p>Z Position</p>
 </dd></dl>
 
 </dd></dl>

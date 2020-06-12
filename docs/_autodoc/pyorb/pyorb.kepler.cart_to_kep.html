@@ -101,7 +101,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cart</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><em>numpy.ndarray</em></a>) – Cartesian state vectors where rows 1-6 correspond to <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, <span class="math notranslate nohighlight">\(z\)</span>, <span class="math notranslate nohighlight">\(v_x\)</span>, <span class="math notranslate nohighlight">\(v_y\)</span>, <span class="math notranslate nohighlight">\(v_z\)</span> and columns correspond to different objects.</p></li>
 <li><p><strong>mu</strong> (<em>float/numpy.ndarray</em>) – Standard gravitational parameter of objects. If <cite>mu</cite> is a numpy vector, the element corresponding to each column of <cite>cart</cite> will be used for its element calculation, Default value is in SI units a massless object orbiting the Sun.</p></li>
-<li><p><strong>degrees</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If <cite>true</cite>, degrees are used. Else all angles are given in radians.</p></li>
+<li><p><strong>degrees</strong> (<em>bool</em>) – If <cite>true</cite>, degrees are used. Else all angles are given in radians.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

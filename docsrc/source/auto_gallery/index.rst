@@ -76,6 +76,27 @@ This is all the examples and tutorials
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Array support">
+
+.. only:: html
+
+ .. figure:: /auto_gallery/images/thumb/sphx_glr_array_orbits_thumb.png
+     :alt: Array support
+
+     :ref:`sphx_glr_auto_gallery_array_orbits.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_gallery/array_orbits
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Get started tutorial">
 
 .. only:: html

@@ -14,15 +14,14 @@ Orbit
       :toctree: .
    
       ~Orbit.__init__
+      ~Orbit.add
+      ~Orbit.allocate
+      ~Orbit.append
       ~Orbit.calc_eccentric_anomaly
       ~Orbit.calc_mean_anomaly
       ~Orbit.calc_true_anomaly
       ~Orbit.calculate_cartesian
       ~Orbit.calculate_kepler
-      ~Orbit.cartesian_elements
-      ~Orbit.cartesian_vector
-      ~Orbit.kepler_elements
-      ~Orbit.kepler_vector
       ~Orbit.propagate
       ~Orbit.update
    
@@ -47,6 +46,7 @@ Orbit
       ~Orbit.i
       ~Orbit.kepler
       ~Orbit.mean_anomaly
+      ~Orbit.num
       ~Orbit.omega
       ~Orbit.period
       ~Orbit.r

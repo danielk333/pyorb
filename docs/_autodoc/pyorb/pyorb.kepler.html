@@ -164,7 +164,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cart</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><em>numpy.ndarray</em></a>) – Cartesian state vectors where rows 1-6 correspond to <span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, <span class="math notranslate nohighlight">\(z\)</span>, <span class="math notranslate nohighlight">\(v_x\)</span>, <span class="math notranslate nohighlight">\(v_y\)</span>, <span class="math notranslate nohighlight">\(v_z\)</span> and columns correspond to different objects.</p></li>
 <li><p><strong>mu</strong> (<em>float/numpy.ndarray</em>) – Standard gravitational parameter of objects. If <cite>mu</cite> is a numpy vector, the element corresponding to each column of <cite>cart</cite> will be used for its element calculation, Default value is in SI units a massless object orbiting the Sun.</p></li>
-<li><p><strong>degrees</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If <cite>true</cite>, degrees are used. Else all angles are given in radians.</p></li>
+<li><p><strong>degrees</strong> (<em>bool</em>) – If <cite>true</cite>, degrees are used. Else all angles are given in radians.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -193,14 +193,14 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>E</strong> (<em>float/numpy.ndarray</em>) – Eccentric anomaly.</p></li>
 <li><p><strong>e</strong> (<em>float/numpy.ndarray</em>) – Eccentricity of ellipse.</p></li>
-<li><p><strong>degrees</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If true degrees are used, else all angles are given in radians</p></li>
+<li><p><strong>degrees</strong> (<em>bool</em>) – If true degrees are used, else all angles are given in radians</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Mean anomaly.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a> or <a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a> or float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -214,14 +214,14 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>E</strong> (<em>float/numpy.ndarray</em>) – Eccentric anomaly.</p></li>
 <li><p><strong>e</strong> (<em>float/numpy.ndarray</em>) – Eccentricity of ellipse.</p></li>
-<li><p><strong>degrees</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If true degrees are used, else all angles are given in radians</p></li>
+<li><p><strong>degrees</strong> (<em>bool</em>) – If true degrees are used, else all angles are given in radians</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>True anomaly.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a> or <a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a> or float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -236,14 +236,14 @@
 <li><p><strong>E</strong> (<em>float/numpy.ndarray</em>) – Eccentric anomaly.</p></li>
 <li><p><strong>a</strong> (<em>float/numpy.ndarray</em>) – Semi-major axis of ellipse.</p></li>
 <li><p><strong>e</strong> (<em>float/numpy.ndarray</em>) – Eccentricity of ellipse.</p></li>
-<li><p><strong>degrees</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If true degrees are used, else all angles are given in radians</p></li>
+<li><p><strong>degrees</strong> (<em>bool</em>) – If true degrees are used, else all angles are given in radians</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Radius from left focus point.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a> or <a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a> or float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -288,7 +288,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>kep</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><em>numpy.ndarray</em></a>) – Keplerian orbital elements where rows 1-6 correspond to <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(e\)</span>, <span class="math notranslate nohighlight">\(i\)</span>, <span class="math notranslate nohighlight">\(\omega\)</span>, <span class="math notranslate nohighlight">\(\Omega\)</span>, <span class="math notranslate nohighlight">\(\nu\)</span> and columns correspond to different objects.</p></li>
 <li><p><strong>mu</strong> (<em>float/numpy.ndarray</em>) – Standard gravitational parameter of objects. If <cite>mu</cite> is a numpy vector, the element corresponding to each column of <cite>cart</cite> will be used for its element calculation, Default value is in SI units a massless object orbiting the Sun.</p></li>
-<li><p><strong>degrees</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If <cite>true</cite>, degrees are used. Else all angles are given in radians.</p></li>
+<li><p><strong>degrees</strong> (<em>bool</em>) – If <cite>true</cite>, degrees are used. Else all angles are given in radians.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -323,7 +323,7 @@
 <dd class="field-even"><p>Guess for eccentric anomaly in radians.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a> or <a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a> or float</p>
 </dd>
 </dl>
 <p><em>Reference:</em> Esmaelzadeh, R., &amp; Ghadiri, H. (2014). Appropriate starter for solving the Kepler’s equation. International Journal of Computer Applications, 89(7).</p>
@@ -340,18 +340,18 @@ Adjusted for solving only real roots (non-hyperbolic orbits)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>M</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Initial guess for eccentric anomaly.</p></li>
+<li><p><strong>M</strong> (<em>float</em>) – Initial guess for eccentric anomaly.</p></li>
 <li><p><strong>M</strong> – Mean anomaly.</p></li>
-<li><p><strong>e</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Eccentricity of ellipse.</p></li>
-<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Absolute numerical tolerance eccentric anomaly.</p></li>
-<li><p><strong>degree</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Polynomial degree in derivation of Laguerre Algorithm.</p></li>
+<li><p><strong>e</strong> (<em>float</em>) – Eccentricity of ellipse.</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – Absolute numerical tolerance eccentric anomaly.</p></li>
+<li><p><strong>degree</strong> (<em>int</em>) – Polynomial degree in derivation of Laguerre Algorithm.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Eccentric anomaly and number of iterations.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>tuple of (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)">float</a>, <a class="reference external" href="https://docs.python.org/dev/library/functions.html#int" title="(in Python v3.10)">int</a>)</p>
+<dd class="field-odd"><p>tuple of (float, int)</p>
 </dd>
 </dl>
 <p><em>Reference:</em> Conway, B. A. (1986). An improved algorithm due to Laguerre for the solution of Kepler’s equation. Celestial mechanics, 39(2), 199-211.</p>
@@ -380,15 +380,15 @@ Adjusted for solving only real roots (non-hyperbolic orbits)</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>M</strong> (<em>float/numpy.ndarray</em>) – Mean anomaly.</p></li>
 <li><p><strong>e</strong> (<em>float/numpy.ndarray</em>) – Eccentricity of ellipse.</p></li>
-<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Numerical tolerance for solving Keplers equation in units of radians.</p></li>
-<li><p><strong>degrees</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If true degrees are used, else all angles are given in radians</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – Numerical tolerance for solving Keplers equation in units of radians.</p></li>
+<li><p><strong>degrees</strong> (<em>bool</em>) – If true degrees are used, else all angles are given in radians</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>True anomaly.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a> or <a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a> or float</p>
 </dd>
 </dl>
 <dl class="simple">
@@ -416,15 +416,15 @@ Adjusted for solving only real roots (non-hyperbolic orbits)</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>M</strong> (<em>float/numpy.ndarray</em>) – Mean anomaly.</p></li>
 <li><p><strong>e</strong> (<em>float/numpy.ndarray</em>) – Eccentricity of ellipse.</p></li>
-<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Numerical tolerance for solving Keplers equation in units of radians.</p></li>
-<li><p><strong>degrees</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If true degrees are used, else all angles are given in radians</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – Numerical tolerance for solving Keplers equation in units of radians.</p></li>
+<li><p><strong>degrees</strong> (<em>bool</em>) – If true degrees are used, else all angles are given in radians</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>True anomaly.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a> or <a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a> or float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -437,7 +437,7 @@ Adjusted for solving only real roots (non-hyperbolic orbits)</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>a</strong> (<em>float/numpy.ndarray</em>) – Semi-major axis of ellipse.</p></li>
-<li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Standard gravitation parameter <span class="math notranslate nohighlight">\(\mu = G(m_1 + m_2)\)</span> of the orbit.</p></li>
+<li><p><strong>mu</strong> (<em>float</em>) – Standard gravitation parameter <span class="math notranslate nohighlight">\(\mu = G(m_1 + m_2)\)</span> of the orbit.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -455,7 +455,7 @@ Adjusted for solving only real roots (non-hyperbolic orbits)</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>r</strong> (<em>float/numpy.ndarray</em>) – Radius from the pericenter.</p></li>
 <li><p><strong>a</strong> (<em>float/numpy.ndarray</em>) – Semi-major axis of ellipse.</p></li>
-<li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Standard gravitation parameter <span class="math notranslate nohighlight">\(\mu = G(m_1 + m_2)\)</span> of the orbit.</p></li>
+<li><p><strong>mu</strong> (<em>float</em>) – Standard gravitation parameter <span class="math notranslate nohighlight">\(\mu = G(m_1 + m_2)\)</span> of the orbit.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -471,7 +471,7 @@ Adjusted for solving only real roots (non-hyperbolic orbits)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>theta</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Angle to rotate.</p></li>
+<li><p><strong>theta</strong> (<em>float</em>) – Angle to rotate.</p></li>
 <li><p><strong>dtype</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.18)"><em>numpy.dtype</em></a>) – The data-type of the output matrix.</p></li>
 </ul>
 </dd>
@@ -491,7 +491,7 @@ Adjusted for solving only real roots (non-hyperbolic orbits)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>theta</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Angle to rotate.</p></li>
+<li><p><strong>theta</strong> (<em>float</em>) – Angle to rotate.</p></li>
 <li><p><strong>dtype</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.18)"><em>numpy.dtype</em></a>) – The data-type of the output matrix.</p></li>
 </ul>
 </dd>
@@ -511,7 +511,7 @@ Adjusted for solving only real roots (non-hyperbolic orbits)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>theta</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Angle to rotate.</p></li>
+<li><p><strong>theta</strong> (<em>float</em>) – Angle to rotate.</p></li>
 <li><p><strong>dtype</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.18)"><em>numpy.dtype</em></a>) – The data-type of the output matrix.</p></li>
 </ul>
 </dd>
@@ -532,7 +532,7 @@ Adjusted for solving only real roots (non-hyperbolic orbits)</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>P</strong> (<em>float/numpy.ndarray</em>) – Orbital period</p></li>
-<li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Standard gravitation parameter <span class="math notranslate nohighlight">\(\mu = G(m_1 + m_2)\)</span> of the orbit.</p></li>
+<li><p><strong>mu</strong> (<em>float</em>) – Standard gravitation parameter <span class="math notranslate nohighlight">\(\mu = G(m_1 + m_2)\)</span> of the orbit.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -550,14 +550,14 @@ Adjusted for solving only real roots (non-hyperbolic orbits)</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nu</strong> (<em>float/numpy.ndarray</em>) – True anomaly.</p></li>
 <li><p><strong>e</strong> (<em>float/numpy.ndarray</em>) – Eccentricity of ellipse.</p></li>
-<li><p><strong>degrees</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If true degrees are used, else all angles are given in radians</p></li>
+<li><p><strong>degrees</strong> (<em>bool</em>) – If true degrees are used, else all angles are given in radians</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Eccentric anomaly.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a> or <a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a> or float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -578,14 +578,14 @@ Adjusted for solving only real roots (non-hyperbolic orbits)</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nu</strong> (<em>float/numpy.ndarray</em>) – True anomaly.</p></li>
 <li><p><strong>e</strong> (<em>float/numpy.ndarray</em>) – Eccentricity of ellipse.</p></li>
-<li><p><strong>degrees</strong> (<a class="reference external" href="https://docs.python.org/dev/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If true degrees are used, else all angles are given in radians</p></li>
+<li><p><strong>degrees</strong> (<em>bool</em>) – If true degrees are used, else all angles are given in radians</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Mean anomaly.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a> or <a class="reference external" href="https://docs.python.org/dev/library/functions.html#float" title="(in Python v3.10)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a> or float</p>
 </dd>
 </dl>
 </dd></dl>

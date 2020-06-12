@@ -113,6 +113,18 @@ class Orbit:
 
 
     def add(self, num=1, **kwargs):
+        '''Adds orbits to this instance
+
+        **Note**: Cannot add objects with BOTH cartesian and Keplerian elements.
+
+        :param int num: Number of orbits to add, defaults to 1
+        :param \*\*kwargs: See "Keyword arguments"
+        :return: None
+
+        :Keyword arguments:
+            - Any valid Cartesian or Keplerian variable name can be given as a key to update that parameter. 
+
+        '''
         inds = slice(self.num, self.num + num, None)
 
         self.m = np.append(
@@ -168,6 +180,13 @@ class Orbit:
 
 
     def allocate(self, num):
+        '''Changes the current allocation of orbits to a fixed number.
+
+        **Warning**: This method overrides all currently stored data to allocate new space.
+
+        :param int num: Number of orbits to change allocation to
+        :return: None
+        '''
         self.m = np.full((num,), 0, dtype=self.dtype)
         self._cart = np.full((6,num), np.nan, dtype=self.dtype)
         self._kep = np.full((6,num), np.nan, dtype=self.dtype)
@@ -178,9 +197,19 @@ class Orbit:
         self.__kep_calculated = np.full((num,), False, dtype=np.bool)
 
 
-    def update(self, **kwargs):
+    def update(self, inds=slice(None, None, None), **kwargs):
+        '''Calculates Keplerian elements based on Cartesian elements
 
-        inds = kwargs.get('inds', slice(None, None, None))
+        **Note**: Cannot update BOTH cartesian and Keplerian elements.
+
+        :param int/list/numpy.ndarray/slice inds: Incidences of orbits to update, defaults to all
+        :param \*\*kwargs: See "Keyword arguments"
+        :return: None
+
+        :Keyword arguments:
+            - Any valid Cartesian or Keplerian variable name can be given as a key to update that parameter. 
+            - Mass can also be updated this way but this requires manual execution of either :code:`calculate_cartesian` or :code:`calculate_kepler` depending on which are to remain constant.
+        '''
 
         cart_updated = False
         kep_updated = False
@@ -223,6 +252,11 @@ class Orbit:
 
 
     def calculate_cartesian(self, inds=slice(None,None,None)):
+        '''Calculates Cartesian elements based on Keplerian elements
+
+        :param int/list/numpy.ndarray/slice inds: Incidences of orbits to calculate, defaults to all
+        :return: None
+        '''
         do_inds = np.full((self.num,), False, dtype=np.bool)
         do_inds[inds] = True
         do_inds[inds] = np.logical_not(np.any(np.isnan(self._kep[:,inds]), axis=0))
@@ -243,6 +277,11 @@ class Orbit:
 
 
     def calculate_kepler(self, inds=slice(None,None,None)):
+        '''Calculates Keplerian elements based on Cartesian elements
+
+        :param int/list/numpy.ndarray/slice inds: Incidences of orbits to calculate, defaults to all
+        :return: None
+        '''
         do_inds = np.full((self.num,), False, dtype=np.bool)
         do_inds[inds] = True
         do_inds[inds] = np.logical_not(np.any(np.isnan(self._cart[:,inds]), axis=0))
@@ -270,6 +309,8 @@ class Orbit:
 
     @property
     def num(self):
+        '''Number of orbits
+        '''
         nk = self._kep.shape[1]
         nc = self._cart.shape[1]
         assert nk == nc, f'Kepler "{nk}" and cartesian "{nc}" sizes do not agree'
@@ -278,6 +319,8 @@ class Orbit:
 
     @property
     def r(self):
+        '''Position vector
+        '''
         self._cart_check()
         return self._cart[:3,:]
     @r.setter
@@ -288,6 +331,8 @@ class Orbit:
 
     @property
     def v(self):
+        '''Velocity vector
+        '''
         self._cart_check()
         return self._cart[3:,:]
     @v.setter
@@ -299,6 +344,8 @@ class Orbit:
 
     @property
     def cartesian(self):
+        '''Cartesian state vector
+        '''
         self._cart_check()
         return self._cart.copy()
     @cartesian.setter
@@ -310,6 +357,8 @@ class Orbit:
 
     @property
     def x(self):
+        '''X Position
+        '''
         self._cart_check()
         return self._cart[0,:]
     @x.setter
@@ -320,6 +369,8 @@ class Orbit:
 
     @property
     def y(self):
+        '''Y Position
+        '''
         self._cart_check()
         return self._cart[1,:]
     @y.setter
@@ -330,6 +381,8 @@ class Orbit:
 
     @property
     def z(self):
+        '''Z Position
+        '''
         self._cart_check()
         return self._cart[2,:]
     @z.setter
@@ -340,6 +393,8 @@ class Orbit:
 
     @property
     def vx(self):
+        '''Velocity X-component
+        '''
         self._cart_check()
         return self._cart[3,:]
     @vx.setter
@@ -350,6 +405,8 @@ class Orbit:
 
     @property
     def vy(self):
+        '''Velocity Y-component
+        '''
         self._cart_check()
         return self._cart[4,:]
     @vy.setter
@@ -360,6 +417,8 @@ class Orbit:
 
     @property
     def vz(self):
+        '''Velocity Z-component
+        '''
         self._cart_check()
         return self._cart[5,:]
     @vz.setter
@@ -370,6 +429,8 @@ class Orbit:
 
     @property
     def kepler(self):
+        '''Keplerian state vector
+        '''
         self._kep_check()
         return self._kep.copy()
     @kepler.setter
@@ -381,6 +442,8 @@ class Orbit:
 
     @property
     def a(self):
+        '''Semi-major axis
+        '''
         self._kep_check()
         return self._kep[0,:]
     @a.setter
@@ -391,6 +454,8 @@ class Orbit:
 
     @property
     def e(self):
+        '''Eccentricity
+        '''
         self._kep_check()
         return self._kep[1,:]
     @e.setter
@@ -401,6 +466,8 @@ class Orbit:
 
     @property
     def i(self):
+        '''Inclination
+        '''
         self._kep_check()
         return self._kep[2,:]
     @i.setter
@@ -411,6 +478,8 @@ class Orbit:
 
     @property
     def omega(self):
+        '''Argument of perihelion
+        '''
         self._kep_check()
         return self._kep[3,:]
     @omega.setter
@@ -421,6 +490,8 @@ class Orbit:
 
     @property
     def Omega(self):
+        '''Longitude of the ascending node
+        '''
         self._kep_check()
         return self._kep[4,:]
     @Omega.setter
@@ -431,6 +502,8 @@ class Orbit:
 
     @property
     def anom(self):
+        '''The orbital anomaly, depending on :code:`self.type` it is either the True, Eccentric or Mean anomaly
+        '''
         self._kep_check()
         return self._kep[5,:]
     @anom.setter
@@ -440,6 +513,8 @@ class Orbit:
 
 
     def calc_true_anomaly(self, inds=slice(None,None,None)):
+        '''Calculates the true anomaly and stores it in :code:`self._true_anomaly`.
+        '''
         if self.type == 'eccentric':
             self._true_anomaly[inds] = functions.eccentric_to_true(
                 self.anom[inds], 
@@ -458,6 +533,8 @@ class Orbit:
 
 
     def calc_mean_anomaly(self, inds=slice(None,None,None)):
+        '''Calculates the mean anomaly and stores it in :code:`self._mean_anomaly`.
+        '''
         if self.type == 'eccentric':
             self._mean_anomaly[inds] = functions.eccentric_to_mean(
                 self.anom[inds], 
@@ -476,6 +553,8 @@ class Orbit:
 
 
     def calc_eccentric_anomaly(self, inds=slice(None,None,None)):
+        '''Calculates the eccentric anomaly and stores it in :code:`self._eccentric_anomaly`.
+        '''
         if self.type == 'mean':
             self._eccentric_anomaly = functions.mean_to_eccentric(
                 self.anom[inds], 
@@ -598,6 +677,7 @@ class Orbit:
 
         self.calc_mean_anomaly()
         return self._mean_anomaly
+
 
     @mean_anomaly.setter
     def mean_anomaly(self, value):
