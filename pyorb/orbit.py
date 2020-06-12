@@ -24,27 +24,23 @@ class Orbit:
     ANOMALY = ['true', 'eccentric', 'mean']
     
     def __init__(self, M0, **kwargs):
-        self.dtype = kwargs.get('dtype', np.float64)
+        self.dtype = kwargs.pop('dtype', np.float64)
 
-        self.G = kwargs.get('G', G_SI)
-        self.m = kwargs.get('m', np.zeros((1,), dtype=self.dtype))
-        self.tol = kwargs.get('tol', 1e-12)
+        self.G = kwargs.pop('G', G_SI)
+        self.tol = kwargs.pop('tol', 1e-12)
         self.M0 = M0
-        self.epoch = kwargs.get('epoch', None)
-        self.degrees = kwargs.get('degrees', False)
-        self.type = kwargs.get('type', 'true')
+        self.epoch = kwargs.pop('epoch', None)
+        self.degrees = kwargs.pop('degrees', False)
+        self.type = kwargs.pop('type', 'true')
         if self.type not in Orbit.ANOMALY:
             raise ValueError(f'Anomaly type "{self.type}" not recognized')
 
-        self._cart = np.full((6,1), np.nan, dtype=self.dtype)
-        self._kep = np.full((6,1), np.nan, dtype=self.dtype)
-
-        self._true_anomaly = np.full((1,), np.nan, dtype=self.dtype)
-        self._eccentric_anomaly = np.full((1,), np.nan, dtype=self.dtype)
-        self._mean_anomaly = np.full((1,), np.nan, dtype=self.dtype)
-        
-        self.__cart_calculated = np.full((1,), False, dtype=np.bool)
-        self.__kep_calculated = np.full((1,), False, dtype=np.bool)
+        self.allocate(kwargs.pop('num',1))
+        if 'm' in kwargs:
+            self.m[:] = kwargs['m']
+            del kwargs['m']
+        if self.num > 0:
+            self.update(**kwargs)
 
 
     def __str__(self):
@@ -86,7 +82,6 @@ class Orbit:
         if len(tmp_orb._cart.shape) == 1:
             tmp_orb._cart.shape = (6,1)
             tmp_orb._kep.shape = (6,1)
-            tmp_orb.m = np.array([tmp_orb.m], dtype=self.dtype)
             
         return tmp_orb
 
@@ -108,8 +103,10 @@ class Orbit:
             raise StopIteration
 
 
-    def propagate(self, t):
-        pass
+    def propagate(self, dt):
+        '''Propagate all orbits in time by modifying the anomaly of the orbit, i.e. by updating the kepler elements
+        '''
+        self.mean_anomaly = np.mod(self.mean_anomaly + self.mean_motion*dt, 2*np.pi)
 
 
     def add(self, num=1, **kwargs):
@@ -237,7 +234,7 @@ class Orbit:
                 kep_updated = True
 
         if 'm' in kwargs:
-            self.m[inds] = kwargs[inds]
+            self.m[inds] = kwargs['m']
             self.__kep_calculated[inds] = False
             self.__cart_calculated[inds] = False
         else:
@@ -258,6 +255,9 @@ class Orbit:
         do_inds = np.full((self.num,), False, dtype=np.bool)
         do_inds[inds] = True
         do_inds[inds] = np.logical_not(np.any(np.isnan(self._kep[:,inds]), axis=0))
+
+        if np.sum(do_inds) == 0:
+            return
 
         self.__cart_calculated[do_inds] = True
         if self.type == 'true':
@@ -283,6 +283,9 @@ class Orbit:
         do_inds = np.full((self.num,), False, dtype=np.bool)
         do_inds[inds] = True
         do_inds[inds] = np.logical_not(np.any(np.isnan(self._cart[:,inds]), axis=0))
+
+        if np.sum(do_inds) == 0:
+            return
 
         self.__kep_calculated[do_inds] = True
         self._kep[:,do_inds] = functions.cart_to_kep(
@@ -510,6 +513,18 @@ class Orbit:
         self._kep[5,:] = value
 
 
+    @property
+    def mean_motion(self):
+        '''Mean motion
+        '''
+        return np.pi*2.0/self.period
+    @mean_motion.setter
+    def mean_motion(self, value):
+        self.__cart_calculated[:] = False
+        self.period = np.pi*2.0/value
+
+
+
     def calc_true_anomaly(self, inds=slice(None,None,None)):
         '''Calculates the true anomaly and stores it in :code:`self._true_anomaly`.
         '''
@@ -601,6 +616,7 @@ class Orbit:
                 self.e, 
                 degrees = self.degrees, 
             )
+        self.__cart_calculated[:] = False
 
 
     @property
@@ -629,41 +645,7 @@ class Orbit:
                 self.e, 
                 degrees = self.degrees, 
             )
-
-
-    @property
-    def period(self):
-        '''Orbital period
-        '''
-        self._kep_check()
-        return functions.orbital_period(self.a, self.G*(self.M0 + self.m))
-
-    @period.setter
-    def period(self):
-        self.a = functions.semi_major_axis(self.period, self.G*(self.M0 + self.m))
-
-
-    @property
-    def speed(self):
-        '''Orbital speed
-        '''
-        if not self.__cart_calculated:
-            return functions.orbital_speed(
-                functions.elliptic_radius(
-                    self.eccentric_anomaly, 
-                    self.a, 
-                    self.e, 
-                    degrees=self.degrees,
-                ), 
-                self.a, 
-                self.G*(self.M0 + self.m),
-            )
-        else:
-            return np.linalg.norm(self.v)
-
-    @speed.setter
-    def speed(self, value):
-        self.v *= value/np.linalg.norm(self.v, axis=0)
+        self.__cart_calculated[:] = False
 
 
     @property
@@ -695,3 +677,40 @@ class Orbit:
                 tol = self.tol,
                 degrees = self.degrees,
             )
+        self.__cart_calculated[:] = False
+
+
+    @property
+    def period(self):
+        '''Orbital period
+        '''
+        self._kep_check()
+        return functions.orbital_period(self.a, self.G*(self.M0 + self.m))
+
+    @period.setter
+    def period(self):
+        self.a = functions.semi_major_axis(self.period, self.G*(self.M0 + self.m))
+        self.__cart_calculated[:] = False
+
+
+    @property
+    def speed(self):
+        '''Orbital speed
+        '''
+        if not self.__cart_calculated:
+            return functions.orbital_speed(
+                functions.elliptic_radius(
+                    self.eccentric_anomaly, 
+                    self.a, 
+                    self.e, 
+                    degrees=self.degrees,
+                ), 
+                self.a, 
+                self.G*(self.M0 + self.m),
+            )
+        else:
+            return np.linalg.norm(self.v)
+
+    @speed.setter
+    def speed(self, value):
+        self.v *= value/np.linalg.norm(self.v, axis=0)
