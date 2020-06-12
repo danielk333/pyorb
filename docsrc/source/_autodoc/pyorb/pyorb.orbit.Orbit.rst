@@ -50,6 +50,7 @@ Orbit
       ~Orbit.omega
       ~Orbit.period
       ~Orbit.r
+      ~Orbit.speed
       ~Orbit.true_anomaly
       ~Orbit.v
       ~Orbit.velocity

@@ -13,19 +13,84 @@ Get started tutorial
 =========================
 
 
+
+
 .. rst-class:: sphx-glr-script-out
 
+ Out:
 
-.. code-block:: pytb
+ .. code-block:: none
 
-    Traceback (most recent call last):
-      File "/home/danielk/venvs/basic/lib/python3.7/site-packages/sphinx_gallery/gen_gallery.py", line 159, in call_memory
-        return 0., func()
-      File "/home/danielk/venvs/basic/lib/python3.7/site-packages/sphinx_gallery/gen_rst.py", line 466, in __call__
-        exec(self.code, self.fake_main.__dict__)
-      File "/home/danielk/IRF/IRF_GITLAB/pyorb/examples/getting_started.py", line 92, in <module>
-        print(f'Orbital speed: {orb2.speed} AU/y')
-    AttributeError: 'Orbit' object has no attribute 'speed'
+    a    : nan   x : nan
+    e    : nan   y : nan
+    i    : nan   z : nan
+    omega: nan   vx: nan
+    Omega: nan   vy: nan
+    anom : nan   vz: nan
+
+
+    a    : 1.4960e+11   x : nan
+    e    : 0.0000e+00   y : nan
+    i    : 0.0000e+00   z : nan
+    omega: 0.0000e+00   vx: nan
+    Omega: 0.0000e+00   vy: nan
+    anom : 0.0000e+00   vz: nan
+    Orbital period: [365.25137584] days
+
+
+    Orbit X-position is [1.49597871e+08] km
+    Orbit velocity vector is [[-0.        ]
+     [29.78514217]
+     [ 0.        ]] km/s
+    a    : 1.4960e+11   x : 1.4960e+11
+    e    : 0.0000e+00   y : 0.0000e+00
+    i    : 0.0000e+00   z : 0.0000e+00
+    omega: 0.0000e+00   vx: -0.0000e+00
+    Omega: 0.0000e+00   vy: 2.9785e+04
+    anom : 0.0000e+00   vz: 0.0000e+00
+
+
+    a    : 1.4960e+11   x : 1.6456e+11
+    e    : 0.0000e+00   y : 0.0000e+00
+    i    : 0.0000e+00   z : 0.0000e+00
+    omega: 0.0000e+00   vx: -0.0000e+00
+    Omega: 0.0000e+00   vy: 2.9785e+04
+    anom : 0.0000e+00   vz: 0.0000e+00
+
+
+    New kepler elements [[1.82841842e+11]
+     [1.00000000e-01]
+     [0.00000000e+00]
+     [0.00000000e+00]
+     [0.00000000e+00]
+     [0.00000000e+00]]
+    a    : 1.8284e+11   x : 1.6456e+11
+    e    : 1.0000e-01   y : 0.0000e+00
+    i    : 0.0000e+00   z : 0.0000e+00
+    omega: 0.0000e+00   vx: -0.0000e+00
+    Omega: 0.0000e+00   vy: 2.9785e+04
+    anom : 0.0000e+00   vz: 0.0000e+00
+
+
+    SI gravitation constant: 6.6743e-11 m^3 kg^-1 s^-2
+    Alternative gravitation constant: 1.993560809749174e-44 AU^3 kg^-1 s^-2
+    a    : 1.0000e+00   x : 1.0000e+00
+    e    : 0.0000e+00   y : 0.0000e+00
+    i    : 0.0000e+00   z : 0.0000e+00
+    omega: 0.0000e+00   vx: -0.0000e+00
+    Omega: 0.0000e+00   vy: 1.9910e-07
+    anom : 0.0000e+00   vz: 0.0000e+00
+    Orbital period: [365.25137584] days
+
+    Astronomical gravitation constant: 39.47812018693255 AU^3 Msol^-1 y^-2
+    a    : 1.0000e+00   x : 1.0000e+00
+    e    : 0.0000e+00   y : 0.0000e+00
+    i    : 0.0000e+00   z : 0.0000e+00
+    omega: 0.0000e+00   vx: -0.0000e+00
+    Omega: 0.0000e+00   vy: 6.2832e+00
+    anom : 0.0000e+00   vz: 0.0000e+00
+    Orbital period: [1.00000377] years
+    Orbital speed: 6.283161639408344 AU/y
 
 
 
@@ -129,7 +194,7 @@ Get started tutorial
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.030 seconds)
+   **Total running time of the script:** ( 0 minutes  0.008 seconds)
 
 
 .. _sphx_glr_download_auto_gallery_getting_started.py:

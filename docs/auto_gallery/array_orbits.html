@@ -6,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Array support &#8212; PyOrb 0.1.0 documentation</title>
+    <title>Array support &#8212; PyOrb 0.2.0 documentation</title>
     <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
@@ -23,7 +23,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Distribution transformation" href="distribution_transform.html" />
-    <link rel="prev" title="Distribution transformation" href="perturbation.html" />
+    <link rel="prev" title="Examples" href="index.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <!--[if lt IE 9]>
     <script src="_static/css3-mediaqueries.js"></script>
@@ -42,9 +42,9 @@
           <a href="distribution_transform.html" title="Distribution transformation"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="perturbation.html" title="Distribution transformation"
+          <a href="index.html" title="Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">PyOrb 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">PyOrb 0.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Examples</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Array support</a></li> 
       </ul>
@@ -103,21 +103,21 @@ anom : nan   vz: nan
 <span class="n">orb</span> <span class="o">=</span> <span class="n">pyorb</span><span class="o">.</span><span class="n">Orbit</span><span class="p">(</span><span class="n">M0</span> <span class="o">=</span> <span class="n">pyorb</span><span class="o">.</span><span class="n">M_sol</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">orb</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">orb</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.linspace.html#numpy.linspace" title="numpy.linspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><a href="https://numpy.org/doc/stable/reference/generated/numpy.linspace.html#numpy.linspace" title="numpy.linspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><a href="https://numpy.org/doc/stable/reference/generated/numpy.linspace.html#numpy.linspace" title="numpy.linspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">linspace</span></a></a></a><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">num</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">*</span><span class="n">pyorb</span><span class="o">.</span><span class="n">AU</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">omega</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Omega</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">anom</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">orb</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.linspace.html#numpy.linspace" title="numpy.linspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">linspace</span></a><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">num</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">*</span><span class="n">pyorb</span><span class="o">.</span><span class="n">AU</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">omega</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Omega</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">anom</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="c1"># print(orb)</span>
 
 <span class="n">orb</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">4</span><span class="o">*</span><span class="n">pyorb</span><span class="o">.</span><span class="n">AU</span><span class="p">)</span>
-<span class="n">orb</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="o">*</span><span class="n">pyorb</span><span class="o">.</span><span class="n">AU</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.linspace.html#numpy.linspace" title="numpy.linspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><a href="https://numpy.org/doc/stable/reference/generated/numpy.linspace.html#numpy.linspace" title="numpy.linspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><a href="https://numpy.org/doc/stable/reference/generated/numpy.linspace.html#numpy.linspace" title="numpy.linspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">linspace</span></a></a></a><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="n">num</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">orb</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="o">*</span><span class="n">pyorb</span><span class="o">.</span><span class="n">AU</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.linspace.html#numpy.linspace" title="numpy.linspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">linspace</span></a><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="n">num</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">orb</span><span class="o">.</span><span class="n">a</span><span class="o">/</span><span class="n">pyorb</span><span class="o">.</span><span class="n">AU</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">orb</span><span class="o">.</span><span class="n">e</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">orb</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">orb</span><span class="p">[</span><span class="mi">14</span><span class="p">])</span>
 
-<span class="nb">print</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orb</span><span class="o">.</span><span class="n">_cart</span></a></a></a><span class="p">[</span><span class="mi">0</span><span class="p">,:])</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orb</span><span class="o">.</span><span class="n">_cart</span></a><span class="p">[</span><span class="mi">0</span><span class="p">,:])</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">orb</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">orb</span><span class="o">.</span><span class="n">eccentric_anomaly</span><span class="p">)</span>
-<span class="n">orb</span><span class="o">.</span><span class="n">eccentric_anomaly</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.linspace.html#numpy.linspace" title="numpy.linspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><a href="https://numpy.org/doc/stable/reference/generated/numpy.linspace.html#numpy.linspace" title="numpy.linspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><a href="https://numpy.org/doc/stable/reference/generated/numpy.linspace.html#numpy.linspace" title="numpy.linspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">linspace</span></a></a></a><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">360</span><span class="p">,</span><span class="n">num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">orb</span><span class="p">))</span>
+<span class="n">orb</span><span class="o">.</span><span class="n">eccentric_anomaly</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.linspace.html#numpy.linspace" title="numpy.linspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">linspace</span></a><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">360</span><span class="p">,</span><span class="n">num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">orb</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">orb</span><span class="o">.</span><span class="n">anom</span><span class="p">)</span>
 
 <span class="c1"># orb.update(inds=[2,3,4], anom=[0,45,90])</span>
@@ -159,8 +159,8 @@ anom : nan   vz: nan
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="perturbation.html"
-                        title="previous chapter">Distribution transformation</a></p>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Examples</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="distribution_transform.html"
                         title="next chapter">Distribution transformation</a></p>
@@ -198,9 +198,9 @@ anom : nan   vz: nan
           <a href="distribution_transform.html" title="Distribution transformation"
              >next</a> |</li>
         <li class="right" >
-          <a href="perturbation.html" title="Distribution transformation"
+          <a href="index.html" title="Examples"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">PyOrb 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">PyOrb 0.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Examples</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Array support</a></li> 
       </ul>

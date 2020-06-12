@@ -13,48 +13,6 @@ This is all the examples and tutorials
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Distribution transformation">
-
-.. only:: html
-
- .. figure:: /auto_gallery/images/thumb/sphx_glr_propagation_thumb.png
-     :alt: Distribution transformation
-
-     :ref:`sphx_glr_auto_gallery_propagation.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_gallery/propagation
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="Distribution transformation">
-
-.. only:: html
-
- .. figure:: /auto_gallery/images/thumb/sphx_glr_perturbation_thumb.png
-     :alt: Distribution transformation
-
-     :ref:`sphx_glr_auto_gallery_perturbation.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_gallery/perturbation
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Array support">
 
 .. only:: html
@@ -94,6 +52,48 @@ This is all the examples and tutorials
    :hidden:
 
    /auto_gallery/distribution_transform
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Propagation">
+
+.. only:: html
+
+ .. figure:: /auto_gallery/images/thumb/sphx_glr_propagation_thumb.png
+     :alt: Propagation
+
+     :ref:`sphx_glr_auto_gallery_propagation.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_gallery/propagation
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Perturbation by modifying elements">
+
+.. only:: html
+
+ .. figure:: /auto_gallery/images/thumb/sphx_glr_perturbation_thumb.png
+     :alt: Perturbation by modifying elements
+
+     :ref:`sphx_glr_auto_gallery_perturbation.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_gallery/perturbation
 
 .. raw:: html
 

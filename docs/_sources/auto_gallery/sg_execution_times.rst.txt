@@ -5,16 +5,16 @@
 
 Computation times
 =================
-**00:01.124** total execution time for **auto_gallery** files:
+**00:00.008** total execution time for **auto_gallery** files:
 
 +----------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_gallery_distribution_transform.py` (``distribution_transform.py``) | 00:01.108 | 0.0 MB |
+| :ref:`sphx_glr_auto_gallery_getting_started.py` (``getting_started.py``)               | 00:00.008 | 0.0 MB |
 +----------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_gallery_getting_started.py` (``getting_started.py``)               | 00:00.007 | 0.0 MB |
+| :ref:`sphx_glr_auto_gallery_array_orbits.py` (``array_orbits.py``)                     | 00:00.000 | 0.0 MB |
 +----------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_gallery_array_orbits.py` (``array_orbits.py``)                     | 00:00.006 | 0.0 MB |
-+----------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_gallery_propagation.py` (``propagation.py``)                       | 00:00.002 | 0.0 MB |
+| :ref:`sphx_glr_auto_gallery_distribution_transform.py` (``distribution_transform.py``) | 00:00.000 | 0.0 MB |
 +----------------------------------------------------------------------------------------+-----------+--------+
 | :ref:`sphx_glr_auto_gallery_perturbation.py` (``perturbation.py``)                     | 00:00.000 | 0.0 MB |
++----------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_gallery_propagation.py` (``propagation.py``)                       | 00:00.000 | 0.0 MB |
 +----------------------------------------------------------------------------------------+-----------+--------+
