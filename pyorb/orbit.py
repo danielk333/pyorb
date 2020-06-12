@@ -106,7 +106,11 @@ class Orbit:
     def propagate(self, dt):
         '''Propagate all orbits in time by modifying the anomaly of the orbit, i.e. by updating the kepler elements
         '''
-        self.mean_anomaly = np.mod(self.mean_anomaly + self.mean_motion*dt, 2*np.pi)
+        if self.degrees:
+            wrap_ = 360.0
+        else:
+            wrap_ = 2*np.pi
+        self.mean_anomaly = np.mod(self.mean_anomaly + self.mean_motion*dt, wrap_)
 
 
     def add(self, num=1, **kwargs):
@@ -169,10 +173,6 @@ class Orbit:
             del kwargs['m']
 
         self.update(inds = inds, **kwargs)
-
-
-    def append():
-        pass
 
 
     def allocate(self, num):
@@ -517,11 +517,20 @@ class Orbit:
     def mean_motion(self):
         '''Mean motion
         '''
-        return np.pi*2.0/self.period
+        if self.degrees:
+            norm_ = 360.0
+        else:
+            norm_ = np.pi*2.0
+
+        return norm_/self.period
     @mean_motion.setter
     def mean_motion(self, value):
         self.__cart_calculated[:] = False
-        self.period = np.pi*2.0/value
+        if self.degrees:
+            norm_ = 360.0
+        else:
+            norm_ = np.pi*2.0
+        self.period = norm_/value
 
 
 
@@ -694,8 +703,8 @@ class Orbit:
 
 
     @property
-    def speed(self):
-        '''Orbital speed
+    def velocity(self):
+        '''Orbital velocity
         '''
         if not self.__cart_calculated:
             return functions.orbital_speed(
@@ -711,6 +720,6 @@ class Orbit:
         else:
             return np.linalg.norm(self.v)
 
-    @speed.setter
-    def speed(self, value):
+    @velocity.setter
+    def velocity(self, value):
         self.v *= value/np.linalg.norm(self.v, axis=0)
