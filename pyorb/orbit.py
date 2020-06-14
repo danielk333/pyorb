@@ -355,7 +355,7 @@ class Orbit:
         return self.m
     @m.setter
     def m(self, value):
-        self.m[:] = m
+        self.m[:] = value
 
 
     @property
