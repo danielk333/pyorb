@@ -27,6 +27,7 @@ class Orbit:
         self.dtype = kwargs.pop('dtype', np.float64)
 
         self.auto_update = kwargs.pop('auto_update', True)
+        self.direct_update = kwargs.pop('direct_update', True)
         self.kepler_read_only = kwargs.pop('kepler_read_only', False)
         self.cartesian_read_only = kwargs.pop('cartesian_read_only', False)
 
@@ -59,13 +60,13 @@ class Orbit:
         return str_
 
     def _cart_check(self):
-        if self.auto_update:
+        if self.auto_update and not self.direct_update:
             self.calculate_cartesian(
                 np.logical_not(self.__cart_calculated),
             )
 
     def _kep_check(self):
-        if self.auto_update:
+        if self.auto_update and not self.direct_update:
             self.calculate_kepler(
                 np.logical_not(self.__kep_calculated),
             )
@@ -117,7 +118,8 @@ class Orbit:
         else:
             wrap_ = 2*np.pi
         self.mean_anomaly = np.mod(self.mean_anomaly + self.mean_motion*dt, wrap_)
-
+        if self.direct_update:
+            self.calculate_cartesian()
 
     def add(self, num=1, **kwargs):
         '''Adds orbits to this instance
@@ -219,16 +221,22 @@ class Orbit:
             if self.cartesian_read_only:
                 raise ValueError('Cannot update read only Cartesian elements')
             self._cart[:, inds] = kwargs['cartesian']
-            self.__cart_calculated[inds] = True
-            self.__kep_calculated[inds] = False
+            if self.direct_update:
+                self.calculate_kepler()
+            else:
+                self.__cart_calculated[inds] = True
+                self.__kep_calculated[inds] = False
             return
 
         if 'kepler' in kwargs:
             if self.kepler_read_only:
                 raise ValueError('Cannot update read only Kepler elements')
             self._kep[:, inds] = kwargs['kepler']
-            self.__kep_calculated[inds] = True
-            self.__cart_calculated[inds] = False
+            if self.direct_update:
+                self.calculate_cartesian()
+            else:
+                self.__kep_calculated[inds] = True
+                self.__cart_calculated[inds] = False
             return
 
         for ind, key in enumerate(Orbit.CARTESIAN):
@@ -248,16 +256,24 @@ class Orbit:
                 kep_updated = True
 
         if 'm' in kwargs:
+            if self.direct_update:
+                raise ValueError('Cannot set "m" and direct update, set "m" via property and manually call calculate.')
             self.m[inds] = kwargs['m']
             self.__kep_calculated[inds] = False
             self.__cart_calculated[inds] = False
         else:
             if cart_updated:
-                self.__kep_calculated[inds] = False
-                self.__cart_calculated[inds] = True
+                if self.direct_update:
+                    self.calculate_kepler()
+                else:
+                    self.__kep_calculated[inds] = False
+                    self.__cart_calculated[inds] = True
             if kep_updated:
-                self.__cart_calculated[inds] = False
-                self.__kep_calculated[inds] = True
+                if self.direct_update:
+                    self.calculate_cartesian()
+                else:
+                    self.__cart_calculated[inds] = False
+                    self.__kep_calculated[inds] = True
 
 
     def calculate_cartesian(self, inds=slice(None,None,None)):
@@ -333,6 +349,16 @@ class Orbit:
 
 
     @property
+    def m(self):
+        '''Object mass
+        '''
+        return self.m
+    @m.setter
+    def m(self, value):
+        self.m[:] = m
+
+
+    @property
     def r(self):
         '''Position vector
         '''
@@ -342,9 +368,14 @@ class Orbit:
     def r(self, value):
         if self.cartesian_read_only:
             raise ValueError('Cannot update read only Cartesian elements')
-        self.__kep_calculated[:] = False
-        self.__cart_calculated[:] = True
         self._cart[:3,:] = value
+
+        if self.direct_update:
+            self.calculate_kepler()
+        else:
+            self.__kep_calculated[:] = False
+            self.__cart_calculated[:] = True
+        
 
     @property
     def v(self):
@@ -356,9 +387,14 @@ class Orbit:
     def v(self, value):
         if self.cartesian_read_only:
             raise ValueError('Cannot update read only Cartesian elements')
-        self.__kep_calculated[:] = False
-        self.__cart_calculated[:] = True
         self._cart[3:,:] = value
+
+        if self.direct_update:
+            self.calculate_kepler()
+        else:
+            self.__kep_calculated[:] = False
+            self.__cart_calculated[:] = True
+        
 
 
     @property
@@ -371,9 +407,13 @@ class Orbit:
     def cartesian(self, value):
         if self.cartesian_read_only:
             raise ValueError('Cannot update read only Cartesian elements')
-        self.__kep_calculated[:] = False
-        self.__cart_calculated[:] = True
         self._cart[:,:] = value
+
+        if self.direct_update:
+            self.calculate_kepler()
+        else:
+            self.__kep_calculated[:] = False
+            self.__cart_calculated[:] = True
 
 
     @property
@@ -386,9 +426,12 @@ class Orbit:
     def x(self, value):
         if self.cartesian_read_only:
             raise ValueError('Cannot update read only Cartesian elements')
-        self.__kep_calculated[:] = False
         self._cart[0,:] = value
 
+        if self.direct_update:
+            self.calculate_kepler()
+        else:
+            self.__kep_calculated[:] = False
 
     @property
     def y(self):
@@ -400,8 +443,12 @@ class Orbit:
     def y(self, value):
         if self.cartesian_read_only:
             raise ValueError('Cannot update read only Cartesian elements')
-        self.__kep_calculated[:] = False
         self._cart[1,:] = value
+
+        if self.direct_update:
+            self.calculate_kepler()
+        else:
+            self.__kep_calculated[:] = False
 
 
     @property
@@ -414,8 +461,12 @@ class Orbit:
     def z(self, value):
         if self.cartesian_read_only:
             raise ValueError('Cannot update read only Cartesian elements')
-        self.__kep_calculated[:] = False
         self._cart[2,:] = value
+
+        if self.direct_update:
+            self.calculate_kepler()
+        else:
+            self.__kep_calculated[:] = False
 
 
     @property
@@ -428,8 +479,12 @@ class Orbit:
     def vx(self, value):
         if self.cartesian_read_only:
             raise ValueError('Cannot update read only Cartesian elements')
-        self.__kep_calculated[:] = False
         self._cart[3,:] = value
+
+        if self.direct_update:
+            self.calculate_kepler()
+        else:
+            self.__kep_calculated[:] = False
 
 
     @property
@@ -442,8 +497,12 @@ class Orbit:
     def vy(self, value):
         if self.cartesian_read_only:
             raise ValueError('Cannot update read only Cartesian elements')
-        self.__kep_calculated[:] = False
         self._cart[4,:] = value
+
+        if self.direct_update:
+            self.calculate_kepler()
+        else:
+            self.__kep_calculated[:] = False
 
 
     @property
@@ -456,8 +515,12 @@ class Orbit:
     def vz(self, value):
         if self.cartesian_read_only:
             raise ValueError('Cannot update read only Cartesian elements')
-        self.__kep_calculated[:] = False
         self._cart[5,:] = value
+
+        if self.direct_update:
+            self.calculate_kepler()
+        else:
+            self.__kep_calculated[:] = False
 
 
     @property
@@ -470,9 +533,13 @@ class Orbit:
     def kepler(self, value):
         if self.kepler_read_only:
             raise ValueError('Cannot update read only Kepler elements')
-        self.__cart_calculated[:] = False
-        self.__kep_calculated[:] = True
         self._kep[:,:] = value
+
+        if self.direct_update:
+            self.calculate_cartesian()
+        else:
+            self.__cart_calculated[:] = False
+            self.__kep_calculated[:] = True
 
 
     @property
@@ -485,8 +552,12 @@ class Orbit:
     def a(self, value):
         if self.kepler_read_only:
             raise ValueError('Cannot update read only Kepler elements')
-        self.__cart_calculated[:] = False
         self._kep[0,:] = value
+
+        if self.direct_update:
+            self.calculate_cartesian()
+        else:
+            self.__cart_calculated[:] = False
 
 
     @property
@@ -499,9 +570,12 @@ class Orbit:
     def e(self, value):
         if self.kepler_read_only:
             raise ValueError('Cannot update read only Kepler elements')
-        self.__cart_calculated[:] = False
         self._kep[1,:] = value
 
+        if self.direct_update:
+            self.calculate_cartesian()
+        else:
+            self.__cart_calculated[:] = False
 
     @property
     def i(self):
@@ -513,9 +587,12 @@ class Orbit:
     def i(self, value):
         if self.kepler_read_only:
             raise ValueError('Cannot update read only Kepler elements')
-        self.__cart_calculated[:] = False
         self._kep[2,:] = value
 
+        if self.direct_update:
+            self.calculate_cartesian()
+        else:
+            self.__cart_calculated[:] = False
 
     @property
     def omega(self):
@@ -527,8 +604,12 @@ class Orbit:
     def omega(self, value):
         if self.kepler_read_only:
             raise ValueError('Cannot update read only Kepler elements')
-        self.__cart_calculated[:] = False
         self._kep[3,:] = value
+
+        if self.direct_update:
+            self.calculate_cartesian()
+        else:
+            self.__cart_calculated[:] = False
 
 
     @property
@@ -541,8 +622,12 @@ class Orbit:
     def Omega(self, value):
         if self.kepler_read_only:
             raise ValueError('Cannot update read only Kepler elements')
-        self.__cart_calculated[:] = False
         self._kep[4,:] = value
+
+        if self.direct_update:
+            self.calculate_cartesian()
+        else:
+            self.__cart_calculated[:] = False
 
 
     @property
@@ -555,9 +640,12 @@ class Orbit:
     def anom(self, value):
         if self.kepler_read_only:
             raise ValueError('Cannot update read only Kepler elements')
-        self.__cart_calculated[:] = False
         self._kep[5,:] = value
 
+        if self.direct_update:
+            self.calculate_cartesian()
+        else:
+            self.__cart_calculated[:] = False
 
     @property
     def mean_motion(self):
@@ -573,12 +661,16 @@ class Orbit:
     def mean_motion(self, value):
         if self.kepler_read_only:
             raise ValueError('Cannot update read only Kepler elements')
-        self.__cart_calculated[:] = False
         if self.degrees:
             norm_ = 360.0
         else:
             norm_ = np.pi*2.0
         self.period = norm_/value
+
+        if self.direct_update:
+            self.calculate_cartesian()
+        else:
+            self.__cart_calculated[:] = False
 
 
 
@@ -675,7 +767,11 @@ class Orbit:
                 self.e, 
                 degrees = self.degrees, 
             )
-        self.__cart_calculated[:] = False
+
+        if self.direct_update:
+            self.calculate_cartesian()
+        else:
+            self.__cart_calculated[:] = False
 
 
     @property
@@ -706,7 +802,11 @@ class Orbit:
                 self.e, 
                 degrees = self.degrees, 
             )
-        self.__cart_calculated[:] = False
+
+        if self.direct_update:
+            self.calculate_cartesian()
+        else:
+            self.__cart_calculated[:] = False
 
 
     @property
@@ -740,7 +840,11 @@ class Orbit:
                 tol = self.tol,
                 degrees = self.degrees,
             )
-        self.__cart_calculated[:] = False
+
+        if self.direct_update:
+            self.calculate_cartesian()
+        else:
+            self.__cart_calculated[:] = False
 
 
     @property
@@ -755,15 +859,36 @@ class Orbit:
         if self.kepler_read_only:
             raise ValueError('Cannot update read only Kepler elements')
         self.a = functions.semi_major_axis(self.period, self.G*(self.M0 + self.m))
-        self.__cart_calculated[:] = False
+        if self.direct_update:
+            self.calculate_cartesian()
+        else:
+            self.__cart_calculated[:] = False
 
 
     @property
     def velocity(self):
-        '''Orbital velocity
+        '''Orbital velocity (from cartesian)
         '''
-        if not self.__cart_calculated:
-            return functions.orbital_speed(
+        self._cart_check()
+        return np.linalg.norm(self.v)
+
+    @velocity.setter
+    def velocity(self, value):
+        if self.cartesian_read_only:
+            raise ValueError('Cannot update read only Cartesian elements')
+        self.v *= value/np.linalg.norm(self.v, axis=0)
+
+        if self.direct_update:
+            self.calculate_kepler()
+        else:
+            self.__kep_calculated[:] = False
+
+    @property
+    def speed(self):
+        '''Orbital speed (from kepler)
+        '''
+        self._kep_check()
+        return functions.orbital_speed(
                 functions.elliptic_radius(
                     self.eccentric_anomaly, 
                     self.a, 
@@ -773,14 +898,3 @@ class Orbit:
                 self.a, 
                 self.G*(self.M0 + self.m),
             )
-        else:
-            return np.linalg.norm(self.v)
-
-    @velocity.setter
-    def velocity(self, value):
-        if self.cartesian_read_only:
-            raise ValueError('Cannot update read only Cartesian elements')
-        self.v *= value/np.linalg.norm(self.v, axis=0)
-
-
-Orbit.speed = Orbit.velocity
