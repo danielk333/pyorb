@@ -349,16 +349,6 @@ class Orbit:
 
 
     @property
-    def m(self):
-        '''Object mass
-        '''
-        return self.m
-    @m.setter
-    def m(self, value):
-        self.m[:] = value
-
-
-    @property
     def r(self):
         '''Position vector
         '''
