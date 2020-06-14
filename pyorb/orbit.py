@@ -295,7 +295,7 @@ class Orbit:
         else:
             kep_tmp = self._kep[:,do_inds]
             self.calc_true_anomaly(do_inds)
-            kep_tmp[5,:] = self._true_anomaly[:,do_inds]
+            kep_tmp[5,:] = self._true_anomaly[do_inds]
 
         self._cart[:,do_inds] = functions.kep_to_cart(
             kep_tmp,
