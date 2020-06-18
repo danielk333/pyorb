@@ -72,6 +72,9 @@ class Orbit:
             )
 
 
+    def copy(self):
+        return self[:]
+
     def __getitem__(self, inds):
         tmp_orb = Orbit(
             self.M0,
