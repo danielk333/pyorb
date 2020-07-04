@@ -76,10 +76,12 @@ class Orbit:
         return self[:]
 
     def __getitem__(self, inds):
+        m = self.m[inds]
         tmp_orb = Orbit(
             self.M0,
             G = self.G,
-            m = self.m[inds],
+            num = len(m),
+            m = m,
             degrees = self.degrees,
             tol = self.tol, 
             dtype = self.dtype,
