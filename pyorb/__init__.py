@@ -1,4 +1,4 @@
-__version__ = '0.3.1'
+from .version import __version__
 
 
 from .unit import get_G
