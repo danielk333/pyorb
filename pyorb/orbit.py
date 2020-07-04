@@ -124,6 +124,23 @@ class Orbit:
         if self.direct_update:
             self.calculate_cartesian()
 
+
+    def delete(self, inds):
+        '''Deletes the selected orbits from this instance.
+
+        :param int/list/numpy.ndarray/slice inds: Incidences of orbits to delete.
+        :return: None
+        '''
+        self.m = np.delete(self.m, inds, axis=0)
+        self._cart = np.delete(self._cart, inds, axis=1)
+        self._kep = np.delete(self._kep, inds, axis=1)
+        self._true_anomaly = np.delete(self._true_anomaly, inds, axis=0)
+        self._eccentric_anomaly = np.delete(self._eccentric_anomaly, inds, axis=0)
+        self._mean_anomaly = np.delete(self._mean_anomaly, inds, axis=0)
+        self.__cart_calculated = np.delete(self.__cart_calculated, inds, axis=0)
+        self.__kep_calculated = np.delete(self.__kep_calculated, inds, axis=0)
+
+
     def add(self, num=1, **kwargs):
         '''Adds orbits to this instance
 
