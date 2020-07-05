@@ -77,10 +77,15 @@ class Orbit:
 
     def __getitem__(self, inds):
         m = self.m[inds]
+        try:
+            num = len(m)
+        except TypeError:
+            num = 1
+        
         tmp_orb = Orbit(
             self.M0,
             G = self.G,
-            num = len(m),
+            num = num,
             m = m,
             degrees = self.degrees,
             tol = self.tol, 
