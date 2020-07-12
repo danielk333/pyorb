@@ -46,7 +46,107 @@ i_lim = np.pi*1e-9
 """float: The limit on inclination in radians below witch an orbit is considered not inclined
 """
 
+def cart_to_equi(cart, mu=M_sol*G, degrees=False):
+    '''Converts set of Cartesian state vectors to set of Equinoctial orbital elements.
+    '''
+    if not isinstance(cart, np.ndarray):
+        raise TypeError('Input type {} not supported: must be {}'.format( type(cart),np.ndarray ))
+    if cart.shape[0] != 6:
+        raise ValueError('Input data must have at least 6 variables along axis 0: input shape is {}'.format(cart.shape))
+    
+    if len(cart.shape) < 2:
+        input_is_vector = True
+        try:
+            cart.shape=(6,1)
+        except ValueError as e:
+            print('Error {} while trying to cast vector into single column.'.format(e))
+            print('Input array shape: {}'.format(cart.shape))
+            raise
+    else:
+        input_is_vector = False
 
+    if degrees:
+        pass
+
+    if input_is_vector:
+        cart.shape = (6,)
+        # o.shape = (6,)
+
+    raise NotImplementedError()
+
+def equi_to_cart(equi, mu=M_sol*G, degrees=False):
+    '''Converts set of Equinoctial orbital elements to set of Cartesian state vectors.
+    '''
+    if not isinstance(equi, np.ndarray):
+        raise TypeError('Input type {} not supported: must be {}'.format( type(equi),np.ndarray ))
+    if equi.shape[0] != 6:
+        raise ValueError('Input data must have at least 6 variables along axis 0: input shape is {}'.format(equi.shape))
+    
+    if len(equi.shape) < 2:
+        input_is_vector = True
+        try:
+            equi.shape=(6,1)
+        except ValueError as e:
+            print('Error {} while trying to cast vector into single column.'.format(e))
+            print('Input array shape: {}'.format(equi.shape))
+            raise
+    else:
+        input_is_vector = False
+
+
+    if degrees:
+        pass
+
+    if input_is_vector:
+        equi.shape = (6,)
+        # o.shape = (6,)
+
+    raise NotImplementedError()
+
+
+def kep_to_equi(kep, degrees=False):
+
+    lam = kep[3,...] + kep[4,...]
+    om = kep[4,...]
+    hi = 0.5*kep[2,...]
+    if degrees:
+        lam = np.radians(lam)
+        om = np.radians(om)
+        hi = np.radians(hi)
+
+    elems = np.empty(kep.shape, dtype=kep.dtype)
+
+    elems[0,...] = kep[0,...]
+    elems[1,...] = kep[1,...]*np.sin(lam)
+    elems[2,...] = kep[1,...]*np.cos(lam)
+    
+    elems[3,...] = np.sin(hi)*np.sin(om)
+    elems[4,...] = np.sin(hi)*np.cos(om)
+
+    elems[5,...] = kep[5,...] + lam
+
+    return elems
+
+def equi_to_kep(equi, degrees=False):
+
+    kep = np.empty(equi.shape, dtype=equi.dtype)
+
+    kep[0,...] = equi[0,...]
+    kep[1,...] = np.sqrt(equi[1,...]**2 + equi[2,...]**2)
+    hi = np.arcsin(np.sqrt(equi[3,...]**2 + equi[4,...]**2))
+    kep[2,...] = 2*hi
+    kep[4,...] = np.arctan2(equi[3,...], equi[4,...])
+
+    lam = np.arctan2(equi[1,...], equi[2,...])
+    if degrees:
+        lam = np.degrees(lam)
+        kep[4,...] = np.degrees(kep[4,...])
+        kep[2,...] = np.degrees(kep[2,...])
+    
+    kep[3,...] = lam - kep[4,...]
+    kep[5,...] = equi[5,...] - lam
+
+    return kep
 
 def cart_to_kep(cart, mu=M_sol*G, degrees=False):
     '''Converts set of Cartesian state vectors to set of Keplerian orbital elements.

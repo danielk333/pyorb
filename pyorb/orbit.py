@@ -21,6 +21,7 @@ class Orbit:
 
     CARTESIAN = ['x', 'y', 'z', 'vx', 'vy', 'vz']
     KEPLER = ['a', 'e', 'i', 'omega', 'Omega', 'anom']
+    EQUINOCTIAL = ['a', 'h', 'k', 'p', 'q', 'l']
     ANOMALY = ['true', 'eccentric', 'mean']
     
     def __init__(self, M0, **kwargs):
@@ -71,6 +72,9 @@ class Orbit:
                 np.logical_not(self.__kep_calculated),
             )
 
+
+    def __copy__(self):
+        return self[:]
 
     def copy(self):
         return self[:]
@@ -862,6 +866,38 @@ class Orbit:
             self.calculate_cartesian()
         else:
             self.__cart_calculated[:] = False
+
+    @property
+    def apoapsis(self):
+        return (1.0 + self.e)*self.a
+
+    @property
+    def periapsis(self):
+        return (1.0 - self.e)*self.a
+    
+    @property
+    def mean_longitude(self):
+        return self.mean_anomaly + self.omega + self.Omega
+
+
+    @property
+    def equinoctial(self):
+        kep = self.kepler
+        kep[5,...] = self.mean_anomaly
+        elems = functions.kep_to_equi(kep, degrees=self.degrees)
+        if self.num == 1:
+            elems.shape = (6,)
+        return elems
+
+
+    @equinoctial.setter
+    def equinoctial(self, vals):
+        elems = functions.equi_to_kep(vals, degrees=self.degrees)
+        tmp_elms = elems[:5,...]
+        if len(tmp_elms.shape) == 1:
+            tmp_elms.shape = (5,1)
+        self._kep[:5,...] = tmp_elms
+        self.mean_anomaly = elems[5,...]
 
 
     @property
