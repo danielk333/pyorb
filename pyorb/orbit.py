@@ -80,7 +80,7 @@ class Orbit:
         return self[:]
 
     def __getitem__(self, inds):
-        m = self.m[inds]
+        m = self.m[inds].copy()
         try:
             num = len(m)
         except TypeError:
@@ -97,8 +97,13 @@ class Orbit:
             epoch = self.epoch, 
             type = self.type,
         )
-        tmp_orb._cart = self._cart[:,inds]
-        tmp_orb._kep = self._kep[:,inds]
+        tmp_orb.auto_update = self.auto_update
+        tmp_orb.direct_update = self.direct_update
+        tmp_orb.kepler_read_only = self.kepler_read_only
+        tmp_orb.cartesian_read_only = self.cartesian_read_only
+
+        tmp_orb._cart = self._cart[:,inds].copy()
+        tmp_orb._kep = self._kep[:,inds].copy()
 
         if len(tmp_orb._cart.shape) == 1:
             tmp_orb._cart.shape = (6,1)
