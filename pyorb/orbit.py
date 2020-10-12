@@ -23,6 +23,8 @@ class Orbit:
     KEPLER = ['a', 'e', 'i', 'omega', 'Omega', 'anom']
     EQUINOCTIAL = ['a', 'h', 'k', 'p', 'q', 'l']
     ANOMALY = ['true', 'eccentric', 'mean']
+
+    UPDATE_KW = ['cartesian', 'kepler', 'm'] + KEPLER + CARTESIAN
     
     def __init__(self, M0, **kwargs):
         self.dtype = kwargs.pop('dtype', np.float64)
