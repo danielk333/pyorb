@@ -489,7 +489,7 @@ def rot_mat_y(theta, dtype=np.float):
 
 
 
-def laguerre_solve_kepler(E0, M, e, tol=1e-12, degree=5):
+def laguerre_solve_kepler(E0, M, e, tol=1e-12, max_iter=5000, degree=5):
     '''Solve the Kepler equation using the The Laguerre Algorithm, a algorithm that guarantees global convergence.
     Adjusted for solving only real roots (non-hyperbolic orbits)
     
@@ -503,6 +503,7 @@ def laguerre_solve_kepler(E0, M, e, tol=1e-12, degree=5):
     :param float M: Mean anomaly.
     :param float e: Eccentricity of ellipse.
     :param float tol: Absolute numerical tolerance eccentric anomaly.
+    :param int max_iter: Maximum number of iterations before solver is aborted.
     :param int degree: Polynomial degree in derivation of Laguerre Algorithm.
     :return: Eccentric anomaly and number of iterations.
     :rtype: tuple of (float, int)
@@ -559,6 +560,9 @@ def laguerre_solve_kepler(E0, M, e, tol=1e-12, degree=5):
         E = E - delta
 
         f_eval = _f(E)
+
+        if it_num > max_iter:
+            break
 
     return E, it_num
 
