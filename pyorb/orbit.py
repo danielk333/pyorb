@@ -23,6 +23,8 @@ class Orbit:
     KEPLER = ['a', 'e', 'i', 'omega', 'Omega', 'anom']
     EQUINOCTIAL = ['a', 'h', 'k', 'p', 'q', 'l']
     ANOMALY = ['true', 'eccentric', 'mean']
+
+    UPDATE_KW = ['cartesian', 'kepler', 'm'] + KEPLER + CARTESIAN
     
     def __init__(self, M0, **kwargs):
         self.dtype = kwargs.pop('dtype', np.float64)
@@ -433,7 +435,13 @@ class Orbit:
     def cartesian(self, value):
         if self.cartesian_read_only:
             raise ValueError('Cannot update read only Cartesian elements')
-        self._cart[:,:] = value
+        if isinstance(value, np.ndarray):
+            if len(value.shape) == 1:
+                self._cart[:,:] = value[:,None]
+            else:
+                self._cart[:,:] = value[:,:]
+        else:
+            self._cart[:,:] = value
 
         if self.direct_update:
             self.calculate_kepler()
@@ -559,7 +567,13 @@ class Orbit:
     def kepler(self, value):
         if self.kepler_read_only:
             raise ValueError('Cannot update read only Kepler elements')
-        self._kep[:,:] = value
+        if isinstance(value, np.ndarray):
+            if len(value.shape) == 1:
+                self._kep[:,:] = value[:,None]
+            else:
+                self._kep[:,:] = value[:,:]
+        else:
+            self._kep[:,:] = value
 
         if self.direct_update:
             self.calculate_cartesian()
