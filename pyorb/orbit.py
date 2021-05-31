@@ -39,9 +39,9 @@ class Orbit:
         self.M0 = M0
         self.epoch = kwargs.pop('epoch', None)
         self.degrees = kwargs.pop('degrees', False)
-        self.type = kwargs.pop('type', 'true')
-        if self.type not in Orbit.ANOMALY:
-            raise ValueError(f'Anomaly type "{self.type}" not recognized')
+        self.__type = kwargs.pop('type', 'true')
+        if self.__type not in Orbit.ANOMALY:
+            raise ValueError(f'Anomaly type "{self.__type}" not recognized')
 
         self.allocate(kwargs.pop('num',1))
         if 'm' in kwargs:
@@ -129,6 +129,24 @@ class Orbit:
             return self[self.__it-1]
         else:
             raise StopIteration
+
+    @property
+    def type(self):
+        return self.__type
+
+    @type.setter
+    def type(self, val):
+        val = val.lower().strip()
+        if val not in Orbit.ANOMALY:
+            raise ValueError(f'Anomaly type "{val}" not recognized')
+        if self.__type != val:
+            if val == 'true':
+                self.anom = self.true_anomaly
+            elif val == 'eccentric':
+                self.anom = self.eccentric_anomaly
+            elif val == 'mean':
+                self.anom = self.mean_anomaly
+            self.__type = val
 
 
     def propagate(self, dt):
