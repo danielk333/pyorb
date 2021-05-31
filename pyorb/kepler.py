@@ -33,7 +33,7 @@ M_earth = 398600.5e9/G
 '''
 
 M_sol = 1.98847e30
-"""float: The mass of the sun :math:`M_\odot` given in kg
+"""float: The mass of the sun :math:`M_\\odot` given in kg
 
 **Reference**: The Astronomical Almanac - http://asa.usno.navy.mil/static/files/2014/Astronomical_Constants_2014.pdf
 """
@@ -163,11 +163,11 @@ def cart_to_kep(cart, mu=M_sol*G, degrees=False):
        * The direction of motion as True anoamly :math:`\\nu`: increases for a zero inclination :math:`i`: orbit is anti-coockwise, i.e. from +x towards +y.
        * If the eccentricity :math:`e`: is increased, the periapsis will lie in +x direction.
        * If the inclination :math:`i`: is increased, the ellipse will rotate around the x-axis, so that +y is rotated toward +z.
-       * An increase in Longitude of ascending node :math:`\Omega`: corresponds to a rotation around the z-axis so that +x is rotated toward +y.
-       * Changing argument of perihelion :math:`\omega`: will not change the plane of the orbit, it will rotate the orbit in the plane.
+       * An increase in Longitude of ascending node :math:`\\Omega`: corresponds to a rotation around the z-axis so that +x is rotated toward +y.
+       * Changing argument of perihelion :math:`\\omega`: will not change the plane of the orbit, it will rotate the orbit in the plane.
        * The periapsis is shifted in the direction of motion.
-       * True anomaly measures from the +x axis, i.e :math:`\\nu = 0` is located at periapsis and :math:`\\nu = \pi` at apoapsis.
-       * All anomalies and orientation angles reach between 0 and :math:`2\pi`
+       * True anomaly measures from the +x axis, i.e :math:`\\nu = 0` is located at periapsis and :math:`\\nu = \\pi` at apoapsis.
+       * All anomalies and orientation angles reach between 0 and :math:`2\\pi`
 
        *Reference:* "Orbital Motion" by A.E. Roy.
     
@@ -181,8 +181,8 @@ def cart_to_kep(cart, mu=M_sol*G, degrees=False):
        * :math:`a`: Semi-major axis
        * :math:`e`: Eccentricity
        * :math:`i`: Inclination
-       * :math:`\omega`: Argument of perihelion
-       * :math:`\Omega`: Longitude of ascending node
+       * :math:`\\omega`: Argument of perihelion
+       * :math:`\\Omega`: Longitude of ascending node
        * :math:`\\nu`: True anomaly
 
 
@@ -190,7 +190,7 @@ def cart_to_kep(cart, mu=M_sol*G, degrees=False):
     :param float/numpy.ndarray mu: Standard gravitational parameter of objects. If `mu` is a numpy vector, the element corresponding to each column of `cart` will be used for its element calculation, Default value is in SI units a massless object orbiting the Sun.
     :param bool degrees: If `true`, degrees are used. Else all angles are given in radians.
 
-    :return: Keplerian orbital elements where rows 1-6 correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\omega`, :math:`\Omega`, :math:`\\nu` and columns correspond to different objects.
+    :return: Keplerian orbital elements where rows 1-6 correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\\omega`, :math:`\\Omega`, :math:`\\nu` and columns correspond to different objects.
     :rtype: numpy.ndarray
 
     **Example:**
@@ -493,7 +493,7 @@ def laguerre_solve_kepler(E0, M, e, tol=1e-12, max_iter=5000, degree=5):
     '''Solve the Kepler equation using the The Laguerre Algorithm, a algorithm that guarantees global convergence.
     Adjusted for solving only real roots (non-hyperbolic orbits)
     
-    Absolute numerical tolerance is defined as :math:`|f(E)| < tol` where :math:`f(E) = M - E + e \sin(E)`.
+    Absolute numerical tolerance is defined as :math:`|f(E)| < tol` where :math:`f(E) = M - E + e \\sin(E)`.
 
     # TODO: implement hyperbolic solving.
 
@@ -727,31 +727,31 @@ def mean_to_true(M, e, tol=1e-12, degrees=False):
 
 
 def orbital_speed(r, a, mu):
-    '''Calculates the orbital speed at a given radius for an Keplerian orbit :math:`v = \sqrt{\mu \left (\\frac{2}{r} - \\frac{1}{a} \\right )}`.
+    '''Calculates the orbital speed at a given radius for an Keplerian orbit :math:`v = \\sqrt{\\mu \\left (\\frac{2}{r} - \\frac{1}{a} \\right )}`.
     
     :param float/numpy.ndarray r: Radius from the pericenter.
     :param float/numpy.ndarray a: Semi-major axis of ellipse.
-    :param float/numpy.ndarray mu: Standard gravitation parameter :math:`\mu = G(m_1 + m_2)` of the orbit.
+    :param float/numpy.ndarray mu: Standard gravitation parameter :math:`\\mu = G(m_1 + m_2)` of the orbit.
     :return: Orbital speed.
     '''
     return np.sqrt(mu*(2.0/r - 1.0/a))
 
 
 def orbital_period(a, mu):
-    '''Calculates the orbital period of an Keplerian orbit based on the semi-major axis :math:`P = 2\pi\sqrt{\\frac{a^3}{\mu}}`.
+    '''Calculates the orbital period of an Keplerian orbit based on the semi-major axis :math:`P = 2\\pi\\sqrt{\\frac{a^3}{\\mu}}`.
     
     :param float/numpy.ndarray a: Semi-major axis of ellipse.
-    :param float/numpy.ndarray mu: Standard gravitation parameter :math:`\mu = G(m_1 + m_2)` of the orbit.
+    :param float/numpy.ndarray mu: Standard gravitation parameter :math:`\\mu = G(m_1 + m_2)` of the orbit.
     :return: Orbital period.
     '''
     return 2.0*np.pi*np.sqrt(a**3.0/mu)
 
 
 def semi_major_axis(P, mu):
-    '''Calculates the orbital semi-major axis of an Keplerian orbit based on the orbital period :math:`a = \mu^{\\frac{1}{3}}(\\frac{P}{2\pi})^{\\frac{2}{3}}`.
+    '''Calculates the orbital semi-major axis of an Keplerian orbit based on the orbital period :math:`a = \\mu^{\\frac{1}{3}}(\\frac{P}{2\\pi})^{\\frac{2}{3}}`.
     
     :param float/numpy.ndarray P: Orbital period
-    :param float/numpy.ndarray mu: Standard gravitation parameter :math:`\mu = G(m_1 + m_2)` of the orbit.
+    :param float/numpy.ndarray mu: Standard gravitation parameter :math:`\\mu = G(m_1 + m_2)` of the orbit.
     :return: semi-major axis.
     '''
     np.cbrt((P/(2.0*np.pi))**2*mu)
@@ -773,8 +773,8 @@ def kep_to_cart(kep, mu=M_sol*G, degrees=False):
        * The direction of motion as True anoamly :math:`\\nu`: increases for a zero inclination :math:`i`: orbit is anti-coockwise, i.e. from +x towards +y.
        * If the eccentricity :math:`e`: is increased, the periapsis will lie in +x direction.
        * If the inclination :math:`i`: is increased, the ellipse will rotate around the x-axis, so that +y is rotated toward +z.
-       * An increase in Longitude of ascending node :math:`\Omega`: corresponds to a rotation around the z-axis so that +x is rotated toward +y.
-       * Changing argument of perihelion :math:`\omega`: will not change the plane of the orbit, it will rotate the orbit in the plane.
+       * An increase in Longitude of ascending node :math:`\\Omega`: corresponds to a rotation around the z-axis so that +x is rotated toward +y.
+       * Changing argument of perihelion :math:`\\omega`: will not change the plane of the orbit, it will rotate the orbit in the plane.
        * The periapsis is shifted in the direction of motion.
 
        *Reference:* "Orbital Motion" by A.E. Roy.
@@ -783,15 +783,15 @@ def kep_to_cart(kep, mu=M_sol*G, degrees=False):
        * :math:`a`: Semi-major axis
        * :math:`e`: Eccentricity
        * :math:`i`: Inclination
-       * :math:`\omega`: Argument of perihelion
-       * :math:`\Omega`: Longitude of ascending node
+       * :math:`\\omega`: Argument of perihelion
+       * :math:`\\Omega`: Longitude of ascending node
        * :math:`\\nu`: True anoamly
 
     **Uses:**
        * :func:`~pyorb.kepler.true_to_eccentric`
        * :func:`~pyorb.kepler.elliptic_radius`
 
-    :param numpy.ndarray kep: Keplerian orbital elements where rows 1-6 correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\omega`, :math:`\Omega`, :math:`\\nu` and columns correspond to different objects.
+    :param numpy.ndarray kep: Keplerian orbital elements where rows 1-6 correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\\omega`, :math:`\\Omega`, :math:`\\nu` and columns correspond to different objects.
     :param float/numpy.ndarray mu: Standard gravitational parameter of objects. If `mu` is a numpy vector, the element corresponding to each column of `cart` will be used for its element calculation, Default value is in SI units a massless object orbiting the Sun.
     :param bool degrees: If `true`, degrees are used. Else all angles are given in radians.
 
