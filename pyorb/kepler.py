@@ -318,7 +318,7 @@ def cart_to_kep(cart, mu=M_sol*G, degrees=False):
     return o
 
 
-def true_to_eccentric(nu, e, degrees=True):
+def true_to_eccentric(nu, e, degrees=False):
     '''Calculates the eccentric anomaly from the true anomaly.
 
     :param float/numpy.ndarray nu: True anomaly.
@@ -342,7 +342,7 @@ def true_to_eccentric(nu, e, degrees=True):
     return E
 
 
-def eccentric_to_true(E, e, degrees=True):
+def eccentric_to_true(E, e, degrees=False):
     '''Calculates the true anomaly from the eccentric anomaly.
 
     :param float/numpy.ndarray E: Eccentric anomaly.
@@ -434,7 +434,7 @@ def elliptic_radius(E, a, e, degrees=False):
     return a*(1.0 - e*np.cos( _E ))
 
 
-def rot_mat_z(theta, dtype=np.float):
+def rot_mat_z(theta, dtype=np.float64):
     '''Generates the 3D transformation matrix for rotation around Z-axis.
     
     :param float theta: Angle to rotate.
@@ -452,7 +452,7 @@ def rot_mat_z(theta, dtype=np.float):
     return R
 
 
-def rot_mat_x(theta, dtype=np.float):
+def rot_mat_x(theta, dtype=np.float64):
     '''Generates the 3D transformation matrix for rotation around X-axis.
     
     :param float theta: Angle to rotate.
@@ -470,7 +470,7 @@ def rot_mat_x(theta, dtype=np.float):
     return R
 
 
-def rot_mat_y(theta, dtype=np.float):
+def rot_mat_y(theta, dtype=np.float64):
     '''Generates the 3D transformation matrix for rotation around Y-axis.
     
     :param float theta: Angle to rotate.
