@@ -285,6 +285,68 @@ class TestKepCart(unittest.TestCase):
         nt.assert_array_almost_equal(x, x_ref, decimal = 6)
 
 
+
+    def test_orientation_convention(self):
+
+        e = 0.5
+        orb0 = np.array([self.a, e, 0, 0, 0, 0], dtype=np.float64)
+        q = self.a*(1 - e)
+        Q = self.a*(1 + e)
+        l = self.a*(1 - e**2)
+
+        orb = orb0.copy()
+        x = kep.kep_to_cart(orb, mu=self.mu, degrees=True)
+        nt.assert_almost_equal(x[0], q, decimal = 6)
+
+        orb = orb0.copy()
+        orb[5] = 90
+        x = kep.kep_to_cart(orb, mu=self.mu, degrees=True)
+        nt.assert_almost_equal(x[1], l, decimal = 6)
+
+        orb = orb0.copy()
+        orb[3] = 180
+        x = kep.kep_to_cart(orb, mu=self.mu, degrees=True)
+        nt.assert_almost_equal(x[0], -q, decimal = 6)
+
+        orb[5] = 180
+        x = kep.kep_to_cart(orb, mu=self.mu, degrees=True)
+        nt.assert_almost_equal(x[0], Q, decimal = 6)
+
+        orb = orb0.copy()
+        orb[3] = 90
+        orb[4] = 90
+        orb[5] = 180
+        x = kep.kep_to_cart(orb, mu=self.mu, degrees=True)
+        nt.assert_almost_equal(x[0], Q, decimal = 6)
+
+        orb = orb0.copy()
+        orb[2] = 90
+        x = kep.kep_to_cart(orb, mu=self.mu, degrees=True)
+        nt.assert_almost_equal(x[0], q, decimal = 6)
+        nt.assert_almost_equal(x[1], 0, decimal = 6)
+
+        orb[3] = 90
+        x = kep.kep_to_cart(orb, mu=self.mu, degrees=True)
+        nt.assert_almost_equal(x[0], 0, decimal = 6)
+        nt.assert_almost_equal(x[1], 0, decimal = 6)
+        nt.assert_almost_equal(x[2], q, decimal = 6)
+
+        orb[4] = 180
+        x = kep.kep_to_cart(orb, mu=self.mu, degrees=True)
+        nt.assert_almost_equal(x[0], 0, decimal = 6)
+        nt.assert_almost_equal(x[1], 0, decimal = 6)
+        nt.assert_almost_equal(x[2], q, decimal = 6)
+
+        orb = orb0.copy()
+        orb[2] = 45
+        orb[3] = 90
+        orb[4] = 90
+        x = kep.kep_to_cart(orb, mu=self.mu, degrees=True)
+        nt.assert_almost_equal(x[0], -q*np.sqrt(2)*0.5, decimal = 6)
+        nt.assert_almost_equal(x[1], 0, decimal = 6)
+        nt.assert_almost_equal(x[2], q*np.sqrt(2)*0.5, decimal = 6)
+
+
     def test_cart_kep_inverse(self):
         a = np.linspace(self.a, self.a + self.R_e, num=2, dtype=np.float64)
         e = np.linspace(0.0, 0.99, num=10, dtype=np.float64)
@@ -326,8 +388,16 @@ class TestKepCart(unittest.TestCase):
                 print(o_calc[:,ind] - o[:,ind])
                 raise
 
-        o[3, o[1,:] < 1e-3] *= 0.0
-        o[4, o[2,:] < 180e-3] *= 0.0
+        el = o[1,:] < kep.e_lim
+        il = o[2,:] < kep.i_lim
+        o_orig = o.copy()
+
+        o[3, el] = 0.0
+        o[4, il] = 0.0
+        o[5, el] += o_orig[3, el]
+        o[5, np.logical_and(il,el)] += o_orig[4, np.logical_and(il,el)]
+        o[3, np.logical_and(il,np.logical_not(el))] += o_orig[4, np.logical_and(il,np.logical_not(el))]
+        o[5,:] = np.mod(o[5,:] + 360.0, 360.0)
 
         for ind in range(av.size):
             test = np.isclose(o_calc[0,ind]/self.R_e, o[0,ind]/self.R_e, atol=1e-3)
@@ -338,7 +408,13 @@ class TestKepCart(unittest.TestCase):
             )
             test = np.logical_and(test, test_ang)
             if not np.all(test):
+
+                # x_ = kep.kep_to_cart(o_orig[:,ind], mu=self.mu, degrees=True)
+                # o_calc_ = kep.cart_to_kep(x_, mu=self.mu, degrees=True)
+                # x_calc_ = kep.kep_to_cart(o_calc_, mu=self.mu, degrees=True)
+
                 print(ind)
+                print(o_orig[:,ind])
                 print(o[:,ind])
                 print(o_calc[:,ind])
                 print(o_calc[:,ind] - o[:,ind])
