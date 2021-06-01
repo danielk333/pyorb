@@ -33,7 +33,14 @@ class Orbit:
         self.direct_update = kwargs.pop('direct_update', True)
 
         self.G = kwargs.pop('G', G_SI)
-        self.tol = kwargs.pop('tol', 1e-12)
+
+        self.solver_options = dict(
+            tol=1e-12,
+            max_iter=5000,
+            degree=5,
+        )
+        self.solver_options.update(kwargs.pop('solver_options', {}))
+
         self.M0 = M0
         self.epoch = kwargs.pop('epoch', None)
         self.degrees = kwargs.pop('degrees', False)
@@ -99,7 +106,7 @@ class Orbit:
             num = num,
             m = m,
             degrees = self.degrees,
-            tol = self.tol, 
+            solver_options = copy.deepcopy(self.solver_options), 
             dtype = self.dtype,
             epoch = self.epoch, 
             type = self.type,
@@ -750,7 +757,7 @@ class Orbit:
             self._true_anomaly[inds] = functions.mean_to_true(
                 self.anom[inds], 
                 self.e[inds],
-                tol = self.tol,
+                solver_options = self.solver_options,
                 degrees = self.degrees,
             )
         else:
@@ -784,7 +791,7 @@ class Orbit:
             self._eccentric_anomaly = functions.mean_to_eccentric(
                 self.anom[inds], 
                 self.e[inds],
-                tol = self.tol,
+                solver_options = self.solver_options,
                 degrees = self.degrees,
             )
         elif self.type == 'true':
@@ -893,14 +900,14 @@ class Orbit:
             self.anom = functions.mean_to_true(
                 value, 
                 self.e,
-                tol = self.tol,
+                solver_options = self.solver_options,
                 degrees = self.degrees,
             )
         elif self.type == 'eccentric':
             self.anom = functions.mean_to_eccentric(
                 value, 
                 self.e,
-                tol = self.tol,
+                solver_options = self.solver_options,
                 degrees = self.degrees,
             )
 

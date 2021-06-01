@@ -696,12 +696,12 @@ def kepler_guess(M, e):
     return E0
 
 
-def mean_to_eccentric(M, e, tol=1e-12, degrees=False):
+def mean_to_eccentric(M, e, solver_options=None, degrees=False):
     '''Calculates the eccentric anomaly from the mean anomaly by solving the Kepler equation.
 
     :param float/numpy.ndarray M: Mean anomaly.
     :param float/numpy.ndarray e: Eccentricity of ellipse.
-    :param float tol: Numerical tolerance for solving Keplers equation in units of radians.
+    :param dict solver_options: Options for the numerical solution of Kepler's equation. See `pyorb.kepler.laguerre_solve_kepler` for information.
     :param bool degrees: If true degrees are used, else all angles are given in radians
     
     :return: True anomaly.
@@ -711,6 +711,8 @@ def mean_to_eccentric(M, e, tol=1e-12, degrees=False):
        * :func:`~pyorb.kepler._get_kepler_guess`
        * :func:`~pyorb.kepler.laguerre_solve_kepler`
     '''
+    if solver_options is None:
+        solver_options = {}
 
     if degrees:
         _M = np.radians(M)
@@ -739,7 +741,7 @@ def mean_to_eccentric(M, e, tol=1e-12, degrees=False):
             Ec = next(Eit)
 
             E0 = _get_kepler_guess(Mc, ec)
-            E_calc, it_num = laguerre_solve_kepler(E0, Mc, ec, tol=tol)
+            E_calc, it_num = laguerre_solve_kepler(E0, Mc, ec, **solver_options)
 
             Ec[...] = E_calc
 
@@ -748,7 +750,7 @@ def mean_to_eccentric(M, e, tol=1e-12, degrees=False):
             return M
 
         E0 = _get_kepler_guess(_M, e)
-        E, it_num = laguerre_solve_kepler(E0, _M, e, tol=tol)
+        E, it_num = laguerre_solve_kepler(E0, _M, e, **solver_options)
 
 
     if degrees:
@@ -757,7 +759,7 @@ def mean_to_eccentric(M, e, tol=1e-12, degrees=False):
     return E
 
 
-def mean_to_true(M, e, tol=1e-12, degrees=False):
+def mean_to_true(M, e, solver_options=None, degrees=False):
     '''Transforms mean anomaly to true anomaly.
     
     **Uses:**
@@ -766,7 +768,7 @@ def mean_to_true(M, e, tol=1e-12, degrees=False):
 
     :param float/numpy.ndarray M: Mean anomaly.
     :param float/numpy.ndarray e: Eccentricity of ellipse.
-    :param float tol: Numerical tolerance for solving Keplers equation in units of radians.
+    :param dict solver_options: Options for the numerical solution of Kepler's equation. See `pyorb.kepler.laguerre_solve_kepler` for information.
     :param bool degrees: If true degrees are used, else all angles are given in radians
     
     :return: True anomaly.
@@ -777,7 +779,7 @@ def mean_to_true(M, e, tol=1e-12, degrees=False):
     else:
         _M = M
 
-    E = mean_to_eccentric(_M, e, tol=tol, degrees=False)
+    E = mean_to_eccentric(_M, e, solver_options=solver_options, degrees=False)
     nu = eccentric_to_true(E, e, degrees=False)
 
     if degrees:
