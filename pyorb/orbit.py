@@ -805,7 +805,7 @@ class Orbit:
         #But then its on the users head if something changes since this does 
         #not get updated until someone calls calc_eccentric_anomaly
         self.calc_eccentric_anomaly()
-        return self._eccentric_anomaly
+        return self._eccentric_anomaly.copy()
 
     @eccentric_anomaly.setter
     def eccentric_anomaly(self, value):
@@ -840,7 +840,7 @@ class Orbit:
             return self.anom
         
         self.calc_true_anomaly()
-        return self._true_anomaly
+        return self._true_anomaly.copy()
 
     @true_anomaly.setter
     def true_anomaly(self, value):
@@ -875,7 +875,7 @@ class Orbit:
             return self.anom
 
         self.calc_mean_anomaly()
-        return self._mean_anomaly
+        return self._mean_anomaly.copy()
 
 
     @mean_anomaly.setter
