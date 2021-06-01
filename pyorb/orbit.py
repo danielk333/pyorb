@@ -275,7 +275,7 @@ class Orbit:
 
         if 'cartesian' in kwargs:
             if self.cartesian_read_only:
-                raise ValueError('Cannot update read only Cartesian elements')
+                raise AttributeError('Cannot update read only Cartesian elements')
             self._cart[:, inds] = kwargs['cartesian']
             if self.direct_update:
                 self.calculate_kepler()
@@ -286,7 +286,7 @@ class Orbit:
 
         if 'kepler' in kwargs:
             if self.kepler_read_only:
-                raise ValueError('Cannot update read only Kepler elements')
+                raise AttributeError('Cannot update read only Kepler elements')
             self._kep[:, inds] = kwargs['kepler']
             if self.direct_update:
                 self.calculate_cartesian()
@@ -298,16 +298,16 @@ class Orbit:
         for ind, key in enumerate(Orbit.CARTESIAN):
             if key in kwargs:
                 if self.cartesian_read_only:
-                    raise ValueError('Cannot update read only Cartesian elements')
+                    raise AttributeError('Cannot update read only Cartesian elements')
                 self._cart[ind, inds] = kwargs[key]
                 cart_updated = True
 
         for ind, key in enumerate(Orbit.KEPLER):
             if key in kwargs:
                 if self.kepler_read_only:
-                    raise ValueError('Cannot update read only Cartesian elements')
+                    raise AttributeError('Cannot update read only Cartesian elements')
                 if cart_updated:
-                    raise ValueError('Cannot update both cartesian and Keplerian elements simultaneously.')
+                    raise AttributeError('Cannot update both cartesian and Keplerian elements simultaneously.')
                 self._kep[ind, inds] = kwargs[key]
                 kep_updated = True
 
@@ -413,7 +413,7 @@ class Orbit:
     @r.setter
     def r(self, value):
         if self.cartesian_read_only:
-            raise ValueError('Cannot update read only Cartesian elements')
+            raise AttributeError('Cannot update read only Cartesian elements')
         self._cart[:3,:] = value
 
         if self.direct_update:
@@ -432,7 +432,7 @@ class Orbit:
     @v.setter
     def v(self, value):
         if self.cartesian_read_only:
-            raise ValueError('Cannot update read only Cartesian elements')
+            raise AttributeError('Cannot update read only Cartesian elements')
         self._cart[3:,:] = value
 
         if self.direct_update:
@@ -452,7 +452,7 @@ class Orbit:
     @cartesian.setter
     def cartesian(self, value):
         if self.cartesian_read_only:
-            raise ValueError('Cannot update read only Cartesian elements')
+            raise AttributeError('Cannot update read only Cartesian elements')
         if isinstance(value, np.ndarray):
             if len(value.shape) == 1:
                 self._cart[:,:] = value[:,None]
@@ -477,7 +477,7 @@ class Orbit:
     @x.setter
     def x(self, value):
         if self.cartesian_read_only:
-            raise ValueError('Cannot update read only Cartesian elements')
+            raise AttributeError('Cannot update read only Cartesian elements')
         self._cart[0,:] = value
 
         if self.direct_update:
@@ -494,7 +494,7 @@ class Orbit:
     @y.setter
     def y(self, value):
         if self.cartesian_read_only:
-            raise ValueError('Cannot update read only Cartesian elements')
+            raise AttributeError('Cannot update read only Cartesian elements')
         self._cart[1,:] = value
 
         if self.direct_update:
@@ -512,7 +512,7 @@ class Orbit:
     @z.setter
     def z(self, value):
         if self.cartesian_read_only:
-            raise ValueError('Cannot update read only Cartesian elements')
+            raise AttributeError('Cannot update read only Cartesian elements')
         self._cart[2,:] = value
 
         if self.direct_update:
@@ -530,7 +530,7 @@ class Orbit:
     @vx.setter
     def vx(self, value):
         if self.cartesian_read_only:
-            raise ValueError('Cannot update read only Cartesian elements')
+            raise AttributeError('Cannot update read only Cartesian elements')
         self._cart[3,:] = value
 
         if self.direct_update:
@@ -548,7 +548,7 @@ class Orbit:
     @vy.setter
     def vy(self, value):
         if self.cartesian_read_only:
-            raise ValueError('Cannot update read only Cartesian elements')
+            raise AttributeError('Cannot update read only Cartesian elements')
         self._cart[4,:] = value
 
         if self.direct_update:
@@ -566,7 +566,7 @@ class Orbit:
     @vz.setter
     def vz(self, value):
         if self.cartesian_read_only:
-            raise ValueError('Cannot update read only Cartesian elements')
+            raise AttributeError('Cannot update read only Cartesian elements')
         self._cart[5,:] = value
 
         if self.direct_update:
@@ -584,7 +584,7 @@ class Orbit:
     @kepler.setter
     def kepler(self, value):
         if self.kepler_read_only:
-            raise ValueError('Cannot update read only Kepler elements')
+            raise AttributeError('Cannot update read only Kepler elements')
         if isinstance(value, np.ndarray):
             if len(value.shape) == 1:
                 self._kep[:,:] = value[:,None]
@@ -609,7 +609,7 @@ class Orbit:
     @a.setter
     def a(self, value):
         if self.kepler_read_only:
-            raise ValueError('Cannot update read only Kepler elements')
+            raise AttributeError('Cannot update read only Kepler elements')
         self._kep[0,:] = value
 
         if self.direct_update:
@@ -627,7 +627,7 @@ class Orbit:
     @e.setter
     def e(self, value):
         if self.kepler_read_only:
-            raise ValueError('Cannot update read only Kepler elements')
+            raise AttributeError('Cannot update read only Kepler elements')
         self._kep[1,:] = value
 
         if self.direct_update:
@@ -644,7 +644,7 @@ class Orbit:
     @i.setter
     def i(self, value):
         if self.kepler_read_only:
-            raise ValueError('Cannot update read only Kepler elements')
+            raise AttributeError('Cannot update read only Kepler elements')
         self._kep[2,:] = value
 
         if self.direct_update:
@@ -661,7 +661,7 @@ class Orbit:
     @omega.setter
     def omega(self, value):
         if self.kepler_read_only:
-            raise ValueError('Cannot update read only Kepler elements')
+            raise AttributeError('Cannot update read only Kepler elements')
         self._kep[3,:] = value
 
         if self.direct_update:
@@ -679,7 +679,7 @@ class Orbit:
     @Omega.setter
     def Omega(self, value):
         if self.kepler_read_only:
-            raise ValueError('Cannot update read only Kepler elements')
+            raise AttributeError('Cannot update read only Kepler elements')
         self._kep[4,:] = value
 
         if self.direct_update:
@@ -697,7 +697,7 @@ class Orbit:
     @anom.setter
     def anom(self, value):
         if self.kepler_read_only:
-            raise ValueError('Cannot update read only Kepler elements')
+            raise AttributeError('Cannot update read only Kepler elements')
         self._kep[5,:] = value
 
         if self.direct_update:
@@ -718,7 +718,7 @@ class Orbit:
     @mean_motion.setter
     def mean_motion(self, value):
         if self.kepler_read_only:
-            raise ValueError('Cannot update read only Kepler elements')
+            raise AttributeError('Cannot update read only Kepler elements')
         if self.degrees:
             norm_ = 360.0
         else:
@@ -810,7 +810,7 @@ class Orbit:
     @eccentric_anomaly.setter
     def eccentric_anomaly(self, value):
         if self.kepler_read_only:
-            raise ValueError('Cannot update read only Kepler elements')
+            raise AttributeError('Cannot update read only Kepler elements')
         if self.type == 'eccentric':
             self.anom = value
         elif self.type == 'true':
@@ -845,7 +845,7 @@ class Orbit:
     @true_anomaly.setter
     def true_anomaly(self, value):
         if self.kepler_read_only:
-            raise ValueError('Cannot update read only Kepler elements')
+            raise AttributeError('Cannot update read only Kepler elements')
         if self.type == 'true':
             self.anom = value
         elif self.type == 'eccentric':
@@ -881,7 +881,7 @@ class Orbit:
     @mean_anomaly.setter
     def mean_anomaly(self, value):
         if self.kepler_read_only:
-            raise ValueError('Cannot update read only Kepler elements')
+            raise AttributeError('Cannot update read only Kepler elements')
         if self.type == 'mean':
             self.anom = value
         elif self.type == 'true':
@@ -947,7 +947,7 @@ class Orbit:
     @period.setter
     def period(self):
         if self.kepler_read_only:
-            raise ValueError('Cannot update read only Kepler elements')
+            raise AttributeError('Cannot update read only Kepler elements')
         self.a = functions.semi_major_axis(self.period, self.G*(self.M0 + self.m))
         if self.direct_update:
             self.calculate_cartesian()
@@ -965,7 +965,7 @@ class Orbit:
     @velocity.setter
     def velocity(self, value):
         if self.cartesian_read_only:
-            raise ValueError('Cannot update read only Cartesian elements')
+            raise AttributeError('Cannot update read only Cartesian elements')
         self.v *= value/np.linalg.norm(self.v, axis=0)
 
         if self.direct_update:
