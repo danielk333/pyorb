@@ -635,7 +635,7 @@ def laguerre_solve_kepler(E0, M, e, tol=1e-12, max_iter=5000, degree=5):
 
         f_eval = _f(E)
 
-        if it_num > max_iter:
+        if it_num >= max_iter:
             break
 
     return E, it_num
