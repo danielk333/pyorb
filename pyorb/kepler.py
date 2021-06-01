@@ -331,8 +331,16 @@ def cart_to_kep(cart, mu=M_sol*G, degrees=False):
     o[3,ez_neg] = 2.0*np.pi - o[3,ez_neg]
 
     #second case: ex component
-    ey_neg = np.logical_and(e[1,:] < 0.0, eg_il)
-    o[3,ey_neg] = 2.0*np.pi - o[3,ey_neg]
+    #prograde
+    ey_neg = np.logical_and(o[2,:] < np.pi*0.5, eg_il)
+    ey_neg2 = np.logical_and(ey_neg, e[1,:] < 0.0)
+    o[3,ey_neg2] = 2.0*np.pi - o[3,ey_neg2]
+    
+    #retrograde
+    ey_neg = np.logical_and(o[2,:] > np.pi*0.5, eg_il)
+    ey_neg2 = np.logical_and(ey_neg, e[1,:] >= 0.0)
+    o[3,ey_neg2] = 2.0*np.pi - o[3,ey_neg2]
+
 
     ### TRUE ANOMALY ###
     cos_nu = np.empty_like(hn)
@@ -364,9 +372,15 @@ def cart_to_kep(cart, mu=M_sol*G, degrees=False):
     o[5,tmp_ind_] = 2.0*np.pi - o[5,tmp_ind_]
 
     #circular and planar
-    tmp_ind_ = np.logical_and(r[1,:] < 0.0, el_il)
-    o[5,tmp_ind_] = 2.0*np.pi - o[5,tmp_ind_]
+    #prograde
+    tmp_ind_ = np.logical_and(o[2,:] < np.pi*0.5, el_il)
+    tmp_ind2_ = np.logical_and(tmp_ind_, r[1,:] < 0.0)
+    o[5,tmp_ind2_] = 2.0*np.pi - o[5,tmp_ind2_]
 
+    #if retrograde, its reversed
+    tmp_ind_ = np.logical_and(o[2,:] > np.pi*0.5, el_il)
+    tmp_ind2_ = np.logical_and(tmp_ind_, r[1,:] >= 0.0)
+    o[5,tmp_ind2_] = 2.0*np.pi - o[5,tmp_ind2_]
 
     ## OUTPUT FORMATTING ##
     if degrees:
