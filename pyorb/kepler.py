@@ -271,7 +271,7 @@ def cart_to_kep(cart, mu=M_sol*G, degrees=False):
 
     #possible cases
     eg = o[1,:] > e_lim #e grater
-    ig = o[2,:] > i_lim #i grater
+    ig = np.logical_and(o[2,:] > i_lim, o[2,:] < np.pi - i_lim) #i grater (include retrograde planar orbits)
     el = np.logical_not(eg) #e less equal
     il = np.logical_not(ig) #i less equal
 

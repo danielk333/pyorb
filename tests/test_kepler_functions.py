@@ -388,6 +388,30 @@ class TestKepCart(unittest.TestCase):
         nt.assert_almost_equal(x[1], 0, decimal = 6)
         nt.assert_almost_equal(x[2], q*np.sqrt(2)*0.5, decimal = 6)
 
+    def test_planar_detection(self):
+        '''Longitude of ascending node gets transfered to argument of periapsis in planar orbits. Test if this is true for retro-grade and pro-grade planar orbits.
+        '''
+
+        orb_in = np.array([self.a, 0.5, 0, 0, 45, 0], dtype=np.float64)
+        orb_ref = np.array([self.a, 0.5, 0, 45, 0, 0], dtype=np.float64)
+
+        x0 = kep.kep_to_cart(orb_in, mu=self.mu, degrees=True)
+        orb_out = kep.cart_to_kep(x0, mu=self.mu, degrees=True)
+
+        nt.assert_almost_equal(orb_ref, orb_out)
+
+        orb_in = np.array([self.a, 0.5, 180, 0, 45, 0], dtype=np.float64)
+        orb_ref = np.array([self.a, 0.5, 180, 45, 0, 0], dtype=np.float64)
+
+        x1 = kep.kep_to_cart(orb_in, mu=self.mu, degrees=True)
+        orb_out = kep.cart_to_kep(x1, mu=self.mu, degrees=True)
+
+        #should be same but reversed velocity
+        x1[3:] = -x1[3:]
+        nt.assert_almost_equal(x0, x1)
+
+        nt.assert_almost_equal(orb_ref, orb_out)
+
 
     def test_cart_kep_inverse(self):
         a = np.linspace(self.a, self.a + self.R_e, num=2, dtype=np.float64)
