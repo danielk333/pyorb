@@ -455,14 +455,22 @@ class TestKepCart(unittest.TestCase):
                 raise
 
         el = o[1,:] < kep.e_lim
-        il = o[2,:] < kep.i_lim
+        
+        il = o[2,:] < np.degrees(kep.i_lim)
+        il_ret = o[2,:] > 180 - np.degrees(kep.i_lim)
         o_orig = o.copy()
 
         o[3, el] = 0.0
         o[4, il] = 0.0
+        o[4, il_ret] = 0.0
         o[5, el] += o_orig[3, el]
+
         o[5, np.logical_and(il,el)] += o_orig[4, np.logical_and(il,el)]
         o[3, np.logical_and(il,np.logical_not(el))] += o_orig[4, np.logical_and(il,np.logical_not(el))]
+
+        o[5, np.logical_and(il_ret,el)] -= o_orig[4, np.logical_and(il_ret,el)]
+        o[3, np.logical_and(il_ret,np.logical_not(el))] -= o_orig[4, np.logical_and(il_ret,np.logical_not(el))]
+
         o[5,:] = np.mod(o[5,:] + 360.0, 360.0)
 
         for ind in range(av.size):
