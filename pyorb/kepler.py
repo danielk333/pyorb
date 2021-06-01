@@ -495,24 +495,6 @@ def elliptic_radius(E, a, e, degrees=False):
     return a*(1.0 - e*np.cos( _E ))
 
 
-def rot_mat_z(theta, dtype=np.float64):
-    '''Generates the 3D transformation matrix for rotation around Z-axis.
-    
-    :param float theta: Angle to rotate.
-    :param numpy.dtype dtype: The data-type of the output matrix.
-
-    :return: Rotation matrix
-    :rtype: (3,3) numpy.ndarray
-    '''
-    R = np.zeros((3,3), dtype=dtype)
-    R[0,0] = np.cos(theta)
-    R[0,1] = -np.sin(theta)
-    R[1,0] = np.sin(theta)
-    R[1,1] = np.cos(theta)
-    R[2,2] = 1.0
-    return R
-
-
 def rot_mat_x(theta, dtype=np.float64):
     '''Generates the 3D transformation matrix for rotation around X-axis.
     
@@ -548,6 +530,23 @@ def rot_mat_y(theta, dtype=np.float64):
     R[1,1] = 1.0
     return R
 
+
+def rot_mat_z(theta, dtype=np.float64):
+    '''Generates the 3D transformation matrix for rotation around Z-axis.
+    
+    :param float theta: Angle to rotate.
+    :param numpy.dtype dtype: The data-type of the output matrix.
+
+    :return: Rotation matrix
+    :rtype: (3,3) numpy.ndarray
+    '''
+    R = np.zeros((3,3), dtype=dtype)
+    R[0,0] = np.cos(theta)
+    R[0,1] = -np.sin(theta)
+    R[1,0] = np.sin(theta)
+    R[1,1] = np.cos(theta)
+    R[2,2] = 1.0
+    return R
 
 
 def laguerre_solve_kepler(E0, M, e, tol=1e-12, max_iter=5000, degree=5):
