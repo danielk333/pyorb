@@ -223,12 +223,12 @@ class Orbit:
         )
         self.__cart_calculated = np.append(
             self.__cart_calculated,
-            np.full((num,), False, dtype=np.bool),
+            np.full((num,), False, dtype=np.bool_),
             axis=0,
         )
         self.__kep_calculated = np.append(
             self.__kep_calculated,
-            np.full((num,), False, dtype=np.bool),
+            np.full((num,), False, dtype=np.bool_),
             axis=0,
         )
 
@@ -253,8 +253,8 @@ class Orbit:
         self._true_anomaly = np.full((num,), np.nan, dtype=self.dtype)
         self._eccentric_anomaly = np.full((num,), np.nan, dtype=self.dtype)
         self._mean_anomaly = np.full((num,), np.nan, dtype=self.dtype)
-        self.__cart_calculated = np.full((num,), False, dtype=np.bool)
-        self.__kep_calculated = np.full((num,), False, dtype=np.bool)
+        self.__cart_calculated = np.full((num,), False, dtype=np.bool_)
+        self.__kep_calculated = np.full((num,), False, dtype=np.bool_)
 
 
     def update(self, inds=slice(None, None, None), **kwargs):
@@ -338,7 +338,7 @@ class Orbit:
         :param int/list/numpy.ndarray/slice inds: Incidences of orbits to calculate, defaults to all
         :return: None
         '''
-        do_inds = np.full((self.num,), False, dtype=np.bool)
+        do_inds = np.full((self.num,), False, dtype=np.bool_)
         do_inds[inds] = True
         do_inds[inds] = np.logical_not(np.any(np.isnan(self._kep[:,inds]), axis=0))
 
@@ -366,7 +366,7 @@ class Orbit:
         :param int/list/numpy.ndarray/slice inds: Incidences of orbits to calculate, defaults to all
         :return: None
         '''
-        do_inds = np.full((self.num,), False, dtype=np.bool)
+        do_inds = np.full((self.num,), False, dtype=np.bool_)
         do_inds[inds] = True
         do_inds[inds] = np.logical_not(np.any(np.isnan(self._cart[:,inds]), axis=0))
 
