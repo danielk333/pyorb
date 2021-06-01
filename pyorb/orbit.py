@@ -31,8 +31,6 @@ class Orbit:
 
         self.auto_update = kwargs.pop('auto_update', True)
         self.direct_update = kwargs.pop('direct_update', True)
-        self.kepler_read_only = kwargs.pop('kepler_read_only', False)
-        self.cartesian_read_only = kwargs.pop('cartesian_read_only', False)
 
         self.G = kwargs.pop('G', G_SI)
         self.tol = kwargs.pop('tol', 1e-12)
@@ -43,12 +41,19 @@ class Orbit:
         if self.__type not in Orbit.ANOMALY:
             raise ValueError(f'Anomaly type "{self.__type}" not recognized')
 
+        self.kepler_read_only = False
+        self.cartesian_read_only = False
+
         self.allocate(kwargs.pop('num',1))
         if 'm' in kwargs:
             self.m[:] = kwargs['m']
             del kwargs['m']
         if self.num > 0:
             self.update(**kwargs)
+
+        self.kepler_read_only = kwargs.pop('kepler_read_only', False)
+        self.cartesian_read_only = kwargs.pop('cartesian_read_only', False)
+
 
 
     def __str__(self):
