@@ -409,7 +409,7 @@ class Orbit:
         '''Position vector
         '''
         self._cart_check()
-        return self._cart[:3,:]
+        return self._cart[:3,:].copy()
     @r.setter
     def r(self, value):
         if self.cartesian_read_only:
@@ -428,7 +428,7 @@ class Orbit:
         '''Velocity vector
         '''
         self._cart_check()
-        return self._cart[3:,:]
+        return self._cart[3:,:].copy()
     @v.setter
     def v(self, value):
         if self.cartesian_read_only:
@@ -473,7 +473,7 @@ class Orbit:
         '''X Position
         '''
         self._cart_check()
-        return self._cart[0,:]
+        return self._cart[0,:].copy()
     @x.setter
     def x(self, value):
         if self.cartesian_read_only:
@@ -490,7 +490,7 @@ class Orbit:
         '''Y Position
         '''
         self._cart_check()
-        return self._cart[1,:]
+        return self._cart[1,:].copy()
     @y.setter
     def y(self, value):
         if self.cartesian_read_only:
@@ -508,7 +508,7 @@ class Orbit:
         '''Z Position
         '''
         self._cart_check()
-        return self._cart[2,:]
+        return self._cart[2,:].copy()
     @z.setter
     def z(self, value):
         if self.cartesian_read_only:
@@ -526,7 +526,7 @@ class Orbit:
         '''Velocity X-component
         '''
         self._cart_check()
-        return self._cart[3,:]
+        return self._cart[3,:].copy()
     @vx.setter
     def vx(self, value):
         if self.cartesian_read_only:
@@ -544,7 +544,7 @@ class Orbit:
         '''Velocity Y-component
         '''
         self._cart_check()
-        return self._cart[4,:]
+        return self._cart[4,:].copy()
     @vy.setter
     def vy(self, value):
         if self.cartesian_read_only:
@@ -562,7 +562,7 @@ class Orbit:
         '''Velocity Z-component
         '''
         self._cart_check()
-        return self._cart[5,:]
+        return self._cart[5,:].copy()
     @vz.setter
     def vz(self, value):
         if self.cartesian_read_only:
@@ -605,7 +605,7 @@ class Orbit:
         '''Semi-major axis
         '''
         self._kep_check()
-        return self._kep[0,:]
+        return self._kep[0,:].copy()
     @a.setter
     def a(self, value):
         if self.kepler_read_only:
@@ -623,7 +623,7 @@ class Orbit:
         '''Eccentricity
         '''
         self._kep_check()
-        return self._kep[1,:]
+        return self._kep[1,:].copy()
     @e.setter
     def e(self, value):
         if self.kepler_read_only:
@@ -640,7 +640,7 @@ class Orbit:
         '''Inclination
         '''
         self._kep_check()
-        return self._kep[2,:]
+        return self._kep[2,:].copy()
     @i.setter
     def i(self, value):
         if self.kepler_read_only:
@@ -657,7 +657,7 @@ class Orbit:
         '''Argument of perihelion
         '''
         self._kep_check()
-        return self._kep[3,:]
+        return self._kep[3,:].copy()
     @omega.setter
     def omega(self, value):
         if self.kepler_read_only:
@@ -675,7 +675,7 @@ class Orbit:
         '''Longitude of the ascending node
         '''
         self._kep_check()
-        return self._kep[4,:]
+        return self._kep[4,:].copy()
     @Omega.setter
     def Omega(self, value):
         if self.kepler_read_only:
@@ -693,7 +693,7 @@ class Orbit:
         '''The orbital anomaly, depending on :code:`self.type` it is either the True, Eccentric or Mean anomaly
         '''
         self._kep_check()
-        return self._kep[5,:]
+        return self._kep[5,:].copy()
     @anom.setter
     def anom(self, value):
         if self.kepler_read_only:
