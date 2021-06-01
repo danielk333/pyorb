@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
-'''Orbit class definition
-
+'''Orbit class definition.
 '''
 
 #Python standard import
-
+import copy
 
 #Third party import
 import numpy as np
@@ -18,6 +17,54 @@ from . import kepler as functions
 
 
 class Orbit:
+    '''Main encapsulating class for the concept of an orbit.
+
+
+    :Pointers:
+        All properties return copies of the internal variables rather then return 
+        a pointer to the internal variable, e.g. `self.cartesian` accesses and 
+        creates a copy of the internal storage `self._cart`, while the pointer can 
+        technically be used this may cause unexpected behavior in variables as 
+        internal parameters can be set without passing trough the setter functions 
+        and previously accessed variables can be changed by the instance after 
+        access and should be avoided.
+
+    :Copy:
+        The `Orbit` class has a `self.copy` method that returns a completely 
+        independent copy of the instance. The `copy` function from the `copy` 
+        standard python package can also be used to the same effect.
+
+    :Iteration:
+        The `Orbit` instance has an iteration method that iterates trough each 
+        orbit in the instance and upon each iteration returns an `Orbit` 
+        instance with only the member of the current iteration step.
+
+
+    :param numpy.dtype dtype: A numpy dtype that will be used to store all orbit information. Defaults to `np.float64`. To save RAM footprint and if memory usage is a problem, consider if `np.float32` can support your required precision.
+    :param bool direct_update: Toggles if the corresponding kepler/cartesian elements are directly updated when a cartesian/kepler element is changed. Consider disabling if performance is an issue or multiple properties should be set prior to cartesian or kepler calculation. To completely disable automatic conversion between kepler and cartesian elements, `direct_update` also needs to be disabled.
+    :param bool auto_update: Advanced configuration, toggles automatic updating of the kepler/cartesian elements when accessed if any cartesian/kepler element has changed trough a property setter since last access. Does not affect behavior if `direct_update` is `True`.
+    :param bool kepler_read_only: Toggles if the kepler variables can be only read or the properties can also be set, e.g. if `kepler_read_only=True` an access of `self.a` is fine but `self.a = 1` would raise an `AttributeError`.
+    :param bool cartesian_read_only: Same as `kepler_read_only` but for the cartesian variables.
+    :param float G: Gravitational constant, should match the set of units used. Defaults to SI units. See :func:`pyorb.get_G` for more information.
+    :param epoch: Storage for the epoch of the orbit. Not used internally for any calculations.
+    :param bool degrees: Toggles if angles are given in degrees instead of radians. Radians are used by default, i.e `degrees=False`.
+    :param str type: Specifies the type of anomaly is used to describe the position on the orbit. The string values for the available options are listed in `Orbit.ANOMALY`. The setter is not case sensitive.
+    :param numpy.ndarray m: Masses of the objects for which to calculate orbits. Used to calculate the gravitational parameter.
+    :param int num: Integer describing the number of orbits in this instance. As the orbit calculations are vectorized, for performance when converting large amounts of orbits a single instance should be used with many orbits.
+    :param dict solver_options: Settings for the numerical solving of Kepler's equation. See description below.
+
+
+    :Kepler's equation:
+        The Kepler equation is solved using the The Laguerre Algorithm, an algorithm that guarantees global convergence.
+        This algorithm has been split into two, one branch adjusted for solving 
+        only real roots (non-hyperbolic orbits) and for solving only imaginary
+        roots (hyperbolic orbits). The options for this algorithm are currently:
+
+        - _float_ **tol**: Numerical tolerance for solving Kepler's equation in units of radians.
+        - _int_ **max_iter**: Maximum number of iterations to reach error tolerance.
+        - _int_ **degree**: Polynomial degree used in derivation of Laguerre Algorithm.
+
+    '''
 
     CARTESIAN = ['x', 'y', 'z', 'vx', 'vy', 'vz']
     KEPLER = ['a', 'e', 'i', 'omega', 'Omega', 'anom']
