@@ -61,3 +61,12 @@ Example
 
     #print cartesian position in AU at aphelion after the above changes
     print(orb.r/pyorb.AU)
+
+
+Notes
+------
+
+Array orbits:
+- Properties act on ALL orbits in the class
+- Only way to update individual orbits of a set is to use ``self.update`` with the ``inds`` keyword
+- Iterations are passive, the objects are copies from the array so the array itself is NOT modified

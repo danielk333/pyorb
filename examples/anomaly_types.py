@@ -2,7 +2,7 @@
 Anomaly types
 ===============
 
-To get another anomaly, either change anomaly type :code:`orb.type = 'mean'` or use the property
+To get another anomaly, either change anomaly type ``orb.type = 'mean'`` or use the property ``orb.mean_anomaly``.
 '''
 import matplotlib.pyplot as plt
 import numpy as np
@@ -25,8 +25,6 @@ orb = pyorb.Orbit(
     Omega = 0, 
     anom = anom.reshape(num**2),
     degrees = True,
-    auto_update = True, 
-    direct_update = True,
     type = 'true'
 )
 
@@ -39,6 +37,9 @@ print(f'Orbit anomaly type: {orb.type}')
 fig, ax = plt.subplots(1,1)
 
 c = ax.pcolormesh(ecc, true, mean-true)
+ax.set_xlabel('Eccentricity [1]')
+ax.set_ylabel('True anomaly [deg]')
+ax.set_title('Difference between True and mean anomaly [deg]')
 fig.colorbar(c)
 
 plt.show()
