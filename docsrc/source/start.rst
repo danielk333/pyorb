@@ -18,7 +18,7 @@ Code
     #Currently the orbit has no values
     print(orb)
 
-.. execute_code:: python
+.. code-block:: python
     :hide_code:
 
     import pyorb
@@ -36,7 +36,7 @@ Code
     print(orb)
     print(f'Orbital period: {orb.period/(3600.0*24)} days')
 
-.. execute_code:: python
+.. code-block:: python
     :hide_code:
 
     import pyorb
@@ -58,7 +58,7 @@ Code
     print(f'Orbit velocity vector is {orb.v*1e-3} km/s')
     print(orb)
 
-.. execute_code:: python
+.. code-block:: python
     :hide_code:
 
     import pyorb
@@ -89,7 +89,7 @@ Code
     print(f'New kepler elements {orb.kepler}')
     print(orb)
 
-.. execute_code:: python
+.. code-block:: python
     :hide_code:
 
     import pyorb
@@ -106,7 +106,7 @@ Code
 
 As a standard, SI units are used but we can also create orbits with an arbitrary system of units
 
-.. execute_code:: python
+.. code-block:: python
     :linenos:
 
     import pyorb
