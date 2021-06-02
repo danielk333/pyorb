@@ -326,7 +326,9 @@ class Orbit:
 
         :Keyword arguments:
             - Any valid Cartesian or Keplerian variable name can be given as a key to update that parameter. 
-            - Mass can also be updated this way but this requires manual execution of either :code:`calculate_cartesian` or :code:`calculate_kepler` depending on which are to remain constant.
+            - If `kepler` is given, it is interpreted as an input array the same as using `orb.kepler = kepler` and no other updates are done.
+            - If `cartesian` is given, it is interpreted as an input array the same as using `orb.cartesian = cartesian` and no other updates are done.
+            - Mass can also be updated this way but this assumes that if kepler elements are updated, they stay constant due to the mass change and the cartesian are changed. Vice versa with updating mass and cartesian elements. If only mass is updated :code:`calculate_cartesian` or :code:`calculate_kepler` must be called manually depending on which are to remain constant.
         '''
 
         cart_updated = False
@@ -358,7 +360,6 @@ class Orbit:
             if key in kwargs:
                 if self.cartesian_read_only:
                     raise AttributeError('Cannot update read only Cartesian elements')
-                self._cart[ind, inds] = kwargs[key]
                 cart_updated = True
 
         for ind, key in enumerate(Orbit.KEPLER):
@@ -367,8 +368,8 @@ class Orbit:
                     raise AttributeError('Cannot update read only Cartesian elements')
                 if cart_updated:
                     raise ValueError('Cannot update both cartesian and Keplerian elements simultaneously.')
-                self._kep[ind, inds] = kwargs[key]
                 kep_updated = True
+
 
         if 'm' in kwargs:
             if self.direct_update:
@@ -376,12 +377,20 @@ class Orbit:
             self.m[inds] = kwargs['m']
 
         if cart_updated:
+            for ind, key in enumerate(Orbit.CARTESIAN):
+                if key in kwargs:
+                    self._cart[ind, inds] = kwargs[key]
+
             if self.direct_update:
                 self.calculate_kepler()
             else:
                 self.__kep_calculated[inds] = False
                 self.__cart_calculated[inds] = True
         if kep_updated:
+            for ind, key in enumerate(Orbit.KEPLER):
+                if key in kwargs:
+                    self._kep[ind, inds] = kwargs[key]
+
             if self.direct_update:
                 self.calculate_cartesian()
             else:
