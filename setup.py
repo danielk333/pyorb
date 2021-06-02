@@ -1,5 +1,5 @@
 import setuptools
-__version__ = '0.4.2'
+__version__ = '0.4.3'
 
 with open('README.rst', 'r') as fh:
     long_description = fh.read()
@@ -20,11 +20,13 @@ setuptools.setup(
         'License :: OSI Approved :: GNU-GPLv3',
         'Operating System :: OS Independent',
     ],
+    python_requires='>=3.0',
     install_requires=pip_req,
     packages=setuptools.find_packages(),
+
     # metadata to display on PyPI
     author='Daniel Kastinen',
     author_email='daniel.kastinen@irf.se',
-    description='Python Kepler orbit functions',
+    description='Kepler orbit functions in Python',
     license='GNU-GPLv3',
 )
