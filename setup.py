@@ -23,7 +23,14 @@ setuptools.setup(
     python_requires='>=3.0',
     install_requires=pip_req,
     packages=setuptools.find_packages(),
-
+    extras_require={
+        "dev":  [
+            "pytest",
+            "sphinx",
+            'sphinx-gallery',
+            'coverage',
+        ],
+    }
     # metadata to display on PyPI
     author='Daniel Kastinen',
     author_email='daniel.kastinen@irf.se',
