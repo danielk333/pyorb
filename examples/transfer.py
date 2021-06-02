@@ -5,7 +5,6 @@ Orbit transfer
 
 import pyorb
 import numpy as np
-from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 
@@ -97,23 +96,5 @@ def optim(params):
 v1 = np.linspace(1e3, 10e3, num=100)
 v2 = np.linspace(1e3, 10e3, num=100)
 
-# dm = np.zeros((100,100))
-# for i in range(100):
-#     for j in range(100):
-#         dm[i,j] = optim(np.array([v1[i], v2[j]]))
-
-# fig, ax = plt.subplots(1, 1, figsize=(10,6))
-# conf = ax.contourf(np.log10(dm))
-
 plot_transfer(init, target)
 plt.show()
-
-
-
-# res = minimize(
-#     optim,
-#     np.array([5e3, 1e3]), 
-#     method='Nelder-Mead', 
-#     options={'maxiter': 2000, 'fatol': 1e-6},
-# )
-# print(res)

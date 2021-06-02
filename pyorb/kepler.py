@@ -33,7 +33,7 @@ M_earth = 398600.5e9/G
 '''
 
 M_sol = 1.98847e30
-"""float: The mass of the sun :math:`M_\odot` given in kg
+"""float: The mass of the sun :math:`M_\\odot` given in kg
 
 **Reference**: The Astronomical Almanac - http://asa.usno.navy.mil/static/files/2014/Astronomical_Constants_2014.pdf
 """
@@ -105,7 +105,9 @@ def equi_to_cart(equi, mu=M_sol*G, degrees=False):
 
 
 def kep_to_equi(kep, degrees=False):
-
+    '''TODO
+    '''
+    
     lam = kep[3,...] + kep[4,...]
     om = kep[4,...]
     hi = 0.5*kep[2,...]
@@ -128,6 +130,8 @@ def kep_to_equi(kep, degrees=False):
     return elems
 
 def equi_to_kep(equi, degrees=False):
+    '''TODO
+    '''
 
     kep = np.empty(equi.shape, dtype=equi.dtype)
 
@@ -158,16 +162,27 @@ def cart_to_kep(cart, mu=M_sol*G, degrees=False):
 
        Angles are by default given as radians, all angles are radians internally in functions, input and output angles can be both radians and degrees depending on the :code:`degrees` boolean.
 
+
+    **Variables:**
+       * :math:`a`: Semi-major axis
+       * :math:`e`: Eccentricity
+       * :math:`i`: Inclination
+       * :math:`\\omega`: Argument of perihelion
+       * :math:`\\Omega`: Longitude of ascending node
+       * :math:`\\nu`: True anomaly
+       * :math:`\\mu`: Standard gravitational parameter for the two body problem: :math:`G(M_1 + M_2)`.
+
+
     **Orientation of the ellipse in the coordinate system:**
        * For zero inclination :math:`i`: the ellipse is located in the x-y plane.
        * The direction of motion as True anoamly :math:`\\nu`: increases for a zero inclination :math:`i`: orbit is anti-coockwise, i.e. from +x towards +y.
        * If the eccentricity :math:`e`: is increased, the periapsis will lie in +x direction.
        * If the inclination :math:`i`: is increased, the ellipse will rotate around the x-axis, so that +y is rotated toward +z.
-       * An increase in Longitude of ascending node :math:`\Omega`: corresponds to a rotation around the z-axis so that +x is rotated toward +y.
-       * Changing argument of perihelion :math:`\omega`: will not change the plane of the orbit, it will rotate the orbit in the plane.
+       * An increase in Longitude of ascending node :math:`\\Omega`: corresponds to a rotation around the z-axis so that +x is rotated toward +y.
+       * Changing argument of perihelion :math:`\\omega`: will not change the plane of the orbit, it will rotate the orbit in the plane.
        * The periapsis is shifted in the direction of motion.
-       * True anomaly measures from the +x axis, i.e :math:`\\nu = 0` is located at periapsis and :math:`\\nu = \pi` at apoapsis.
-       * All anomalies and orientation angles reach between 0 and :math:`2\pi`
+       * True anomaly measures from the +x axis, i.e :math:`\\nu = 0` is located at periapsis and :math:`\\nu = \\pi` at apoapsis.
+       * All anomalies and orientation angles reach between 0 and :math:`2\\pi`
 
        *Reference:* "Orbital Motion" by A.E. Roy.
     
@@ -177,32 +192,35 @@ def cart_to_kep(cart, mu=M_sol*G, degrees=False):
        * :mod:`~pyorb.kepler.i_lim`: Used to determine non-inclined orbits
 
 
-    **Variables:**
-       * :math:`a`: Semi-major axis
-       * :math:`e`: Eccentricity
-       * :math:`i`: Inclination
-       * :math:`\omega`: Argument of perihelion
-       * :math:`\Omega`: Longitude of ascending node
-       * :math:`\\nu`: True anomaly
-
-
     :param numpy.ndarray cart: Cartesian state vectors where rows 1-6 correspond to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`, :math:`v_y`, :math:`v_z` and columns correspond to different objects.
     :param float/numpy.ndarray mu: Standard gravitational parameter of objects. If `mu` is a numpy vector, the element corresponding to each column of `cart` will be used for its element calculation, Default value is in SI units a massless object orbiting the Sun.
     :param bool degrees: If `true`, degrees are used. Else all angles are given in radians.
 
-    :return: Keplerian orbital elements where rows 1-6 correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\omega`, :math:`\Omega`, :math:`\\nu` and columns correspond to different objects.
+    :return: Keplerian orbital elements where rows 1-6 correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\\omega`, :math:`\\Omega`, :math:`\\nu` and columns correspond to different objects.
     :rtype: numpy.ndarray
 
     **Example:**
        
-       Convert wat
+       Convert an orbit around the sun from Kepler elements to cartesian elements:
 
        .. code-block:: python
 
-          import bla
+            import pyorb
+            import numpy as np
+
+            orb = np.array([1*pyorb.AU, 0.5, 30, 10, 55, 2], dtype=np.float64)
+
+            x = pyorb.kep_to_cart(orb, mu=pyorb.M_sol*pyorb.G, degrees=True)
+
+            print('Position in the solar-system for an orbit of')
+            for j,var in enumerate(pyorb.Orbit.KEPLER):
+                print(f'{var}: {orb[j]}')
+            print('is:')
+            for j,var in enumerate(pyorb.Orbit.CARTESIAN):
+                print(f'{var}: {x[j]}')
 
 
-    *Reference:* Daniel Kastinen Master Thesis: Meteors and Celestial Dynamics
+    *Reference:* Daniel Kastinen Master Thesis: Meteors and Celestial Dynamics and references therein.
     '''
 
     if not isinstance(cart,np.ndarray):
@@ -236,78 +254,139 @@ def cart_to_kep(cart, mu=M_sol*G, degrees=False):
 
     epsilon = vn**2*0.5 - mu/rn
 
-    o[0,:] = -mu/(2.0*epsilon)
 
+    ### ECCENTRICITY ###
     e = 1.0/mu*((vn**2 - mu/rn)*r - (rn*vr)*v)
     o[1,:] = np.linalg.norm(e,axis=0)
 
-    #could implement this with nditers?
-    #np.nditer(a, flags=['external_loop'], order='F')
+    ### SEMI MAJOR AXIS ###
+    #possible cases
+    # e < 1
+    #and
+    # e >= 1
+    e_hyp = o[1,:] >= 1
+    o[0,:] = -mu/(2.0*epsilon)
+    o[0,e_hyp] = -o[0,e_hyp]
 
-    for ind in range(iter_n):
-        if o[0, ind] < 0:
-            o[0, ind] = -o[0, ind]
+    ### ANUGLAR MOMENTUM ###
+    h = np.cross(r, v, axisa=0, axisb=0, axisc=0)
+    hn = np.linalg.norm(h, axis=0)
+    o[2,:] = np.arccos(h[2,:]/hn)
 
-        h = np.cross( r[:, ind], v[:, ind] )
-        hn = np.linalg.norm(h)
-        inc = np.arccos(h[2]/hn)
+    #possible cases
+    eg = o[1,:] > e_lim #e grater
+    ig = np.logical_and(o[2,:] > i_lim, o[2,:] < np.pi - i_lim) #i grater (include retrograde planar orbits)
+    el = np.logical_not(eg) #e less equal
+    il = np.logical_not(ig) #i less equal
 
-        if inc < i_lim:
-            n = ex
-            nn = 1.0
-        else:
-            n = np.cross(ez, h)
-            nn = np.linalg.norm(n)
+    #e > elim & i > ilim 
+    eg_ig = np.logical_and(eg, ig)
 
-        if np.abs(inc) < i_lim:
-            asc_node = 0.0
-        elif n[1] < 0.0:
-            asc_node = 2.0*np.pi - np.arccos(n[0]/nn)
-        else:
-            asc_node = np.arccos(n[0]/nn)
+    #e > elim & i <= ilim
+    eg_il = np.logical_and(eg, il)
 
-        if o[1,ind] < e_lim:
-            omega = 0.0
-        else:
-            tmp_ratio = np.sum(n*e[:, ind], axis=0)/(nn*o[1, ind])
-            if tmp_ratio > 1.0:
-                tmp_ratio = 1.0
-            elif tmp_ratio < -1.0:
-                tmp_ratio = -1.0
+    #e <= elim & i > ilim
+    el_ig = np.logical_and(el, ig)
 
-            if e[2,ind] < 0.0:
-                omega = 2.0*np.pi - np.arccos(tmp_ratio)
-            else:
-                omega = np.arccos(tmp_ratio)
+    #e <= elim & i <= ilim
+    el_il = np.logical_and(el, il)
 
-        if o[1, ind] >= e_lim:
-            tmp_ratio = np.sum(e[:,ind]*r[:,ind],axis=0)/(o[1, ind]*rn[ind])
-            if tmp_ratio > 1.0:
-                tmp_ratio = 1.0
-            elif tmp_ratio < -1.0:
-                tmp_ratio = -1.0
+    ### ASCENDING NODE ###
+    #ascending node pointing vector
+    n = np.empty_like(h)
+    nn = np.empty_like(hn)
+    n[:,ig] = np.cross(ez, h[:,ig], axisa=0, axisb=0, axisc=0)
+    nn[ig] = np.linalg.norm(n[:,ig], axis=0)
 
-            if vr[ind] < 0.0:
-                nu = 2.0*np.pi - np.arccos(tmp_ratio)
-            else:
-                nu = np.arccos(tmp_ratio)
-        else:
-            tmp_ratio = np.sum((n/nn)*(r[:,ind]/rn[ind]),axis=0)
-            if tmp_ratio > 1.0:
-                tmp_ratio = 1.0
-            elif tmp_ratio < -1.0:
-                tmp_ratio = -1.0
-            nu = np.arccos(tmp_ratio)
+    #ensure [0,2pi]
+    ny_neg = np.logical_and(n[1,:] < 0.0, ig)
+    o[4,ig] = np.arccos(n[0,ig]/nn[ig])
+    o[4,ny_neg] = 2.0*np.pi - o[4,ny_neg]
 
-            if (r[2,ind] < 0.0 and inc >= i_lim) or \
-                    (r[1,ind] < 0.0 and inc < i_lim):
-                nu = 2.0*np.pi - nu
+    #non inclined: no ascending node
+    o[4,il] = 0
 
-        o[2,ind] = inc
-        o[3,ind] = omega
-        o[4,ind] = asc_node
-        o[5,ind] = nu
+    ### ARGUMENT OF PERIAPSIS ###
+    # circular orbits: no argument of periapsis
+    o[3,el] = 0
 
+    # elliptical and hyperbolic orbits
+    #two cases
+    cos_om = np.empty_like(hn)
+    #first case: eg and ig (n-vector)
+    #use vector angle between the two
+    cos_om[eg_ig] = np.sum(n[:,eg_ig]*e[:,eg_ig], axis=0)/(nn[eg_ig]*o[1, eg_ig])
+
+    #second case: eg and il (no n-vector)
+    #use e vector angle
+    cos_om[eg_il] = e[0,eg_il]/o[1, eg_il]
+    
+    #remove unused array positions
+    cos_om = cos_om[eg]
+    
+    #do not fail due to number precision fluctuation
+    cos_om[cos_om > 1.0] = 1.0
+    cos_om[cos_om < -1.0] = -1.0
+
+    o[3,eg] = np.arccos(cos_om)
+
+    #first case: e and n vector angle
+    ez_neg = np.logical_and(e[2,:] < 0.0, eg_ig)
+    o[3,ez_neg] = 2.0*np.pi - o[3,ez_neg]
+
+    #second case: ex component
+    #prograde
+    ey_neg = np.logical_and(o[2,:] < np.pi*0.5, eg_il)
+    ey_neg2 = np.logical_and(ey_neg, e[1,:] < 0.0)
+    o[3,ey_neg2] = 2.0*np.pi - o[3,ey_neg2]
+    
+    #retrograde
+    ey_neg = np.logical_and(o[2,:] > np.pi*0.5, eg_il)
+    ey_neg2 = np.logical_and(ey_neg, e[1,:] >= 0.0)
+    o[3,ey_neg2] = 2.0*np.pi - o[3,ey_neg2]
+
+
+    ### TRUE ANOMALY ###
+    cos_nu = np.empty_like(hn)
+
+    #three cases
+    #elliptical and hyperbolic: (angle from periapsis using e and r)
+    cos_nu[eg] = np.sum(e[:,eg]*r[:,eg], axis=0)/(o[1, eg]*rn[eg])
+
+    #circular and inclined: (angle from periapsis using n and r)
+    #if e=0 and omega := 0, with inclination +y -> +z perihelion is ascending node
+    cos_nu[el_ig] = np.sum((n[:,el_ig]/nn[el_ig])*(r[:,el_ig]/rn[el_ig]), axis=0)
+
+    #circular and planar: (use angle of position vector)
+    cos_nu[el_il] = r[0,el_il]/rn[el_il]
+
+    #do not fail due to number precision fluctuation
+    cos_nu[cos_nu > 1.0] = 1.0
+    cos_nu[cos_nu < -1.0] = -1.0
+
+    o[5,:] = np.arccos(cos_nu)
+
+    #ensure [0,2pi]
+    #elliptical and hyperbolic
+    tmp_ind_ = np.logical_and(vr < 0.0, eg)
+    o[5,tmp_ind_] = 2.0*np.pi - o[5,tmp_ind_]
+
+    #circular and inclined
+    tmp_ind_ = np.logical_and(r[2,:] < 0.0, el_ig)
+    o[5,tmp_ind_] = 2.0*np.pi - o[5,tmp_ind_]
+
+    #circular and planar
+    #prograde
+    tmp_ind_ = np.logical_and(o[2,:] < np.pi*0.5, el_il)
+    tmp_ind2_ = np.logical_and(tmp_ind_, r[1,:] < 0.0)
+    o[5,tmp_ind2_] = 2.0*np.pi - o[5,tmp_ind2_]
+
+    #if retrograde, its reversed
+    tmp_ind_ = np.logical_and(o[2,:] > np.pi*0.5, el_il)
+    tmp_ind2_ = np.logical_and(tmp_ind_, r[1,:] >= 0.0)
+    o[5,tmp_ind2_] = 2.0*np.pi - o[5,tmp_ind2_]
+
+    ## OUTPUT FORMATTING ##
     if degrees:
         o[2:,:] = np.degrees(o[2:,:])
 
@@ -318,7 +397,7 @@ def cart_to_kep(cart, mu=M_sol*G, degrees=False):
     return o
 
 
-def true_to_eccentric(nu, e, degrees=True):
+def true_to_eccentric(nu, e, degrees=False):
     '''Calculates the eccentric anomaly from the true anomaly.
 
     :param float/numpy.ndarray nu: True anomaly.
@@ -342,7 +421,7 @@ def true_to_eccentric(nu, e, degrees=True):
     return E
 
 
-def eccentric_to_true(E, e, degrees=True):
+def eccentric_to_true(E, e, degrees=False):
     '''Calculates the true anomaly from the eccentric anomaly.
 
     :param float/numpy.ndarray E: Eccentric anomaly.
@@ -434,25 +513,7 @@ def elliptic_radius(E, a, e, degrees=False):
     return a*(1.0 - e*np.cos( _E ))
 
 
-def rot_mat_z(theta, dtype=np.float):
-    '''Generates the 3D transformation matrix for rotation around Z-axis.
-    
-    :param float theta: Angle to rotate.
-    :param numpy.dtype dtype: The data-type of the output matrix.
-
-    :return: Rotation matrix
-    :rtype: (3,3) numpy.ndarray
-    '''
-    R = np.zeros((3,3), dtype=dtype)
-    R[0,0] = np.cos(theta)
-    R[0,1] = -np.sin(theta)
-    R[1,0] = np.sin(theta)
-    R[1,1] = np.cos(theta)
-    R[2,2] = 1.0
-    return R
-
-
-def rot_mat_x(theta, dtype=np.float):
+def rot_mat_x(theta, dtype=np.float64):
     '''Generates the 3D transformation matrix for rotation around X-axis.
     
     :param float theta: Angle to rotate.
@@ -470,7 +531,7 @@ def rot_mat_x(theta, dtype=np.float):
     return R
 
 
-def rot_mat_y(theta, dtype=np.float):
+def rot_mat_y(theta, dtype=np.float64):
     '''Generates the 3D transformation matrix for rotation around Y-axis.
     
     :param float theta: Angle to rotate.
@@ -488,12 +549,29 @@ def rot_mat_y(theta, dtype=np.float):
     return R
 
 
+def rot_mat_z(theta, dtype=np.float64):
+    '''Generates the 3D transformation matrix for rotation around Z-axis.
+    
+    :param float theta: Angle to rotate.
+    :param numpy.dtype dtype: The data-type of the output matrix.
+
+    :return: Rotation matrix
+    :rtype: (3,3) numpy.ndarray
+    '''
+    R = np.zeros((3,3), dtype=dtype)
+    R[0,0] = np.cos(theta)
+    R[0,1] = -np.sin(theta)
+    R[1,0] = np.sin(theta)
+    R[1,1] = np.cos(theta)
+    R[2,2] = 1.0
+    return R
+
 
 def laguerre_solve_kepler(E0, M, e, tol=1e-12, max_iter=5000, degree=5):
     '''Solve the Kepler equation using the The Laguerre Algorithm, a algorithm that guarantees global convergence.
     Adjusted for solving only real roots (non-hyperbolic orbits)
     
-    Absolute numerical tolerance is defined as :math:`|f(E)| < tol` where :math:`f(E) = M - E + e \sin(E)`.
+    Absolute numerical tolerance is defined as :math:`|f(E)| < tol` where :math:`f(E) = M - E + e \\sin(E)`.
 
     # TODO: implement hyperbolic solving.
 
@@ -561,7 +639,7 @@ def laguerre_solve_kepler(E0, M, e, tol=1e-12, max_iter=5000, degree=5):
 
         f_eval = _f(E)
 
-        if it_num > max_iter:
+        if it_num >= max_iter:
             break
 
     return E, it_num
@@ -636,12 +714,12 @@ def kepler_guess(M, e):
     return E0
 
 
-def mean_to_eccentric(M, e, tol=1e-12, degrees=False):
+def mean_to_eccentric(M, e, solver_options=None, degrees=False):
     '''Calculates the eccentric anomaly from the mean anomaly by solving the Kepler equation.
 
     :param float/numpy.ndarray M: Mean anomaly.
     :param float/numpy.ndarray e: Eccentricity of ellipse.
-    :param float tol: Numerical tolerance for solving Keplers equation in units of radians.
+    :param dict solver_options: Options for the numerical solution of Kepler's equation. See `pyorb.kepler.laguerre_solve_kepler` for information.
     :param bool degrees: If true degrees are used, else all angles are given in radians
     
     :return: True anomaly.
@@ -651,6 +729,8 @@ def mean_to_eccentric(M, e, tol=1e-12, degrees=False):
        * :func:`~pyorb.kepler._get_kepler_guess`
        * :func:`~pyorb.kepler.laguerre_solve_kepler`
     '''
+    if solver_options is None:
+        solver_options = {}
 
     if degrees:
         _M = np.radians(M)
@@ -679,7 +759,7 @@ def mean_to_eccentric(M, e, tol=1e-12, degrees=False):
             Ec = next(Eit)
 
             E0 = _get_kepler_guess(Mc, ec)
-            E_calc, it_num = laguerre_solve_kepler(E0, Mc, ec, tol=tol)
+            E_calc, it_num = laguerre_solve_kepler(E0, Mc, ec, **solver_options)
 
             Ec[...] = E_calc
 
@@ -688,7 +768,7 @@ def mean_to_eccentric(M, e, tol=1e-12, degrees=False):
             return M
 
         E0 = _get_kepler_guess(_M, e)
-        E, it_num = laguerre_solve_kepler(E0, _M, e, tol=tol)
+        E, it_num = laguerre_solve_kepler(E0, _M, e, **solver_options)
 
 
     if degrees:
@@ -697,7 +777,7 @@ def mean_to_eccentric(M, e, tol=1e-12, degrees=False):
     return E
 
 
-def mean_to_true(M, e, tol=1e-12, degrees=False):
+def mean_to_true(M, e, solver_options=None, degrees=False):
     '''Transforms mean anomaly to true anomaly.
     
     **Uses:**
@@ -706,7 +786,7 @@ def mean_to_true(M, e, tol=1e-12, degrees=False):
 
     :param float/numpy.ndarray M: Mean anomaly.
     :param float/numpy.ndarray e: Eccentricity of ellipse.
-    :param float tol: Numerical tolerance for solving Keplers equation in units of radians.
+    :param dict solver_options: Options for the numerical solution of Kepler's equation. See `pyorb.kepler.laguerre_solve_kepler` for information.
     :param bool degrees: If true degrees are used, else all angles are given in radians
     
     :return: True anomaly.
@@ -717,7 +797,7 @@ def mean_to_true(M, e, tol=1e-12, degrees=False):
     else:
         _M = M
 
-    E = mean_to_eccentric(_M, e, tol=tol, degrees=False)
+    E = mean_to_eccentric(_M, e, solver_options=solver_options, degrees=False)
     nu = eccentric_to_true(E, e, degrees=False)
 
     if degrees:
@@ -727,31 +807,31 @@ def mean_to_true(M, e, tol=1e-12, degrees=False):
 
 
 def orbital_speed(r, a, mu):
-    '''Calculates the orbital speed at a given radius for an Keplerian orbit :math:`v = \sqrt{\mu \left (\\frac{2}{r} - \\frac{1}{a} \\right )}`.
+    '''Calculates the orbital speed at a given radius for an Keplerian orbit :math:`v = \\sqrt{\\mu \\left (\\frac{2}{r} - \\frac{1}{a} \\right )}`.
     
     :param float/numpy.ndarray r: Radius from the pericenter.
     :param float/numpy.ndarray a: Semi-major axis of ellipse.
-    :param float/numpy.ndarray mu: Standard gravitation parameter :math:`\mu = G(m_1 + m_2)` of the orbit.
+    :param float/numpy.ndarray mu: Standard gravitation parameter :math:`\\mu = G(m_1 + m_2)` of the orbit.
     :return: Orbital speed.
     '''
     return np.sqrt(mu*(2.0/r - 1.0/a))
 
 
 def orbital_period(a, mu):
-    '''Calculates the orbital period of an Keplerian orbit based on the semi-major axis :math:`P = 2\pi\sqrt{\\frac{a^3}{\mu}}`.
+    '''Calculates the orbital period of an Keplerian orbit based on the semi-major axis :math:`P = 2\\pi\\sqrt{\\frac{a^3}{\\mu}}`.
     
     :param float/numpy.ndarray a: Semi-major axis of ellipse.
-    :param float/numpy.ndarray mu: Standard gravitation parameter :math:`\mu = G(m_1 + m_2)` of the orbit.
+    :param float/numpy.ndarray mu: Standard gravitation parameter :math:`\\mu = G(m_1 + m_2)` of the orbit.
     :return: Orbital period.
     '''
     return 2.0*np.pi*np.sqrt(a**3.0/mu)
 
 
 def semi_major_axis(P, mu):
-    '''Calculates the orbital semi-major axis of an Keplerian orbit based on the orbital period :math:`a = \mu^{\\frac{1}{3}}(\\frac{P}{2\pi})^{\\frac{2}{3}}`.
+    '''Calculates the orbital semi-major axis of an Keplerian orbit based on the orbital period :math:`a = \\mu^{\\frac{1}{3}}(\\frac{P}{2\\pi})^{\\frac{2}{3}}`.
     
     :param float/numpy.ndarray P: Orbital period
-    :param float/numpy.ndarray mu: Standard gravitation parameter :math:`\mu = G(m_1 + m_2)` of the orbit.
+    :param float/numpy.ndarray mu: Standard gravitation parameter :math:`\\mu = G(m_1 + m_2)` of the orbit.
     :return: semi-major axis.
     '''
     np.cbrt((P/(2.0*np.pi))**2*mu)
@@ -773,8 +853,8 @@ def kep_to_cart(kep, mu=M_sol*G, degrees=False):
        * The direction of motion as True anoamly :math:`\\nu`: increases for a zero inclination :math:`i`: orbit is anti-coockwise, i.e. from +x towards +y.
        * If the eccentricity :math:`e`: is increased, the periapsis will lie in +x direction.
        * If the inclination :math:`i`: is increased, the ellipse will rotate around the x-axis, so that +y is rotated toward +z.
-       * An increase in Longitude of ascending node :math:`\Omega`: corresponds to a rotation around the z-axis so that +x is rotated toward +y.
-       * Changing argument of perihelion :math:`\omega`: will not change the plane of the orbit, it will rotate the orbit in the plane.
+       * An increase in Longitude of ascending node :math:`\\Omega`: corresponds to a rotation around the z-axis so that +x is rotated toward +y.
+       * Changing argument of perihelion :math:`\\omega`: will not change the plane of the orbit, it will rotate the orbit in the plane.
        * The periapsis is shifted in the direction of motion.
 
        *Reference:* "Orbital Motion" by A.E. Roy.
@@ -783,15 +863,15 @@ def kep_to_cart(kep, mu=M_sol*G, degrees=False):
        * :math:`a`: Semi-major axis
        * :math:`e`: Eccentricity
        * :math:`i`: Inclination
-       * :math:`\omega`: Argument of perihelion
-       * :math:`\Omega`: Longitude of ascending node
+       * :math:`\\omega`: Argument of perihelion
+       * :math:`\\Omega`: Longitude of ascending node
        * :math:`\\nu`: True anoamly
 
     **Uses:**
        * :func:`~pyorb.kepler.true_to_eccentric`
        * :func:`~pyorb.kepler.elliptic_radius`
 
-    :param numpy.ndarray kep: Keplerian orbital elements where rows 1-6 correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\omega`, :math:`\Omega`, :math:`\\nu` and columns correspond to different objects.
+    :param numpy.ndarray kep: Keplerian orbital elements where rows 1-6 correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\\omega`, :math:`\\Omega`, :math:`\\nu` and columns correspond to different objects.
     :param float/numpy.ndarray mu: Standard gravitational parameter of objects. If `mu` is a numpy vector, the element corresponding to each column of `cart` will be used for its element calculation, Default value is in SI units a massless object orbiting the Sun.
     :param bool degrees: If `true`, degrees are used. Else all angles are given in radians.
 
