@@ -16,9 +16,11 @@ setuptools.setup(
     long_description=long_description,
     url='https://github.com/danielk333/pyorb',
     classifiers=[
-        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.7',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: OS Independent',
+        'Intended Audience :: Science/Research',
+        'Development Status :: 4 - Beta',
     ],
     python_requires='>=3.0',
     install_requires=pip_req,
