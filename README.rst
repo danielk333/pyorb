@@ -5,20 +5,20 @@ Feature list
 -------------
 
 Current features:
-* Clear definition of an orbit, consistent throughout the code, including planar and circular orbits
-* Kepler to Cartesian conversion
-* Cartesian to Kepler conversion
-* All function handles all special cases (e.g. planar and circular orbits)
-* Convenient ``Orbit`` class or storing orbits and seamlessly convert between Kepler and Cartesian elements
-* Access to all types of orbit anomalies
-* Vectorized function for increased performance
-* Access to alternative parameterizations such as Equinoctial elements
+- Clear definition of an orbit, consistent throughout the code, including planar and circular orbits
+- Kepler to Cartesian conversion
+- Cartesian to Kepler conversion
+- All function handles all special cases (e.g. planar and circular orbits)
+- Convenient ``Orbit`` class or storing orbits and seamlessly convert between Kepler and Cartesian elements
+- Access to all types of orbit anomalies
+- Vectorized function for increased performance
+- Access to alternative parameterizations such as Equinoctial elements
 
 On the upcoming feature list:
-* Can handle hyperbolic orbits
-* C-implementation of conversion function for performance
-* Converting of orbits to a byte-stream
-* Saving orbits to file (binary or HDFS 5)
+- Can handle hyperbolic orbits
+- C-implementation of conversion function for performance
+- Converting of orbits to a byte-stream
+- Saving orbits to file (binary or HDFS 5)
 
 
 
