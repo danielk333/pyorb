@@ -30,7 +30,7 @@ setuptools.setup(
             'sphinx-gallery',
             'coverage',
         ],
-    }
+    },
     # metadata to display on PyPI
     author='Daniel Kastinen',
     author_email='daniel.kastinen@irf.se',
