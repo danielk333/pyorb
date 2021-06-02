@@ -1,6 +1,8 @@
 PyOrb
 =========
 
+PyOrb is a lightweight package designed to convert between cartesian and kepler coordinates seamlessly and consequently following strict defined rules. It provides a convenience class for handling orbits and is tested for special cases such as planar and circular orbits.
+
 Feature list
 -------------
 
