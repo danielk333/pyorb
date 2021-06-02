@@ -366,7 +366,7 @@ class Orbit:
                 if self.kepler_read_only:
                     raise AttributeError('Cannot update read only Cartesian elements')
                 if cart_updated:
-                    raise AttributeError('Cannot update both cartesian and Keplerian elements simultaneously.')
+                    raise ValueError('Cannot update both cartesian and Keplerian elements simultaneously.')
                 self._kep[ind, inds] = kwargs[key]
                 kep_updated = True
 
@@ -374,21 +374,19 @@ class Orbit:
             if self.direct_update:
                 raise ValueError('Cannot set "m" and direct update, set "m" via property and manually call calculate.')
             self.m[inds] = kwargs['m']
-            self.__kep_calculated[inds] = False
-            self.__cart_calculated[inds] = False
-        else:
-            if cart_updated:
-                if self.direct_update:
-                    self.calculate_kepler()
-                else:
-                    self.__kep_calculated[inds] = False
-                    self.__cart_calculated[inds] = True
-            if kep_updated:
-                if self.direct_update:
-                    self.calculate_cartesian()
-                else:
-                    self.__cart_calculated[inds] = False
-                    self.__kep_calculated[inds] = True
+
+        if cart_updated:
+            if self.direct_update:
+                self.calculate_kepler()
+            else:
+                self.__kep_calculated[inds] = False
+                self.__cart_calculated[inds] = True
+        if kep_updated:
+            if self.direct_update:
+                self.calculate_cartesian()
+            else:
+                self.__cart_calculated[inds] = False
+                self.__kep_calculated[inds] = True
 
 
     def calculate_cartesian(self, inds=slice(None,None,None)):
