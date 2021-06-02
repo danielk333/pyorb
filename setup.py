@@ -29,6 +29,7 @@ setuptools.setup(
             "sphinx",
             'sphinx-gallery',
             'coverage',
+            'matplotlib',
         ],
     },
     # metadata to display on PyPI
