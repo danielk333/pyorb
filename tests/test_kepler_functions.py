@@ -13,6 +13,7 @@ import numpy.testing as nt
 import pyorb.kepler as kep
 import pyorb
 
+@unittest.skip("Not yet implemented")
 class TestAlternativeParameters(unittest.TestCase):
 
     def setUp(self):
@@ -112,8 +113,35 @@ class TestKeplerSolver(unittest.TestCase):
                 nt.assert_almost_equal(Eit, E_calc, decimal = 1e-9)
                 assert fun_err < 1e-11
 
+    @unittest.skip("Not yet implemented")
+    def test_laguerre_solve_hyperbolic_kepler(self):
+        assert False
 
+    @unittest.skip("Not yet implemented")
+    def test_hyperbolic_kepler_guess(self):
+        assert False
 
+@unittest.skip("Not yet implemented")
+class TestAnomaliesHyperbolic(unittest.TestCase):
+
+    def test_true_to_hyperbolic(self):
+        assert False
+
+    def test_hyperbolic_to_true(self):
+        assert False
+
+    def test_mean_to_hyperbolic(self):
+        assert False
+
+    def test_hyperbolic_to_mean(self):
+        assert False
+
+    def test_true_to_hyperbolic_coencides(self):
+        assert False
+        e_test = [1, 2]
+        for e in e_test:
+            E = kep.true_to_eccentric(0.0, e)
+            self.assertAlmostEqual(E, 0.0)
 
 
 class TestAnomalies(unittest.TestCase):
