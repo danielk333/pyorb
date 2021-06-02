@@ -1,0 +1,402 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module summary &#8212; PyOrb 0.2.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Orbit" href="pyorb.orbit.Orbit.html" />
+    <link rel="prev" title="true_to_mean" href="pyorb.kepler.true_to_mean.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pyorb.orbit.Orbit.html" title="Orbit"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pyorb.kepler.true_to_mean.html" title="true_to_mean"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PyOrb 0.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../api.html" accesskey="U">API Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Module summary</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="module-pyorb.orbit"></span><p>Orbit class definition</p>
+<div class="section" id="module-summary">
+<h1>Module summary<a class="headerlink" href="#module-summary" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Classes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.html#pyorb.orbit.Orbit" title="pyorb.orbit.Orbit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Orbit</span></code></a>(M0, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="contents">
+<h1>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Orbit</p>
+<dl class="py class">
+<dt>
+<em class="property">class </em><code class="sig-prename descclassname">pyorb.orbit.</code><code class="sig-name descname">Orbit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">M0</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">Omega</code></dt>
+<dd><p>Longitude of the ascending node</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">a</code></dt>
+<dd><p>Semi-major axis</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.add"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Adds orbits to this instance</p>
+<p><strong>Note</strong>: Cannot add objects with BOTH cartesian and Keplerian elements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>num</strong> (<em>int</em>) – Number of orbits to add, defaults to 1</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Keyword arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>Any valid Cartesian or Keplerian variable name can be given as a key to update that parameter.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">allocate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.allocate"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Changes the current allocation of orbits to a fixed number.</p>
+<p><strong>Warning</strong>: This method overrides all currently stored data to allocate new space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>num</strong> (<em>int</em>) – Number of orbits to change allocation to</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">anom</code></dt>
+<dd><p>The orbital anomaly, depending on <code class="code docutils literal notranslate"><span class="pre">self.type</span></code> it is either the True, Eccentric or Mean anomaly</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">calc_eccentric_anomaly</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inds</span><span class="o">=</span><span class="default_value">slice(None, None, None)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.calc_eccentric_anomaly"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Calculates the eccentric anomaly and stores it in <code class="code docutils literal notranslate"><span class="pre">self._eccentric_anomaly</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">calc_mean_anomaly</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inds</span><span class="o">=</span><span class="default_value">slice(None, None, None)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.calc_mean_anomaly"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Calculates the mean anomaly and stores it in <code class="code docutils literal notranslate"><span class="pre">self._mean_anomaly</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">calc_true_anomaly</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inds</span><span class="o">=</span><span class="default_value">slice(None, None, None)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.calc_true_anomaly"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Calculates the true anomaly and stores it in <code class="code docutils literal notranslate"><span class="pre">self._true_anomaly</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">calculate_cartesian</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inds</span><span class="o">=</span><span class="default_value">slice(None, None, None)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.calculate_cartesian"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Calculates Cartesian elements based on Keplerian elements</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>inds</strong> (<em>int/list/numpy.ndarray/slice</em>) – Incidences of orbits to calculate, defaults to all</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">calculate_kepler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inds</span><span class="o">=</span><span class="default_value">slice(None, None, None)</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.calculate_kepler"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Calculates Keplerian elements based on Cartesian elements</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>inds</strong> (<em>int/list/numpy.ndarray/slice</em>) – Incidences of orbits to calculate, defaults to all</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">cartesian</code></dt>
+<dd><p>Cartesian state vector</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">e</code></dt>
+<dd><p>Eccentricity</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">eccentric_anomaly</code></dt>
+<dd><p>Eccentric Anomaly</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">i</code></dt>
+<dd><p>Inclination</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">kepler</code></dt>
+<dd><p>Keplerian state vector</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">mean_anomaly</code></dt>
+<dd><p>Mean Anomaly</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">mean_motion</code></dt>
+<dd><p>Mean motion</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">num</code></dt>
+<dd><p>Number of orbits</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">omega</code></dt>
+<dd><p>Argument of perihelion</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">period</code></dt>
+<dd><p>Orbital period</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">propagate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.propagate"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Propagate all orbits in time by modifying the anomaly of the orbit, i.e. by updating the kepler elements</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">r</code></dt>
+<dd><p>Position vector</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">speed</code></dt>
+<dd><p>Orbital velocity</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">true_anomaly</code></dt>
+<dd><p>true Anomaly</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inds</span><span class="o">=</span><span class="default_value">slice(None, None, None)</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit.update"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Calculates Keplerian elements based on Cartesian elements</p>
+<p><strong>Note</strong>: Cannot update BOTH cartesian and Keplerian elements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>inds</strong> (<em>int/list/numpy.ndarray/slice</em>) – Incidences of orbits to update, defaults to all</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Keyword arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>Any valid Cartesian or Keplerian variable name can be given as a key to update that parameter.</p></li>
+<li><p>Mass can also be updated this way but this requires manual execution of either <code class="code docutils literal notranslate"><span class="pre">calculate_cartesian</span></code> or <code class="code docutils literal notranslate"><span class="pre">calculate_kepler</span></code> depending on which are to remain constant.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">v</code></dt>
+<dd><p>Velocity vector</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">velocity</code></dt>
+<dd><p>Orbital velocity</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">vx</code></dt>
+<dd><p>Velocity X-component</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">vy</code></dt>
+<dd><p>Velocity Y-component</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">vz</code></dt>
+<dd><p>Velocity Z-component</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">x</code></dt>
+<dd><p>X Position</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">y</code></dt>
+<dd><p>Y Position</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">z</code></dt>
+<dd><p>Z Position</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Module summary</a></li>
+<li><a class="reference internal" href="#contents">Contents</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pyorb.kepler.true_to_mean.html"
+                        title="previous chapter">true_to_mean</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pyorb.orbit.Orbit.html"
+                        title="next chapter">Orbit</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/_autodoc/pyorb/pyorb.orbit.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pyorb.orbit.Orbit.html" title="Orbit"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pyorb.kepler.true_to_mean.html" title="true_to_mean"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PyOrb 0.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../api.html" >API Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Module summary</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020-2020, Daniel Kastinen.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.0.
+    </div>
+  </body>
+</html>

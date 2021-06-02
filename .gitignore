@@ -1,9 +1,6 @@
 # Compiled source #
 ###################
 
-#gh-pages
-docs/
-
 #Sublime
 *.sublime*
 

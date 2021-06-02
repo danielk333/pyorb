@@ -1,0 +1,258 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbit &#8212; PyOrb 0.2.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/gallery-dataframe.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Orbit.__init__" href="pyorb.orbit.Orbit.__init__.html" />
+    <link rel="prev" title="Module summary" href="pyorb.orbit.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pyorb.orbit.Orbit.__init__.html" title="Orbit.__init__"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pyorb.orbit.html" title="Module summary"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PyOrb 0.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="pyorb.orbit.html" accesskey="U">Module summary</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Orbit</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="orbit">
+<h1>Orbit<a class="headerlink" href="#orbit" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pyorb.orbit.Orbit">
+<em class="property">class </em><code class="sig-prename descclassname">pyorb.orbit.</code><code class="sig-name descname">Orbit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">M0</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyorb/orbit.html#Orbit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyorb.orbit.Orbit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.__init__.html#pyorb.orbit.Orbit.__init__" title="pyorb.orbit.Orbit.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(M0, **kwargs)</p></td>
+<td><p>Initialize self.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.add.html#pyorb.orbit.Orbit.add" title="pyorb.orbit.Orbit.add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code></a>([num])</p></td>
+<td><p>Adds orbits to this instance</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.allocate.html#pyorb.orbit.Orbit.allocate" title="pyorb.orbit.Orbit.allocate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">allocate</span></code></a>(num)</p></td>
+<td><p>Changes the current allocation of orbits to a fixed number.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.calc_eccentric_anomaly.html#pyorb.orbit.Orbit.calc_eccentric_anomaly" title="pyorb.orbit.Orbit.calc_eccentric_anomaly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_eccentric_anomaly</span></code></a>([inds])</p></td>
+<td><p>Calculates the eccentric anomaly and stores it in <code class="code docutils literal notranslate"><span class="pre">self._eccentric_anomaly</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.calc_mean_anomaly.html#pyorb.orbit.Orbit.calc_mean_anomaly" title="pyorb.orbit.Orbit.calc_mean_anomaly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_mean_anomaly</span></code></a>([inds])</p></td>
+<td><p>Calculates the mean anomaly and stores it in <code class="code docutils literal notranslate"><span class="pre">self._mean_anomaly</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.calc_true_anomaly.html#pyorb.orbit.Orbit.calc_true_anomaly" title="pyorb.orbit.Orbit.calc_true_anomaly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_true_anomaly</span></code></a>([inds])</p></td>
+<td><p>Calculates the true anomaly and stores it in <code class="code docutils literal notranslate"><span class="pre">self._true_anomaly</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.calculate_cartesian.html#pyorb.orbit.Orbit.calculate_cartesian" title="pyorb.orbit.Orbit.calculate_cartesian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_cartesian</span></code></a>([inds])</p></td>
+<td><p>Calculates Cartesian elements based on Keplerian elements</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.calculate_kepler.html#pyorb.orbit.Orbit.calculate_kepler" title="pyorb.orbit.Orbit.calculate_kepler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_kepler</span></code></a>([inds])</p></td>
+<td><p>Calculates Keplerian elements based on Cartesian elements</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.propagate.html#pyorb.orbit.Orbit.propagate" title="pyorb.orbit.Orbit.propagate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propagate</span></code></a>(dt)</p></td>
+<td><p>Propagate all orbits in time by modifying the anomaly of the orbit, i.e.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.update.html#pyorb.orbit.Orbit.update" title="pyorb.orbit.Orbit.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>([inds])</p></td>
+<td><p>Calculates Keplerian elements based on Cartesian elements</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.ANOMALY.html#pyorb.orbit.Orbit.ANOMALY" title="pyorb.orbit.Orbit.ANOMALY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ANOMALY</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.CARTESIAN.html#pyorb.orbit.Orbit.CARTESIAN" title="pyorb.orbit.Orbit.CARTESIAN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CARTESIAN</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.KEPLER.html#pyorb.orbit.Orbit.KEPLER" title="pyorb.orbit.Orbit.KEPLER"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KEPLER</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.Omega.html#pyorb.orbit.Orbit.Omega" title="pyorb.orbit.Orbit.Omega"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Omega</span></code></a></p></td>
+<td><p>Longitude of the ascending node</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.a.html#pyorb.orbit.Orbit.a" title="pyorb.orbit.Orbit.a"><code class="xref py py-obj docutils literal notranslate"><span class="pre">a</span></code></a></p></td>
+<td><p>Semi-major axis</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.anom.html#pyorb.orbit.Orbit.anom" title="pyorb.orbit.Orbit.anom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">anom</span></code></a></p></td>
+<td><p>The orbital anomaly, depending on <code class="code docutils literal notranslate"><span class="pre">self.type</span></code> it is either the True, Eccentric or Mean anomaly</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.cartesian.html#pyorb.orbit.Orbit.cartesian" title="pyorb.orbit.Orbit.cartesian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cartesian</span></code></a></p></td>
+<td><p>Cartesian state vector</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.e.html#pyorb.orbit.Orbit.e" title="pyorb.orbit.Orbit.e"><code class="xref py py-obj docutils literal notranslate"><span class="pre">e</span></code></a></p></td>
+<td><p>Eccentricity</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.eccentric_anomaly.html#pyorb.orbit.Orbit.eccentric_anomaly" title="pyorb.orbit.Orbit.eccentric_anomaly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eccentric_anomaly</span></code></a></p></td>
+<td><p>Eccentric Anomaly</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.i.html#pyorb.orbit.Orbit.i" title="pyorb.orbit.Orbit.i"><code class="xref py py-obj docutils literal notranslate"><span class="pre">i</span></code></a></p></td>
+<td><p>Inclination</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.kepler.html#pyorb.orbit.Orbit.kepler" title="pyorb.orbit.Orbit.kepler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kepler</span></code></a></p></td>
+<td><p>Keplerian state vector</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.mean_anomaly.html#pyorb.orbit.Orbit.mean_anomaly" title="pyorb.orbit.Orbit.mean_anomaly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_anomaly</span></code></a></p></td>
+<td><p>Mean Anomaly</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.mean_motion.html#pyorb.orbit.Orbit.mean_motion" title="pyorb.orbit.Orbit.mean_motion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_motion</span></code></a></p></td>
+<td><p>Mean motion</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.num.html#pyorb.orbit.Orbit.num" title="pyorb.orbit.Orbit.num"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num</span></code></a></p></td>
+<td><p>Number of orbits</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.omega.html#pyorb.orbit.Orbit.omega" title="pyorb.orbit.Orbit.omega"><code class="xref py py-obj docutils literal notranslate"><span class="pre">omega</span></code></a></p></td>
+<td><p>Argument of perihelion</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.period.html#pyorb.orbit.Orbit.period" title="pyorb.orbit.Orbit.period"><code class="xref py py-obj docutils literal notranslate"><span class="pre">period</span></code></a></p></td>
+<td><p>Orbital period</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.r.html#pyorb.orbit.Orbit.r" title="pyorb.orbit.Orbit.r"><code class="xref py py-obj docutils literal notranslate"><span class="pre">r</span></code></a></p></td>
+<td><p>Position vector</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.speed.html#pyorb.orbit.Orbit.speed" title="pyorb.orbit.Orbit.speed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">speed</span></code></a></p></td>
+<td><p>Orbital velocity</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.true_anomaly.html#pyorb.orbit.Orbit.true_anomaly" title="pyorb.orbit.Orbit.true_anomaly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">true_anomaly</span></code></a></p></td>
+<td><p>true Anomaly</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.v.html#pyorb.orbit.Orbit.v" title="pyorb.orbit.Orbit.v"><code class="xref py py-obj docutils literal notranslate"><span class="pre">v</span></code></a></p></td>
+<td><p>Velocity vector</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.velocity.html#pyorb.orbit.Orbit.velocity" title="pyorb.orbit.Orbit.velocity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">velocity</span></code></a></p></td>
+<td><p>Orbital velocity</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.vx.html#pyorb.orbit.Orbit.vx" title="pyorb.orbit.Orbit.vx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vx</span></code></a></p></td>
+<td><p>Velocity X-component</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.vy.html#pyorb.orbit.Orbit.vy" title="pyorb.orbit.Orbit.vy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vy</span></code></a></p></td>
+<td><p>Velocity Y-component</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.vz.html#pyorb.orbit.Orbit.vz" title="pyorb.orbit.Orbit.vz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vz</span></code></a></p></td>
+<td><p>Velocity Z-component</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.x.html#pyorb.orbit.Orbit.x" title="pyorb.orbit.Orbit.x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code></a></p></td>
+<td><p>X Position</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.y.html#pyorb.orbit.Orbit.y" title="pyorb.orbit.Orbit.y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code></a></p></td>
+<td><p>Y Position</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyorb.orbit.Orbit.z.html#pyorb.orbit.Orbit.z" title="pyorb.orbit.Orbit.z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">z</span></code></a></p></td>
+<td><p>Z Position</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pyorb.orbit.html"
+                        title="previous chapter">Module summary</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pyorb.orbit.Orbit.__init__.html"
+                        title="next chapter">Orbit.__init__</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/_autodoc/pyorb/pyorb.orbit.Orbit.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pyorb.orbit.Orbit.__init__.html" title="Orbit.__init__"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pyorb.orbit.html" title="Module summary"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">PyOrb 0.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../api.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="pyorb.orbit.html" >Module summary</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Orbit</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020-2020, Daniel Kastinen.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.0.
+    </div>
+  </body>
+</html>
