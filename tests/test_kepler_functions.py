@@ -13,6 +13,29 @@ import numpy.testing as nt
 import pyorb.kepler as kep
 import pyorb
 
+class TestAlternativeParameters(unittest.TestCase):
+
+    def setUp(self):
+        pass
+
+    def test_cart_to_equi(self):
+        assert False
+
+    def test_equi_to_cart(self):
+        assert False
+
+    def test_equi_cart_consistency(self):
+        assert False
+
+    def test_kep_to_equi(self):
+        assert False
+
+    def test_equi_to_kep(self):
+        assert False
+
+    def test_equi_kep_consistency(self):
+        assert False
+
 
 class TestRotations(unittest.TestCase):
 

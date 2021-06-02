@@ -105,7 +105,9 @@ def equi_to_cart(equi, mu=M_sol*G, degrees=False):
 
 
 def kep_to_equi(kep, degrees=False):
-
+    '''TODO
+    '''
+    
     lam = kep[3,...] + kep[4,...]
     om = kep[4,...]
     hi = 0.5*kep[2,...]
@@ -128,6 +130,8 @@ def kep_to_equi(kep, degrees=False):
     return elems
 
 def equi_to_kep(equi, degrees=False):
+    '''TODO
+    '''
 
     kep = np.empty(equi.shape, dtype=equi.dtype)
 
