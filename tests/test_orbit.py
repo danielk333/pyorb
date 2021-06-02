@@ -258,8 +258,241 @@ class TestOrbit(unittest.TestCase):
         orb2 = Orbit(M0=self.M, G=self.G, m=0.0, **self.kep_orb)
 
         with self.assertRaises(AssertionError):
-            nt.assert_almost_equal(orb1.cartesian, orb2.cartesian)
+            nt.assert_array_almost_equal(orb1.cartesian, orb2.cartesian)
 
         orb1.m[:] = 0
         orb1.calculate_cartesian()
-        nt.assert_almost_equal(orb1.cartesian, orb2.cartesian)
+        nt.assert_array_almost_equal(orb1.cartesian, orb2.cartesian)
+
+    def test_num(self):
+        orb = Orbit(M0=self.M, G=self.G, num=10)
+        assert orb.num == 10
+        assert orb._kep.shape[1] == 10
+        assert orb._cart.shape[1] == 10
+        i = 0
+        for o in orb:
+            i += 1
+        assert i==10
+
+    def test_update(self):
+        orb = Orbit(M0=self.M, G=self.G, m=0.1, **self.kep_orb)
+
+        with self.assertRaises(ValueError):
+            orb.update(a=2, m=3)
+
+        with self.assertRaises(ValueError):
+            orb.update(a=2, x=3)
+
+        orb.kepler_read_only = True
+        with self.assertRaises(AttributeError):
+            orb.update(a=2)
+        orb.kepler_read_only = False
+
+        orb.cartesian_read_only = True
+        with self.assertRaises(AttributeError):
+            orb.update(x=3)
+        orb.cartesian_read_only = False
+
+        orb.direct_update = False
+        kep0 = orb.kepler
+        cart0 = orb.cartesian
+        orb.update(a=2, m=3)
+        kep0[0] = 2
+        nt.assert_array_almost_equal(orb.kepler, kep0)
+        with self.assertRaises(AssertionError):
+            nt.assert_array_almost_equal(orb.cartesian, cart0)
+
+    def test_allocate(self):
+        orb = Orbit(M0=self.M, G=self.G, m=0.1, **self.kep_orb)
+        assert orb.num == 1
+        orb.allocate(10)
+        assert orb.num == 10
+        orb.add(num=5)
+        assert orb.num == 15
+        orb.allocate(10)
+        assert orb.num == 10
+        assert np.all(np.isnan(orb.cartesian))
+        assert np.all(np.isnan(orb.kepler))
+        nt.assert_array_almost_equal(orb.m, np.zeros_like(orb.m))
+
+    def test_propagate(self):
+        orb = Orbit(M0=self.M, G=self.G, m=0.1, **self.kep_orb)
+        kep0 = orb.kepler
+        cart0 = orb.cartesian
+        orb.propagate(orb.period)
+        nt.assert_array_almost_equal(orb.kepler, kep0)
+        nt.assert_array_almost_equal(orb.cartesian, cart0)
+
+        orb = Orbit(M0=self.M, G=self.G, a=1, e=0, i=0, omega=0, Omega=0, anom=0)
+        cart0 = orb.cartesian
+        orb.propagate(orb.period*0.5)
+        nt.assert_almost_equal(-orb.cartesian[0], cart0[0])
+        nt.assert_array_almost_equal(orb.cartesian[1:3], cart0[1:3])
+        nt.assert_almost_equal(-orb.cartesian[4], cart0[4])
+        nt.assert_almost_equal(orb.cartesian[3], cart0[3])
+        nt.assert_almost_equal(orb.cartesian[5], cart0[5])
+
+
+
+    def test_delete(self):
+        orb = Orbit(M0=self.M, G=self.G, m=0.1, **self.kep_orb)
+
+        a0 = self.kep_orb['a']
+        inds = [2,4,6]
+
+        orb.add(num=9, **self.kep_orb)
+        a = orb.a
+        a[inds] = a0 + 2
+        orb.a = a
+
+        orb.delete(inds)
+
+        assert orb.num == 10-3
+        assert np.all(orb.a < a0 + 1)
+
+
+    def test_type(self):
+        orb = Orbit(M0=self.M, G=self.G, m=0.1, degrees=True, **self.kep_orb)
+        orb.anom = 90
+        anom = orb.anom
+        m0 = orb.mean_anomaly
+        orb.type = 'mean'
+
+        nt.assert_almost_equal(m0, orb.mean_anomaly)
+        nt.assert_almost_equal(m0, orb.anom)
+        nt.assert_almost_equal(anom, orb.true_anomaly)
+
+
+
+class TestOrbitProperties(unittest.TestCase):
+
+    def setUp(self):
+        self.kep_orb = dict(a=1,e=0.2,i=3,omega=10,Omega=20,anom=90, degrees=True)
+        self.G = pyorb.get_G(length='AU', mass='Msol', time='y')
+        self.M0 = 1
+        self.m = 0.1
+        self.orb = Orbit(M0=self.M0, G=self.G, m=self.m, **self.kep_orb)
+        self.cart = self.orb.cartesian
+        self.kep = self.orb.kepler
+
+
+    def test_r(self):
+        nt.assert_array_almost_equal(self.orb.r, self.orb.cartesian[:3])
+    def test_v(self):
+        nt.assert_array_almost_equal(self.orb.v, self.orb.cartesian[3:])
+
+
+
+    def test_velocity(self):
+        vel0 = self.orb.velocity
+        nt.assert_almost_equal(vel0, np.linalg.norm(self.orb.cartesian[3:]))
+        self.orb.velocity = vel0*1.1
+        nt.assert_almost_equal(self.orb.velocity, vel0*1.1)
+        nt.assert_almost_equal(np.linalg.norm(self.orb.cartesian[3:]), vel0*1.1)
+
+    def test_speed(self):
+        nt.assert_almost_equal(self.orb.speed, self.orb.velocity)
+
+        #circular orbits have same speed
+        self.orb.e = 0
+        s0 = self.orb.speed
+        self.orb.anom = 0
+        nt.assert_almost_equal(s0, self.orb.speed)
+
+    def test_period(self):
+        p0 = self.orb.period
+        self.orb.a += 1
+        with self.assertRaises(AssertionError):
+            nt.assert_almost_equal(p0, self.orb.period)
+
+        nt.assert_almost_equal(self.orb.period*self.orb.mean_motion, 360.0)
+        self.orb.degrees = False
+        nt.assert_almost_equal(self.orb.period*self.orb.mean_motion, 2*np.pi)
+
+    def test_a(self):
+        assert self.orb.a == self.kep_orb['a']
+    def test_set_a(self):
+        self.orb.a = 2
+        with self.assertRaises(AssertionError):
+            nt.assert_array_almost_equal(self.orb.cartesian, self.cart)
+
+    def test_e(self):
+        assert self.orb.e == self.kep_orb['e']
+    def test_set_e(self):
+        self.orb.e = 0.1
+        with self.assertRaises(AssertionError):
+            nt.assert_array_almost_equal(self.orb.cartesian, self.cart)
+
+    def test_i(self):
+        assert self.orb.i == self.kep_orb['i']
+    def test_set_i(self):
+        self.orb.i = 20
+        with self.assertRaises(AssertionError):
+            nt.assert_array_almost_equal(self.orb.cartesian, self.cart)
+
+    def test_omega(self):
+        assert self.orb.omega == self.kep_orb['omega']
+    def test_set_omega(self):
+        self.orb.omega = 0
+        with self.assertRaises(AssertionError):
+            nt.assert_array_almost_equal(self.orb.cartesian, self.cart)
+
+    def test_Omega(self):
+        assert self.orb.Omega == self.kep_orb['Omega']
+    def test_set_Omega(self):
+        self.orb.Omega = 0
+        with self.assertRaises(AssertionError):
+            nt.assert_array_almost_equal(self.orb.cartesian, self.cart)
+
+    def test_anom(self):
+        assert self.orb.anom == self.kep_orb['anom']
+    def test_set_anom(self):
+        self.orb.anom = 0
+        with self.assertRaises(AssertionError):
+            nt.assert_array_almost_equal(self.orb.cartesian, self.cart)
+
+
+    def test_x(self):
+        assert self.orb.x == self.cart[0]
+    def test_set_x(self):
+        self.orb.x = 2
+        with self.assertRaises(AssertionError):
+            nt.assert_array_almost_equal(self.orb.kepler, self.kep)
+
+    def test_y(self):
+        assert self.orb.y == self.cart[1]
+    def test_set_y(self):
+        self.orb.y = 2
+        with self.assertRaises(AssertionError):
+            nt.assert_array_almost_equal(self.orb.kepler, self.kep)
+
+    def test_z(self):
+        assert self.orb.z == self.cart[2]
+    def test_set_z(self):
+        self.orb.z = 2
+        with self.assertRaises(AssertionError):
+            nt.assert_array_almost_equal(self.orb.kepler, self.kep)
+
+    def test_vx(self):
+        assert self.orb.vx == self.cart[3]
+    def test_set_vx(self):
+        self.orb.vx = 2
+        with self.assertRaises(AssertionError):
+            nt.assert_array_almost_equal(self.orb.kepler, self.kep)
+
+    def test_vy(self):
+        assert self.orb.vy == self.cart[4]
+    def test_set_vy(self):
+        self.orb.vy = 2
+        with self.assertRaises(AssertionError):
+            nt.assert_array_almost_equal(self.orb.kepler, self.kep)
+
+    def test_vz(self):
+        assert self.orb.vz == self.cart[5]
+    def test_set_vz(self):
+        self.orb.vz = 2
+        with self.assertRaises(AssertionError):
+            nt.assert_array_almost_equal(self.orb.kepler, self.kep)
+
+
+

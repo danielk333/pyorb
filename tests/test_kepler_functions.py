@@ -424,7 +424,7 @@ class TestKepCart(unittest.TestCase):
         nt.assert_almost_equal(orb_ref, orb_out)
 
         orb_in = np.array([self.a, 0.5, 180, 0, 45, 0], dtype=np.float64)
-        orb_ref = np.array([self.a, 0.5, 180, 45, 0, 0], dtype=np.float64)
+        orb_ref = np.array([self.a, 0.5, 180, 360-45, 0, 0], dtype=np.float64)
 
         x1 = kep.kep_to_cart(orb_in, mu=self.mu, degrees=True)
         orb_out = kep.cart_to_kep(x1, mu=self.mu, degrees=True)
