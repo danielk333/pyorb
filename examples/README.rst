@@ -1,4 +1,4 @@
 Examples
 ==========
 
-This is all the examples and tutorials
+These are all the examples and tutorials
