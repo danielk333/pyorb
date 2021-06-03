@@ -1,6 +1,5 @@
 # PyOrb
 
-
 PyOrb is a lightweight package designed to convert back and forth between cartesian and kepler coordinates seamlessly and in a physically consistent manner, following defined rules. It provides a convenience class for handling orbits and is tested for special cases such as planar and circular orbits.
 
 ## Feature list
@@ -22,20 +21,19 @@ On the upcoming feature list:
 - Saving orbits to file (binary or HDFS 5)
 
 
-
 ## To install
 
 
 ```bash
-    pip install pyorb
+pip install pyorb
 ```
 or to do the "nightly" build:
 
 ```bash
-    git clone https://github.com/danielk333/pyorb
-    cd pyorb
-    git checkout develop
-    pip install .
+git clone https://github.com/danielk333/pyorb
+cd pyorb
+git checkout develop
+pip install .
 ```
 
 Alternatively, if you are following updates closely you can install using ``pip install -e .`` so that in the future a ``git pull`` will update the library.
@@ -44,21 +42,20 @@ Alternatively, if you are following updates closely you can install using ``pip 
 ## Example
 
 ```python
+import pyorb
 
-    import pyorb
+orb = pyorb.Orbit(M0 = pyorb.M_sol, degrees=True)
+orb.update(a=1*pyorb.AU, e=0, i=0, omega=0, Omega=0, anom=0)
 
-    orb = pyorb.Orbit(M0 = pyorb.M_sol, degrees=True)
-    orb.update(a=1*pyorb.AU, e=0, i=0, omega=0, Omega=0, anom=0)
+#Convert and get cartesian elements
+print(orb.cartesian)
 
-    #Convert and get cartesian elements
-    print(orb.cartesian)
+#Make eccentric and place at aphelion
+orb.e = 0.2
+orb.anom = 180
 
-    #Make eccentric and place at aphelion
-    orb.e = 0.2
-    orb.anom = 180
-
-    #print cartesian position in AU at aphelion after the above changes
-    print(orb.r/pyorb.AU)
+#print cartesian position in AU at aphelion after the above changes
+print(orb.r/pyorb.AU)
 ```
 
 
