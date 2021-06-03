@@ -9,9 +9,6 @@ import pyorb
 import numpy as np
 import matplotlib.pyplot as plt
 
-#turn on TeX interperter
-plt.rc('text', usetex=True)
-
 #for reproducibility
 np.random.seed(12398748)
 

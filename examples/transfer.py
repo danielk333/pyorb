@@ -52,9 +52,9 @@ def plot_transfer(init, target):
     l, = ax.plot(r[0,:], r[1,:], r[2,:],  '-b')
     ax.plot(rr[0,:], rr[1,:], rr[2,:],  '-r')
     ax.set_title('Orbits', fontsize=22)
-    ax.set_xlabel('X-position $x$ [m]', fontsize=20)
-    ax.set_ylabel('Y-position $y$ [m]', fontsize=20)
-    ax.set_zlabel('Z-position $z$ [m]', fontsize=20)
+    ax.set_xlabel('X-position [m]', fontsize=20)
+    ax.set_ylabel('Y-position [m]', fontsize=20)
+    ax.set_zlabel('Z-position [m]', fontsize=20)
 
     axcolor = 'lightgoldenrodyellow'
     axdv1 = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor=axcolor)
