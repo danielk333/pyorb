@@ -4,17 +4,20 @@ Getting started tutorial
 We first create a standard orbit around the sun in SI units
 
 .. code-block:: python
+
     import pyorb
     orb = pyorb.Orbit(M0 = pyorb.M_sol)
 
 Lets switch to degrees for more human readable units, this setting can also be given at orbit creation as a keyword parameter.
 
 .. code-block:: python
+
     orb.degrees = True
 
 The output from a ``print(orb)`` is
 
-.. code-block:: bash
+.. code-block:: 
+
     a    : nan   x : nan
     e    : nan   y : nan
     i    : nan   z : nan
@@ -26,17 +29,20 @@ Since we have not yet set any parameters for this object. Let us give it a circu
 
 
 .. code-block:: python
+
     orb.update(a=1*pyorb.AU, e=0, i=0, omega=0, Omega=0, anom=0)
 
 The output from printing the following
 
 .. code-block:: python
+
     print(orb)
     print(f'Orbital period: {orb.period/(3600.0*24)} days')
 
 is now
 
-.. code-block:: bash
+.. code-block:: 
+
     a    : 1.4960e+11   x : 1.4960e+11
     e    : 0.0000e+00   y : 0.0000e+00
     i    : 0.0000e+00   z : 0.0000e+00
@@ -47,23 +53,27 @@ is now
 
 As we can see, the orbital period coincides very well with that of an Earth year and the object automatically calculated the cartesian coordinates as well. We can also look at a variety of implemented parameters available as attributes (see API documentation for complete list) such as ``print(f'Orbit velocity is {orb.velocity*1e-3} km/s')`` which would generate:
 
-.. code-block:: bash
+.. code-block:: 
+
     Orbit velocity is 29.785142169221025 km/s
 
 Lets say we desire more control over when a conversion from Kepler to Cartesian is performed. We can then disable the direct conversion by
 
 .. code-block:: python
+
     orb.direct_update = False
 
 Now if we change the semi-major axis to be located at e.g. the orbit of Mars and print the object
 
 .. code-block:: python
+
     orb.a = 1.5237*pyorb.AU
     print(orb)
 
 We get a change in the kepler elements but not in the cartesian elements:
 
-.. code-block:: bash
+.. code-block:: 
+
     a    : 2.2794e+11   x : 1.4960e+11
     e    : 0.0000e+00   y : 0.0000e+00
     i    : 0.0000e+00   z : 0.0000e+00
@@ -73,17 +83,20 @@ We get a change in the kepler elements but not in the cartesian elements:
 
 These values are generated from the internal storage for the elements ``orb._kep`` and ``orb._cart``. However, as a safeguard to avoid inconsistent pairs of elements, the object knows that a change has been made to the kepler elements and hence the cartesian ones are out of date. So if e.g. we would print the x-axis location with ``print(f'Orbit X-axis: {orb.x/pyorb.AU}')`` the elements would be automatically updated
 
-.. code-block:: bash
+.. code-block:: 
+
     Orbit X-axis: [1.5237]
 
 To disable this automatic conversion use following flag 
 
 .. code-block:: python
+
     orb.auto_update = False
 
 Then if we update the eccentricity, print the cartesian coordinates, change a cartesian coordinate and print the kepler coordinates:
 
 .. code-block:: python
+
     orb.e = 0.5
     print(f'Cartesian: {orb.cartesian}')
     orb.vz = 30e3
@@ -93,7 +106,8 @@ Then if we update the eccentricity, print the cartesian coordinates, change a ca
 
 We see that any conversion has to be made manually and the pair can be inconsistent:
 
-.. code-block:: bash
+.. code-block:: 
+
     Cartesian: [[ 2.27942276e+11]
      [ 0.00000000e+00]
      [ 0.00000000e+00]
@@ -117,17 +131,20 @@ We see that any conversion has to be made manually and the pair can be inconsist
 At this point, one would have to choose which set of coordinates is the one desired and use that as a basis for transformation. E.g. if we chose to use the kepler as base:
 
 .. code-block:: python
+
     orb.calculate_cartesian()
     print(f'Orbit X-axis: {orb.x/pyorb.AU}')
 
 We get a x-position consistent with a 0.5 eccentricity orbit:
 
-.. code-block:: bash
+.. code-block:: 
+
     Orbit X-axis: [0.76185]
 
 This manual transformation should mainly be used if there are performance issues or if total control over the transformation is needed. Here we can also see another property of the orbit class: it is completely vectorized. Hence why the ``orb.x`` returns a numpy 1-length vector. Since the ``Orbit`` object can have multiple orbits in the same instance there are a few convenience functions to work with multiple orbits such as
 
 .. code-block:: python
+
     import numpy as np
 
     orb.auto_update = True
@@ -151,7 +168,8 @@ This manual transformation should mainly be used if there are performance issues
 
 Will generate:
 
-.. code-block:: bash
+.. code-block:: 
+
     12 Orbits
     Orbit semi major axis [AU]:
     Item 0: a=[0.5] AU, e=[0.]
@@ -197,7 +215,8 @@ As a standard, SI units are used. But, we can also create orbits with an arbitra
 
 Will generate:
 
-.. code-block:: bash
+.. code-block:: 
+
     SI gravitation constant: 6.6743e-11 m^3 kg^-1 s^-2
     Astronomical gravitation constant: 39.47812018693255 AU^3 Msol^-1 y^-2
     a    : 1.0000e+00   x : 1.0000e+00
@@ -210,10 +229,12 @@ Will generate:
 Here we see all the units now conforming to the new gravitational constant. If we print the period in these units they should be approximently 1 year. Another interesting fact about these units is that the orbital speed should be approximately 2pi as this is the circumference of a circle with radius 1 AU in units of AU:
 
 .. code-block:: python
+
     print(f'Orbital period: {orb2.period} years')
     print(f'Orbital speed: {orb2.speed} AU/y')
 
-.. code-block:: bash
+.. code-block:: 
+
     Orbital period: [1.00000377] years
     Orbital speed: [6.28316164] AU/y
 

@@ -1,11 +1,8 @@
-{{ name | escape | underline }}
-
 .. automodule:: {{ fullname }}
 
 .. currentmodule:: {{ fullname }}
 
-Module summary
---------------
+{{ name | escape | underline }}
 
 {% if classes %}
 .. rubric:: Classes
@@ -29,8 +26,6 @@ Module summary
 
 {% endif %}
 
-Contents
-----------
 
 {% if classes %}
 {% for class in classes %}
