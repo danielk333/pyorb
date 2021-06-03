@@ -49,8 +49,8 @@ for o in orb:
     ax.plot(r[0,:], r[1,:], r[2,:],  '-b', alpha=0.5)
 
 ax.set_title('Orbits', fontsize=22)
-ax.set_xlabel('X-position $x$ [AU]', fontsize=20)
-ax.set_ylabel('Y-position $y$ [AU]', fontsize=20)
-ax.set_zlabel('Z-position $z$ [AU]', fontsize=20)
+ax.set_xlabel('X-position [AU]', fontsize=20)
+ax.set_ylabel('Y-position [AU]', fontsize=20)
+ax.set_zlabel('Z-position [AU]', fontsize=20)
 ax.view_init(14,-6)
 plt.show()
