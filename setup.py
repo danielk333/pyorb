@@ -7,7 +7,7 @@ with open('requirements', 'r') as fh:
     pip_req = fh.read().split('\n')
     pip_req = [x.strip() for x in pip_req if len(x.strip()) > 0]
 
-with open('README.rst', 'r') as fh:
+with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 with open('dev_requirements', 'r') as fh:
@@ -31,7 +31,7 @@ def get_version(rel_path):
 
 setuptools.setup(
     name = 'pyorb',
-    version = get_version("pyorb/__init__.py"),
+    version = get_version("pyorb/version.py"),
     long_description = long_description,
     long_description_content_type = 'text/markdown',
     url = 'https://github.com/danielk333/pyorb',
