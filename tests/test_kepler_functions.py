@@ -121,27 +121,130 @@ class TestKeplerSolver(unittest.TestCase):
     def test_hyperbolic_kepler_guess(self):
         assert False
 
-@unittest.skip("Not yet implemented")
+
+
 class TestAnomaliesHyperbolic(unittest.TestCase):
 
     def test_true_to_hyperbolic(self):
-        assert False
+        nu = kep.true_to_eccentric(0.0, np.array([0.1,1.2]))
+        nt.assert_array_almost_equal(nu, np.zeros_like(nu))
+
+        nu = kep.true_to_eccentric(0.0, 1.2)
+        nt.assert_almost_equal(nu, 0.0)
+
+    def test_true_to_parabolic(self):
+        nu = kep.true_to_eccentric(0.0, np.array([0.1,1]))
+        nt.assert_array_almost_equal(nu, np.zeros_like(nu))
+
+        nu = kep.true_to_eccentric(0.0, 1)
+        nt.assert_almost_equal(nu, 0.0)
 
     def test_hyperbolic_to_true(self):
-        assert False
+        nu = kep.eccentric_to_true(0.0, np.array([0.1,1.2]))
+        nt.assert_array_almost_equal(nu, np.zeros_like(nu))
+
+        nu = kep.eccentric_to_true(0.0, 1.2)
+        nt.assert_almost_equal(nu, 0.0)
+
+    def test_parabolic_to_true(self):
+        nu = kep.eccentric_to_true(0.0, np.array([0.1,1]))
+        nt.assert_array_almost_equal(nu, np.zeros_like(nu))
+
+        nu = kep.eccentric_to_true(0.0, 1)
+        nt.assert_almost_equal(nu, 0.0)
+
+    def test_mean_to_parabolic(self):
+        E = kep.mean_to_eccentric(0.0, np.array([0.1,1.0]))
+        nt.assert_array_almost_equal(E, np.zeros_like(E))
+
+        E = kep.mean_to_eccentric(0.0, 1.2)
+        nt.assert_almost_equal(E, 0.0)
 
     def test_mean_to_hyperbolic(self):
-        assert False
+        E = kep.mean_to_eccentric(0.0, np.array([0.1,1.2]))
+        nt.assert_array_almost_equal(E, np.zeros_like(E))
+
+        E = kep.mean_to_eccentric(0.0, 1.2)
+        nt.assert_almost_equal(E, 0.0)
+
+    def test_parabolic_to_mean(self):
+        M = kep.eccentric_to_mean(0.0, np.array([0.1,1.0]))
+        nt.assert_array_almost_equal(M, np.zeros_like(M))
+
+        M = kep.eccentric_to_mean(0.0, 1)
+        nt.assert_almost_equal(M, 0.0)
 
     def test_hyperbolic_to_mean(self):
-        assert False
+        M = kep.eccentric_to_mean(0.0, np.array([0.1,1.2]))
+        nt.assert_array_almost_equal(M, np.zeros_like(M))
 
-    def test_true_to_hyperbolic_coencides(self):
-        assert False
-        e_test = [1, 2]
-        for e in e_test:
-            E = kep.true_to_eccentric(0.0, e)
-            self.assertAlmostEqual(E, 0.0)
+        M = kep.eccentric_to_mean(0.0, 1.2)
+        nt.assert_almost_equal(M, 0.0)
+
+
+    def test_parabolic_radius(self):
+        nu = np.linspace(np.pi/2,0,num=100)
+        #Semi-latus rectum p = 2q
+
+        r = kep.parabolic_radius(nu, 1.0)
+        nt.assert_almost_equal(r[0], 2)
+        nt.assert_almost_equal(r[-1], 1)
+
+        r = kep.parabolic_radius(-nu, 1.0)
+        nt.assert_almost_equal(r[0], 2)
+        nt.assert_almost_equal(r[-1], 1)
+        with np.errstate(divide='ignore'):
+            r = kep.parabolic_radius(np.pi, 1.0)
+            assert np.isinf(r)
+            r = kep.parabolic_radius(-np.pi, 1.0)
+            assert np.isinf(r)
+
+
+    def test_hyperbolic_to_true_inverse(self):
+        E0 = np.linspace(-np.pi/4,np.pi/4,num=100)
+        e = np.ones_like(E0)*1.2
+
+        nu0 = kep.eccentric_to_true(E0, e)
+        E = kep.true_to_eccentric(nu0, e)
+        nu = kep.eccentric_to_true(E, e)
+
+        nt.assert_array_almost_equal(E0, E)
+        nt.assert_array_almost_equal(nu0, nu)
+
+    def test_parabolic_to_true_inverse(self):
+        E0 = np.linspace(-np.pi/4,np.pi/4,num=100)
+        e = np.ones_like(E0)
+
+        nu0 = kep.eccentric_to_true(E0, e)
+        E = kep.true_to_eccentric(nu0, e)
+        nu = kep.eccentric_to_true(E, e)
+
+        nt.assert_array_almost_equal(E0, E)
+        nt.assert_array_almost_equal(nu0, nu)
+
+
+
+    def test_parabolic_to_mean_inverse(self):
+        E0 = np.linspace(-np.pi/4,np.pi/4,num=100)
+        e = np.ones_like(E0)
+
+        M0 = kep.eccentric_to_mean(E0, e)
+        E = kep.mean_to_eccentric(M0, e)
+        M = kep.eccentric_to_mean(E, e)
+
+        nt.assert_array_almost_equal(E0, E)
+        nt.assert_array_almost_equal(M0, M)
+
+    def test_hyperbolic_to_mean_inverse(self):
+        E0 = np.linspace(-np.pi/4,np.pi/4,num=100)
+        e = np.ones_like(E0)*1.2
+
+        M0 = kep.eccentric_to_mean(E0, e)
+        E = kep.mean_to_eccentric(M0, e)
+        M = kep.eccentric_to_mean(E, e)
+
+        nt.assert_array_almost_equal(E0, E)
+        nt.assert_array_almost_equal(M0, M)
 
 
 class TestAnomalies(unittest.TestCase):

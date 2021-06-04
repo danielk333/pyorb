@@ -401,7 +401,7 @@ def true_to_eccentric(nu, e, degrees=False):
     '''Calculates the eccentric anomaly from the true anomaly.
 
     :param float/numpy.ndarray nu: True anomaly.
-    :param float/numpy.ndarray e: Eccentricity of ellipse.
+    :param float/numpy.ndarray e: Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
     :param bool degrees: If true degrees are used, else all angles are given in radians
 
     :return: Eccentric anomaly.
@@ -412,9 +412,32 @@ def true_to_eccentric(nu, e, degrees=False):
     else:
         _nu = nu
 
-    E = 2.0*np.arctan( np.sqrt( (1.0 - e)/(1.0 + e) )*np.tan(_nu*0.5) )
-    E = np.mod(E + 2.*np.pi,2.*np.pi)
+    if isinstance(_nu, np.ndarray) or isinstance(e, np.ndarray):
+        if not isinstance(_nu, np.ndarray):
+            _nu = np.ones(e.shape, dtype=e.dtype)*_nu
+        if not isinstance(e, np.ndarray):
+            e = np.ones(_nu.shape, dtype=_nu.dtype)*e
+        if _nu.shape != e.shape:
+            raise TypeError('Input dimensions does not agree')
+
+        E = np.empty(_nu.shape, dtype=_nu.dtype)
+        hyp = e > 1
+        per = e == 1
+        eli = e < 1
+
+        E[hyp] = 2.0*np.arctanh( np.sqrt( (e[hyp] - 1.0)/(e[hyp] + 1.0) )*np.tan(_nu[hyp]*0.5) )
+        E[per] = np.tan( _nu[per]*0.5 )
+        E[eli] = 2.0*np.arctan( np.sqrt( (1.0 - e[eli])/(1.0 + e[eli]) )*np.tan(_nu[eli]*0.5) )
+    else:
+        if e > 1:
+            E = 2.0*np.arctanh( np.sqrt( (e - 1.0)/(e + 1.0) )*np.tan(_nu*0.5) )
+        elif e == 1:
+            E = 2.0*np.arctan( _nu )
+        else:
+            E = 2.0*np.arctan( np.sqrt( (1.0 - e)/(1.0 + e) )*np.tan(_nu*0.5) )
     
+    E = np.mod(E + 2.*np.pi, 2.*np.pi)
+
     if degrees:
         E = np.degrees(E)
     
@@ -424,8 +447,8 @@ def true_to_eccentric(nu, e, degrees=False):
 def eccentric_to_true(E, e, degrees=False):
     '''Calculates the true anomaly from the eccentric anomaly.
 
-    :param float/numpy.ndarray E: Eccentric anomaly.
-    :param float/numpy.ndarray e: Eccentricity of ellipse.
+    :param float/numpy.ndarray E: elliptic, parabolic or hyperbolic eccentric anomaly.
+    :param float/numpy.ndarray e: Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
     :param bool degrees: If true degrees are used, else all angles are given in radians
 
     :return: True anomaly.
@@ -436,9 +459,31 @@ def eccentric_to_true(E, e, degrees=False):
     else:
         _E = E
 
-    nu = 2.0*np.arctan( np.sqrt( (1.0 + e)/(1.0 - e) )*np.tan(_E*0.5) )
-    nu = np.mod(nu + 2.*np.pi, 2.*np.pi)
+    if isinstance(_E, np.ndarray) or isinstance(e, np.ndarray):
+        if not isinstance(_E, np.ndarray):
+            _E = np.ones(e.shape, dtype=e.dtype)*_E
+        if not isinstance(e, np.ndarray):
+            e = np.ones(_E.shape, dtype=_E.dtype)*e
+        if _E.shape != e.shape:
+            raise TypeError('Input dimensions does not agree')
 
+        nu = np.empty(_E.shape, dtype=_E.dtype)
+        hyp = e > 1
+        per = e == 1
+        eli = e < 1
+
+        nu[hyp] = 2.0*np.arctan( np.sqrt( (e[hyp] + 1.0)/(e[hyp] - 1.0) )*np.tanh(_E[hyp]*0.5) )
+        nu[per] = 2.0*np.arctan( _E[per] )
+        nu[eli] = 2.0*np.arctan( np.sqrt( (1.0 + e[eli])/(1.0 - e[eli]) )*np.tan(_E[eli]*0.5) )
+    else:
+        if e > 1:
+            nu = 2.0*np.arctan( np.sqrt( (e + 1.0)/(e - 1.0) )*np.tanh(_E*0.5) )
+        elif e == 1:
+            nu = 2.0*np.arctan( _E )
+        else:
+            nu = 2.0*np.arctan( np.sqrt( (1.0 + e)/(1.0 - e) )*np.tan(_E*0.5) )
+    
+    nu = np.mod(nu + 2.*np.pi, 2.*np.pi)
     if degrees:
         nu = np.degrees(nu)
     
@@ -446,10 +491,10 @@ def eccentric_to_true(E, e, degrees=False):
 
 
 def eccentric_to_mean(E, e, degrees=False):
-    '''Calculates the mean anomaly from the eccentric anomaly using Kepler equation.
+    '''Calculates the mean anomaly from the (elliptic, parabolic or hyperbolic) eccentric anomaly using Kepler equation.
 
-    :param float/numpy.ndarray E: Eccentric anomaly.
-    :param float/numpy.ndarray e: Eccentricity of ellipse.
+    :param float/numpy.ndarray E: elliptic, parabolic or hyperbolic eccentric anomaly.
+    :param float/numpy.ndarray e: Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
     :param bool degrees: If true degrees are used, else all angles are given in radians
 
     :return: Mean anomaly.
@@ -460,11 +505,34 @@ def eccentric_to_mean(E, e, degrees=False):
     else:
         _E = E
 
-    M = _E - e*np.sin(_E)
+    if isinstance(_E, np.ndarray) or isinstance(e, np.ndarray):
+        if not isinstance(_E, np.ndarray):
+            _E = np.ones(e.shape, dtype=e.dtype)*_E
+        if not isinstance(e, np.ndarray):
+            e = np.ones(_E.shape, dtype=_E.dtype)*e
+        if _E.shape != e.shape:
+            raise TypeError('Input dimensions does not agree')
 
+        M = np.empty(_E.shape, dtype=_E.dtype)
+        hyp = e > 1
+        per = e == 1
+        eli = e < 1
+
+        M[hyp] = e[hyp]*np.sinh(_E[hyp]) - _E[hyp]
+        M[per] = _E[per] + _E[per]**3/3.0
+        M[eli] = _E[eli] - e[eli]*np.sin(_E[eli])
+    else:
+        if e > 1:
+            M = e*np.sinh(_E) - _E
+        elif e == 1:
+            M = _E + _E**3/3.0
+        else:
+            M = _E - e*np.sin(_E)
+        
     if degrees:
         M = np.degrees(M)
     return M
+
 
 
 def true_to_mean(nu, e, degrees=False):
@@ -475,7 +543,7 @@ def true_to_mean(nu, e, degrees=False):
        * :func:`~pyorb.kepler.eccentric_to_mean`
 
     :param float/numpy.ndarray nu: True anomaly.
-    :param float/numpy.ndarray e: Eccentricity of ellipse.
+    :param float/numpy.ndarray e: Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
     :param bool degrees: If true degrees are used, else all angles are given in radians
     
     :return: Mean anomaly.
@@ -511,6 +579,43 @@ def elliptic_radius(E, a, e, degrees=False):
         _E = E
 
     return a*(1.0 - e*np.cos( _E ))
+
+
+def parabolic_radius(nu, q, degrees=False):
+    '''Calculates the distance between the left focus point of an parabola and a point on the parabola defined by the eccentric anomaly.
+
+    :param float/numpy.ndarray nu: True anomaly.
+    :param float/numpy.ndarray q: Periapsis-distance of parabola.
+    :param bool degrees: If true degrees are used, else all angles are given in radians
+    
+    :return: Radius from left focus point.
+    :rtype: numpy.ndarray or float
+    '''
+    if degrees:
+        _nu = np.radians(nu)
+    else:
+        _nu = nu
+
+    return 2.0*q/(1.0 + np.cos(_nu))
+
+
+def hyperbolic_radius(nu, a, e, degrees=False):
+    '''Calculates the distance between the left focus point of an hyperbola and a point on the hyperbola defined by the eccentric anomaly.
+
+    :param float/numpy.ndarray nu: True anomaly.
+    :param float/numpy.ndarray a: Semi-major axis of hyperbola.
+    :param float/numpy.ndarray e: Eccentricity of hyperbola.
+    :param bool degrees: If true degrees are used, else all angles are given in radians
+    
+    :return: Radius from left focus point.
+    :rtype: numpy.ndarray or float
+    '''
+    if degrees:
+        _nu = np.radians(nu)
+    else:
+        _nu = nu
+
+    return a*(e**2 - 1.0)/(1.0 + e*np.cos(_nu))
 
 
 def rot_mat_x(theta, dtype=np.float64):
@@ -569,17 +674,17 @@ def rot_mat_z(theta, dtype=np.float64):
 
 def laguerre_solve_kepler(E0, M, e, tol=1e-12, max_iter=5000, degree=5):
     '''Solve the Kepler equation using the The Laguerre Algorithm, a algorithm that guarantees global convergence.
-    Adjusted for solving only real roots (non-hyperbolic orbits)
     
-    Absolute numerical tolerance is defined as :math:`|f(E)| < tol` where :math:`f(E) = M - E + e \\sin(E)`.
+    Absolute numerical tolerance is defined as :math:`|f(E)| < tol` where :math:`f(E) = M - E + e \\sin(E)` or 
+    where :math:`f(E) = M + E - e \\sinh(E)`.
 
-    # TODO: implement hyperbolic solving.
+    # TODO: implement in C and bind using ctypes
 
     *Note:* Choice of polynomial degree does not matter significantly for convergence rate.
 
-    :param float M: Initial guess for eccentric anomaly.
+    :param float E0: Initial guess for eccentric anomaly.
     :param float M: Mean anomaly.
-    :param float e: Eccentricity of ellipse.
+    :param float e: Eccentricity of ellipse or hyperbola.
     :param float tol: Absolute numerical tolerance eccentric anomaly.
     :param int max_iter: Maximum number of iterations before solver is aborted.
     :param int degree: Polynomial degree in derivation of Laguerre Algorithm.
@@ -607,9 +712,14 @@ def laguerre_solve_kepler(E0, M, e, tol=1e-12, max_iter=5000, degree=5):
 
     degree = float(degree)
 
-    _f = lambda E: M - E + e*np.sin(E)
-    _fp = lambda E: e*np.cos(E) - 1.0
-    _fpp = lambda E: -e*np.sin(E)
+    if e > 1:
+        _f = lambda E: M + E - e*np.sinh(E)
+        _fp = lambda E: 1.0 - e*np.cosh(E)
+        _fpp = lambda E: -e*np.sinh(E)
+    else:
+        _f = lambda E: M - E + e*np.sin(E)
+        _fp = lambda E: e*np.cos(E) - 1.0
+        _fpp = lambda E: -e*np.sin(E)
 
     E = E0
 
@@ -645,6 +755,29 @@ def laguerre_solve_kepler(E0, M, e, tol=1e-12, max_iter=5000, degree=5):
     return E, it_num
 
 
+def _get_hyperbolic_kepler_guess(M, e):
+    '''The different initial guesses for solving the Kepler equation based on input mean anomaly
+    
+    :param float M: Mean anomaly in radians.
+    :param float e: Eccentricity of hyperbola.
+    :return: Guess for eccentric anomaly in radians.
+    :rtype: float
+
+    Reference: T. M. Burkardt and J. M. A. Danby, “The solutions of Kepler’s equation. II,” Celestial Mechanics, vol. 31, pp. 317–328, Nov. 1983, doi: 10.1007/BF01844230.
+    '''
+    if M > np.pi:
+        _M = 2.0*np.pi - M
+    else:
+        _M = M
+
+    E0 = np.log(2*_M/e + 1.8)
+
+    if M > np.pi:
+        E0 = 2.0*np.pi - E0
+
+    return E0
+
+
 def _get_kepler_guess(M, e):
     '''The different initial guesses for solving the Kepler equation based on input mean anomaly
     
@@ -677,11 +810,12 @@ def kepler_guess(M, e):
     '''Guess the initial iteration point for newtons method.
     
     :param float/numpy.ndarray M: Mean anomaly in radians.
-    :param float/numpy.ndarray e: Eccentricity of ellipse.
+    :param float/numpy.ndarray e: Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
     :return: Guess for eccentric anomaly in radians.
     :rtype: numpy.ndarray or float
 
     *Reference:* Esmaelzadeh, R., & Ghadiri, H. (2014). Appropriate starter for solving the Kepler's equation. International Journal of Computer Applications, 89(7).
+    *Reference:* T. M. Burkardt and J. M. A. Danby, “The solutions of Kepler’s equation. II,” Celestial Mechanics, vol. 31, pp. 317–328, Nov. 1983, doi: 10.1007/BF01844230.
     '''
 
     if isinstance(M, np.ndarray) or isinstance(e, np.ndarray):
@@ -704,7 +838,10 @@ def kepler_guess(M, e):
             ec = next(eit)
             Ec = next(Eit)
 
-            E_calc = _get_kepler_guess(Mc, ec)
+            if ec > 1:
+                E_calc = _get_hyperbolic_kepler_guess(Mc, ec)
+            else:            
+                E_calc = _get_kepler_guess(Mc, ec)
 
             Ec[...] = E_calc
 
@@ -718,12 +855,16 @@ def mean_to_eccentric(M, e, solver_options=None, degrees=False):
     '''Calculates the eccentric anomaly from the mean anomaly by solving the Kepler equation.
 
     :param float/numpy.ndarray M: Mean anomaly.
-    :param float/numpy.ndarray e: Eccentricity of ellipse.
+    :param float/numpy.ndarray e: Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
     :param dict solver_options: Options for the numerical solution of Kepler's equation. See `pyorb.kepler.laguerre_solve_kepler` for information.
     :param bool degrees: If true degrees are used, else all angles are given in radians
     
     :return: True anomaly.
     :rtype: numpy.ndarray or float
+
+    **Note:**
+        * For parabolic orbits the equation is analytic and solvable, ref: *Montenbruck, Oliver; Pfleger, Thomas (2009). Astronomy on the Personal Computer. Springer-Verlag Berlin Heidelberg. ISBN 978-3-540-67221-0. p 64*
+        * For hyperbolic orbits the hyperbolic sine is used in the Kepler equation.
 
     **Uses:**
        * :func:`~pyorb.kepler._get_kepler_guess`
@@ -758,8 +899,16 @@ def mean_to_eccentric(M, e, solver_options=None, degrees=False):
             ec = next(eit)
             Ec = next(Eit)
 
-            E0 = _get_kepler_guess(Mc, ec)
-            E_calc, it_num = laguerre_solve_kepler(E0, Mc, ec, **solver_options)
+            if ec > 1:
+                E0 = _get_hyperbolic_kepler_guess(Mc, ec)
+                E_calc, it_num = laguerre_solve_kepler(E0, Mc, ec, **solver_options)
+            elif ec == 1:
+                A = 3.0/2.0*Mc
+                B = np.cbrt(A + np.sqrt(A**2 + 1))
+                E_calc = B - 1.0/B
+            else:
+                E0 = _get_kepler_guess(Mc, ec)
+                E_calc, it_num = laguerre_solve_kepler(E0, Mc, ec, **solver_options)
 
             Ec[...] = E_calc
 
@@ -767,9 +916,16 @@ def mean_to_eccentric(M, e, solver_options=None, degrees=False):
         if e == 0:
             return M
 
-        E0 = _get_kepler_guess(_M, e)
-        E, it_num = laguerre_solve_kepler(E0, _M, e, **solver_options)
-
+        if e > 1:
+            E0 = _get_hyperbolic_kepler_guess(_M, e)
+            E, it_num = laguerre_solve_kepler(E0, _M, e, **solver_options)
+        elif e == 1:
+            A = 3.0/2.0*_M
+            B = np.cbrt(A + np.sqrt(A**2 + 1))
+            E = B - 1.0/B
+        else:
+            E0 = _get_kepler_guess(_M, e)
+            E, it_num = laguerre_solve_kepler(E0, _M, e, **solver_options)
 
     if degrees:
         E = np.degrees(E)
@@ -785,7 +941,7 @@ def mean_to_true(M, e, solver_options=None, degrees=False):
        * :func:`~pyorb.kepler.eccentric_to_true`
 
     :param float/numpy.ndarray M: Mean anomaly.
-    :param float/numpy.ndarray e: Eccentricity of ellipse.
+    :param float/numpy.ndarray e: Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
     :param dict solver_options: Options for the numerical solution of Kepler's equation. See `pyorb.kepler.laguerre_solve_kepler` for information.
     :param bool degrees: If true degrees are used, else all angles are given in radians
     
@@ -920,7 +1076,14 @@ def kep_to_cart(kep, mu=M_sol*G, degrees=False):
 
     Ecc = true_to_eccentric(nu,e,degrees=False)
 
-    rn = elliptic_radius(Ecc,a,e,degrees=False)
+    hyp = e > 1
+    per = e == 1
+    eli = e < 1
+
+    rn = np.empty_like(Ecc)
+    rn[hyp] = hyperbolic_radius(nu[hyp], a[hyp], e[hyp], degrees=False)
+    rn[per] = parabolic_radius(nu[per], a[per], degrees=False)
+    rn[eli] = elliptic_radius(Ecc[eli], a[eli], e[eli], degrees=False)
 
     r = np.zeros( (3, kep.shape[1]), dtype=kep.dtype )
     r[0,:] = np.cos(wf)
@@ -946,9 +1109,11 @@ def kep_to_cart(kep, mu=M_sol*G, degrees=False):
     m2 = -sin_Omega*sin_w + cos_Omega*cos_w*cos_i
     n1 = sin_w*sin_i
     n2 = cos_w*sin_i
-    b = a*np.sqrt(1.0 - e**2)
-    n = np.sqrt(mu/a**3)
-    nar = n*a/rn
+
+    # b = a*np.sqrt(1.0 - e**2)
+    # n = np.sqrt(mu/a**3)
+    # nar = n*a/rn
+    nar = orbital_speed(rn, a, mu)/a
     
     v = np.zeros( (3, kep.shape[1]), dtype=kep.dtype )
     bcos_E = b*np.cos(Ecc)
