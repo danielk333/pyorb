@@ -81,6 +81,41 @@ class TestRotations(unittest.TestCase):
 
 class TestKeplerSolver(unittest.TestCase):
 
+
+    def test_hyperbolic_kepler_guess(self):
+        E = np.linspace(0.0, np.pi, num=300, dtype=np.float64)
+        e = np.linspace(1.001, 10, num=500, dtype=np.float64)
+
+        Ev, ev = np.meshgrid(E, e)
+
+        Mv = kep.eccentric_to_mean(Ev, ev)
+
+        E0 = kep.kepler_guess(Mv, ev)
+        
+        #the initial guess SHOULD be at least 35 degrees to true
+        test_accuracy = np.abs(E0 - Ev)*180.0/np.pi < 35.0
+        nt.assert_array_equal(
+            test_accuracy,
+            np.full(test_accuracy.shape, True)
+        )
+
+
+    def test_laguerre_solve_hyperbolic_kepler(self):
+        E = np.linspace(0.0, np.pi, num=300, dtype=np.float64)
+        e = np.linspace(1.001, 10, num=500, dtype=np.float64)
+
+        for I, eit in enumerate(e):
+            for J, Eit in enumerate(E):
+                M = kep.eccentric_to_mean(Eit, eit)
+
+                E0 = kep.kepler_guess(M, eit)
+                E_calc, it = kep.laguerre_solve_kepler(E0, M, eit, tol=1e-12)
+                M_calc = kep.eccentric_to_mean(E_calc, eit)
+                fun_err = np.abs(M - M_calc)
+
+                nt.assert_almost_equal(Eit, E_calc, decimal = 1e-9)
+                assert fun_err < 1e-11
+
     def test_kepler_guess(self):
         E = np.linspace(0.0, 2.0*np.pi, num=100, dtype=np.float64)
         e = np.linspace(0, 0.99, num=100, dtype=np.float64)
@@ -113,13 +148,6 @@ class TestKeplerSolver(unittest.TestCase):
                 nt.assert_almost_equal(Eit, E_calc, decimal = 1e-9)
                 assert fun_err < 1e-11
 
-    @unittest.skip("Not yet implemented")
-    def test_laguerre_solve_hyperbolic_kepler(self):
-        assert False
-
-    @unittest.skip("Not yet implemented")
-    def test_hyperbolic_kepler_guess(self):
-        assert False
 
 
 
@@ -201,7 +229,7 @@ class TestAnomaliesHyperbolic(unittest.TestCase):
 
 
     def test_hyperbolic_to_true_inverse(self):
-        E0 = np.linspace(-np.pi/4,np.pi/4,num=100)
+        E0 = np.linspace(0,np.pi/2,num=100)
         e = np.ones_like(E0)*1.2
 
         nu0 = kep.eccentric_to_true(E0, e)
@@ -212,7 +240,7 @@ class TestAnomaliesHyperbolic(unittest.TestCase):
         nt.assert_array_almost_equal(nu0, nu)
 
     def test_parabolic_to_true_inverse(self):
-        E0 = np.linspace(-np.pi/4,np.pi/4,num=100)
+        E0 = np.linspace(0,np.pi/2,num=100)
         e = np.ones_like(E0)
 
         nu0 = kep.eccentric_to_true(E0, e)
@@ -223,9 +251,8 @@ class TestAnomaliesHyperbolic(unittest.TestCase):
         nt.assert_array_almost_equal(nu0, nu)
 
 
-
     def test_parabolic_to_mean_inverse(self):
-        E0 = np.linspace(-np.pi/4,np.pi/4,num=100)
+        E0 = np.linspace(0,np.pi/2,num=100)
         e = np.ones_like(E0)
 
         M0 = kep.eccentric_to_mean(E0, e)
@@ -236,7 +263,7 @@ class TestAnomaliesHyperbolic(unittest.TestCase):
         nt.assert_array_almost_equal(M0, M)
 
     def test_hyperbolic_to_mean_inverse(self):
-        E0 = np.linspace(-np.pi/4,np.pi/4,num=100)
+        E0 = np.linspace(0,np.pi/2,num=100)
         e = np.ones_like(E0)*1.2
 
         M0 = kep.eccentric_to_mean(E0, e)

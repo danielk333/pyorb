@@ -2,20 +2,23 @@
 
 PyOrb is a lightweight package designed to convert back and forth between cartesian and kepler coordinates seamlessly and in a physically consistent manner, following defined rules. It provides a convenience class for handling orbits and is tested for special cases such as planar and circular orbits.
 
+See full documentation at [pyorb github](https://danielk333.github.io/pyorb/docs/index.html).
+
 ## Feature list
 
 Current features:
 - Clear definition of an orbit, consistent throughout the code, including planar and circular orbits
 - Kepler to Cartesian conversion
 - Cartesian to Kepler conversion
-- All function handles all special cases (e.g. planar and circular orbits)
+- Can handle hyperbolic orbits
+- All function handles all special cases (e.g. planar, circular and parabolic orbits)
 - Convenient ``Orbit`` class or storing orbits and seamlessly convert between Kepler and Cartesian elements
 - Access to all types of orbit anomalies
 - Vectorized function for increased performance
 - Access to alternative parameterizations such as Equinoctial elements
 
+
 On the upcoming feature list:
-- Can handle hyperbolic orbits
 - C-implementation of conversion function for performance
 - Converting of orbits to a byte-stream
 - Saving orbits to file (binary or HDFS 5)
@@ -68,6 +71,8 @@ Variables:
  - **omega**: Argument of perihelion
  - **Omega**: Longitude of the ascending node
  - **nu**: True anomaly
+ - **E**: Elliptic, parabolic or hyperbolic eccentric anomaly
+ - **M**: Mean anomaly
 
 
 Orientation of the ellipse in the coordinate system and angle definitions:
@@ -83,7 +88,12 @@ Orientation of the ellipse in the coordinate system and angle definitions:
  - If the inclination is **0** or **pi** the longitude of the ascending node is always zero (the rotation is described by only argument of perihelion).
  - If the eccentricity is zero, the argument of perihelion is always zero (the rotation is described by only the longitude of the ascending node).
  - If both **e=0** and **i=0** or **i=pi**: the position on the circle is only described by the anomaly.
+ - The eccentric anomaly is used for elliptic, parabolic and hyperbolic cases but the kepler equation changes accordingly.
+ - For parabolic and hyperbolic orbits the true and eccentric anomaly wraps at **pi** to the same trajectory, not the mirror version.
 
+ Shape definitions:
+ - The Semi-major axis is always positive. 
+ - In the case of a parabolic orbit, as the Semi-major axis is undefined it is used as the periapsis distance instead.
 
 ## Notes
 

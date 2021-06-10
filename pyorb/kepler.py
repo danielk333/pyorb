@@ -432,7 +432,7 @@ def true_to_eccentric(nu, e, degrees=False):
         if e > 1:
             E = 2.0*np.arctanh( np.sqrt( (e - 1.0)/(e + 1.0) )*np.tan(_nu*0.5) )
         elif e == 1:
-            E = 2.0*np.arctan( _nu )
+            E = np.tan( _nu*0.5 )
         else:
             E = 2.0*np.arctan( np.sqrt( (1.0 - e)/(1.0 + e) )*np.tan(_nu*0.5) )
     
@@ -603,7 +603,7 @@ def hyperbolic_radius(nu, a, e, degrees=False):
     '''Calculates the distance between the left focus point of an hyperbola and a point on the hyperbola defined by the eccentric anomaly.
 
     :param float/numpy.ndarray nu: True anomaly.
-    :param float/numpy.ndarray a: Semi-major axis of hyperbola.
+    :param float/numpy.ndarray a: Semi-major axis of hyperbola (positive).
     :param float/numpy.ndarray e: Eccentricity of hyperbola.
     :param bool degrees: If true degrees are used, else all angles are given in radians
     
@@ -765,15 +765,8 @@ def _get_hyperbolic_kepler_guess(M, e):
 
     Reference: T. M. Burkardt and J. M. A. Danby, “The solutions of Kepler’s equation. II,” Celestial Mechanics, vol. 31, pp. 317–328, Nov. 1983, doi: 10.1007/BF01844230.
     '''
-    if M > np.pi:
-        _M = 2.0*np.pi - M
-    else:
-        _M = M
 
-    E0 = np.log(2*_M/e + 1.8)
-
-    if M > np.pi:
-        E0 = 2.0*np.pi - E0
+    E0 = np.log(2*M/e + 1.8)
 
     return E0
 
@@ -846,7 +839,10 @@ def kepler_guess(M, e):
             Ec[...] = E_calc
 
     else:
-        E0 = _get_kepler_guess(M, e)
+        if e > 1:
+            E0 = _get_hyperbolic_kepler_guess(M, e)
+        else:
+            E0 = _get_kepler_guess(M, e)
 
     return E0
 
@@ -966,7 +962,7 @@ def orbital_speed(r, a, mu):
     '''Calculates the orbital speed at a given radius for an Keplerian orbit :math:`v = \\sqrt{\\mu \\left (\\frac{2}{r} - \\frac{1}{a} \\right )}`.
     
     :param float/numpy.ndarray r: Radius from the pericenter.
-    :param float/numpy.ndarray a: Semi-major axis of ellipse.
+    :param float/numpy.ndarray a: Semi-major axis of (>0) ellipse or (<0) hyperbola.
     :param float/numpy.ndarray mu: Standard gravitation parameter :math:`\\mu = G(m_1 + m_2)` of the orbit.
     :return: Orbital speed.
     '''
@@ -992,6 +988,98 @@ def semi_major_axis(P, mu):
     '''
     np.cbrt((P/(2.0*np.pi))**2*mu)
     return a
+
+
+def stumpff0(x):
+    '''Calculates the Stumpff function number 0 value.
+
+    **Reference**: Fundamentals of Celestial Mechanics (Second Edition) (Hardback) [J.M.A. Danby - 1992]
+    
+    :param numpy.ndarray x: Stumpff input variable.
+    :return: Stumpff function value.
+    '''
+    c0 = np.empty_like(x)
+    inds = x > 0
+    c0[inds] = np.cos(np.sqrt(x[inds]))
+
+    c0[x == 0] = 1
+
+    inds = x < 0
+    c0[inds] = np.cosh(np.sqrt(-x[inds]))
+    return c0
+
+
+def stumpff1(x):
+    '''Calculates the Stumpff function number 1 value.
+
+    **Reference**: Fundamentals of Celestial Mechanics (Second Edition) (Hardback) [J.M.A. Danby - 1992]
+    
+    :param numpy.ndarray x: Stumpff input variable.
+    :return: Stumpff function value.
+    '''
+    c1 = np.empty_like(x)
+    inds = x > 0
+    c1[inds] = np.sin(np.sqrt(x[inds]))/np.sqrt(x[inds])
+
+    c1[x == 0] = 1
+
+    inds = x < 0
+    c1[inds] = np.sinh(np.sqrt(-x[inds]))/np.sqrt(-x[inds])
+    return c1
+
+
+def stumpff2(x):
+    '''Calculates the Stumpff function number 2 value.
+
+    **Reference**: Fundamentals of Celestial Mechanics (Second Edition) (Hardback) [J.M.A. Danby - 1992]
+    
+    :param numpy.ndarray x: Stumpff input variable.
+    :return: Stumpff function value.
+    '''
+    c2 = np.empty_like(x)
+    inds = x > 0
+    c2[inds] = (1 - np.cos(np.sqrt(x[inds])))/x[inds]
+
+    c2[x == 0] = 0.5
+
+    inds = x < 0
+    c2[inds] = (1 - np.cosh(np.sqrt(-x[inds])))/x[inds]
+    return c2
+
+
+def stumpff3(x):
+    '''Calculates the Stumpff function number 3 value.
+
+    **Reference**: Fundamentals of Celestial Mechanics (Second Edition) (Hardback) [J.M.A. Danby - 1992]
+    
+    :param numpy.ndarray x: Stumpff input variable.
+    :return: Stumpff function value.
+    '''
+    c3 = np.empty_like(x)
+    inds = x > 0
+    xsq = np.sqrt(x[inds])
+    c3[inds] = (xsq - np.sin(xsq))/(xsq*x[inds])
+
+    c3[x == 0] = 1/6
+
+    inds = x < 0
+    xsq = np.sqrt(-x[inds])
+    c3[inds] = (xsq - np.sinh(xsq))/(xsq*x[inds])
+    return c3
+
+
+def stumpff(x):
+    '''Calculate the 0-3 stumpff functions.
+
+    These Stumpff function are used in the universal variable formulation of the kepler orbit. 
+
+    The `n`'th' Stumpff function is defined as:
+    :math:`c_{n}(x) = \\sum^{\\infty}_{j=0} \\frac{(-1)^j x^j}{(n + 2j)!}`.
+
+    However, it can be found that the first Stumpff functions can be expressed in terms of trigonometric functions,
+    as this is implemented here and only `c0, c1, c2, c3` are used in the universal variable formulation of a kepler orbit.
+    '''
+    return stumpff0(x), stumpff1(x), stumpff2(x), stumpff3(x)
 
 
 def kep_to_cart(kep, mu=M_sol*G, degrees=False):
@@ -1076,6 +1164,19 @@ def kep_to_cart(kep, mu=M_sol*G, degrees=False):
 
     Ecc = true_to_eccentric(nu,e,degrees=False)
 
+    #hyperbola
+    #x^2/a^2 - y^2/b^2 = 1
+    #a sec theta, b tan theta
+
+    #ellipse
+    #x^2/a^2 + y^2/b^2 = 1
+    #a cos theta, b sin theta
+
+    #parabola
+    #y^2 - 4ax = 0
+    #-at^2, 2at = 
+
+
     hyp = e > 1
     per = e == 1
     eli = e < 1
@@ -1110,7 +1211,7 @@ def kep_to_cart(kep, mu=M_sol*G, degrees=False):
     n1 = sin_w*sin_i
     n2 = cos_w*sin_i
 
-    # b = a*np.sqrt(1.0 - e**2)
+    b = a*np.sqrt(1.0 - e**2)
     # n = np.sqrt(mu/a**3)
     # nar = n*a/rn
     nar = orbital_speed(rn, a, mu)/a
