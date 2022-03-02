@@ -67,3 +67,34 @@ def get_G(length, mass, time):
         raise TypeError(f'Type "{type(length)}" for length not supported')
 
     return G_SI*(_mass*_time**2/_length**3)
+
+
+def angle_units(in_arg_inds, in_arg_keys, out_arg_inds):
+    '''Wrapper to automatically convert input arguemnts from degrees to radians 
+    and back to degrees if the keyword argument `degrees = True`.
+    '''
+
+    def angle_converter_warpper(func):
+        def wrapped_func(*args, **kwargs):
+            if not kwargs.pop('degrees', False):
+                return func(*args, **kwargs)
+
+            args = list(args)
+            if in_arg_inds is not None:
+                for ind in in_arg_inds:
+                    args[ind] = np.radians(args[ind])
+            if in_arg_keys is not None:
+                for key in in_arg_keys:
+                    if key in kwargs:
+                        kwargs[key] = np.radians(kwargs[key])
+
+            ret = func(*args, **kwargs)
+
+            ret = list(ret)
+            if out_arg_inds is not None:
+                for ind in out_arg_inds:
+                    ret[ind] = np.degrees(ret[ind])
+
+                return ret
+        return wrapped_func
+    return angle_converter_warpper
