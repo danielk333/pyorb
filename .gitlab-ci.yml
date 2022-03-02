@@ -113,11 +113,12 @@ pages:
   script:
     - cd docs
     - make html
-    - mv build/html ../public
+    - mv build ../public
   artifacts:
     paths:
       - public
-
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
 
 #Publish package on local PyPI if
 # the commit has a version tag
@@ -132,3 +133,4 @@ upload:
       dist/*
   rules:
     - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == "main"
