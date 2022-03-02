@@ -2,10 +2,9 @@
 ###################
 
 #gh-pages
-docs/
-docsrc/build/
-docsrc/source/_autodoc/
-docsrc/source/auto_gallery/
+docs/build/
+docs/source/autosummary/
+docs/source/auto_gallery/
 
 #Sublime
 *.sublime*
