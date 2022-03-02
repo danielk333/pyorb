@@ -6,8 +6,7 @@ orbit
 ======
 
 .. autosummary::
-   :template: autosummary/module.rst
-   :toctree: _autodoc/pyorb
+   :toctree: autosummary
 
    pyorb.orbit
 
@@ -15,8 +14,7 @@ kepler
 ======
 
 .. autosummary::
-   :template: autosummary/module.rst
-   :toctree: _autodoc/pyorb
+   :toctree: autosummary
 
    pyorb.kepler
 
@@ -24,7 +22,6 @@ unit
 ======
 
 .. autosummary::
-   :template: autosummary/module.rst
-   :toctree: _autodoc/pyorb
+   :toctree: autosummary
 
    pyorb.unit
