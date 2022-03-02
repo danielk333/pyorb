@@ -89,4 +89,4 @@ print(f'Orbital period: {orb2.period} years')
 
 #The orbital speed should be approximately 2pi as this is the 
 # circumference of a circle with radius 1 AU in units of AU
-print(f'Orbital speed: {orb2.speed} AU/y')
+# print(f'Orbital speed: {orb2.speed} AU/y')
