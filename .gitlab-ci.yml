@@ -92,8 +92,8 @@ default:
 #   <<: *python-test # Merge the contents of the alias
 #   image: python:3.7
 
-# python:
-#   <<: *python-test # Merge the contents of the alias
+python:
+  <<: *python-test # Merge the contents of the alias
 
 # python3.9:
 #   <<: *python-test # Merge the contents of the alias
@@ -101,14 +101,14 @@ default:
 
 
 #Build and check integrity of distribution
-# package:
-#   stage: release
-#   script:
-#     - python -m build
-#     - python -m twine check dist/*
-#   artifacts:
-#     paths:
-#       - dist/*
+package:
+  stage: release
+  script:
+    - python -m build
+    - python -m twine check dist/*
+  artifacts:
+    paths:
+      - dist/*
 
 
 #Compile documentation for publication
