@@ -13,6 +13,7 @@ import numpy.testing as nt
 import pyorb
 from pyorb import Orbit
 
+
 class TestOrbit(unittest.TestCase):
 
     def setUp(self):
@@ -45,7 +46,6 @@ class TestOrbit(unittest.TestCase):
         assert orb.x.dtype==np.float32
         assert orb.dtype==np.float32
 
-
     def test_disable_update_anoms(self):
         orb = Orbit(M0=self.M, G=self.G, direct_update=False, auto_update=False, **self.cart_orb)
         orb.calculate_kepler()
@@ -77,7 +77,6 @@ class TestOrbit(unittest.TestCase):
         with self.assertRaises(AssertionError):
             nt.assert_array_equal(nu0, nu)
         nt.assert_array_equal(cart0, cart)
-
 
     def test_disable_update(self):
         orb = Orbit(M0=self.M, G=self.G, direct_update=False, auto_update=False, **self.cart_orb)
@@ -119,8 +118,7 @@ class TestOrbit(unittest.TestCase):
 
         nt.assert_array_equal(cart0, cart)
 
-
-    def test_direct_update_cart(self):
+    def test_direct_update_kep(self):
         orb = Orbit(M0=self.M, G=self.G, direct_update=True, **self.cart_orb)
         assert orb.direct_update is True
         assert np.all(np.logical_not(np.isnan(orb.kepler)))
@@ -158,7 +156,6 @@ class TestOrbit(unittest.TestCase):
         nt.assert_array_equal(kep0, kep)
         with self.assertRaises(AssertionError):
             nt.assert_array_equal(kep0, kep2)
-
 
     def test_direct_update_cart(self):
         orb = Orbit(M0=self.M, G=self.G, direct_update=True, **self.kep_orb)
@@ -199,9 +196,7 @@ class TestOrbit(unittest.TestCase):
         with self.assertRaises(AssertionError):
             nt.assert_array_equal(kep0, kep2)
 
-
-
-    def test_kepler_read_only(self):
+    def test_cart_read_only(self):
         orb = Orbit(M0=self.M, G=self.G, kepler_read_only=True, **self.cart_orb)
 
         a = orb.a
@@ -213,7 +208,6 @@ class TestOrbit(unittest.TestCase):
 
         with self.assertRaises(AssertionError):
             nt.assert_array_equal(a, orb.a)
-
 
     def test_kepler_read_only(self):
         orb = Orbit(M0=self.M, G=self.G, cartesian_read_only=True, **self.cart_orb)
@@ -363,11 +357,14 @@ class TestOrbit(unittest.TestCase):
         nt.assert_almost_equal(anom, orb.true_anomaly)
 
 
-
 class TestOrbitProperties(unittest.TestCase):
 
     def setUp(self):
-        self.kep_orb = dict(a=1,e=0.2,i=3,omega=10,Omega=20,anom=90, degrees=True)
+        self.kep_orb = dict(
+            a=1, e=0.2, i=3, 
+            omega=10, Omega=20, anom=90, 
+            degrees=True,
+        )
         self.G = pyorb.get_G(length='AU', mass='Msol', time='y')
         self.M0 = 1
         self.m = 0.1
@@ -375,13 +372,11 @@ class TestOrbitProperties(unittest.TestCase):
         self.cart = self.orb.cartesian
         self.kep = self.orb.kepler
 
-
     def test_r(self):
         nt.assert_array_almost_equal(self.orb.r, self.orb.cartesian[:3])
+
     def test_v(self):
         nt.assert_array_almost_equal(self.orb.v, self.orb.cartesian[3:])
-
-
 
     def test_velocity(self):
         vel0 = self.orb.velocity
@@ -393,7 +388,7 @@ class TestOrbitProperties(unittest.TestCase):
     def test_speed(self):
         nt.assert_almost_equal(self.orb.speed, self.orb.velocity)
 
-        #circular orbits have same speed
+        # circular orbits have same speed
         self.orb.e = 0
         s0 = self.orb.speed
         self.orb.anom = 0
@@ -411,6 +406,7 @@ class TestOrbitProperties(unittest.TestCase):
 
     def test_a(self):
         assert self.orb.a == self.kep_orb['a']
+
     def test_set_a(self):
         self.orb.a = 2
         with self.assertRaises(AssertionError):
@@ -418,6 +414,7 @@ class TestOrbitProperties(unittest.TestCase):
 
     def test_e(self):
         assert self.orb.e == self.kep_orb['e']
+
     def test_set_e(self):
         self.orb.e = 0.1
         with self.assertRaises(AssertionError):
@@ -425,6 +422,7 @@ class TestOrbitProperties(unittest.TestCase):
 
     def test_i(self):
         assert self.orb.i == self.kep_orb['i']
+
     def test_set_i(self):
         self.orb.i = 20
         with self.assertRaises(AssertionError):
@@ -432,6 +430,7 @@ class TestOrbitProperties(unittest.TestCase):
 
     def test_omega(self):
         assert self.orb.omega == self.kep_orb['omega']
+
     def test_set_omega(self):
         self.orb.omega = 0
         with self.assertRaises(AssertionError):
@@ -439,6 +438,7 @@ class TestOrbitProperties(unittest.TestCase):
 
     def test_Omega(self):
         assert self.orb.Omega == self.kep_orb['Omega']
+
     def test_set_Omega(self):
         self.orb.Omega = 0
         with self.assertRaises(AssertionError):
@@ -446,14 +446,15 @@ class TestOrbitProperties(unittest.TestCase):
 
     def test_anom(self):
         assert self.orb.anom == self.kep_orb['anom']
+
     def test_set_anom(self):
         self.orb.anom = 0
         with self.assertRaises(AssertionError):
             nt.assert_array_almost_equal(self.orb.cartesian, self.cart)
 
-
     def test_x(self):
         assert self.orb.x == self.cart[0]
+
     def test_set_x(self):
         self.orb.x = 2
         with self.assertRaises(AssertionError):
@@ -461,6 +462,7 @@ class TestOrbitProperties(unittest.TestCase):
 
     def test_y(self):
         assert self.orb.y == self.cart[1]
+
     def test_set_y(self):
         self.orb.y = 2
         with self.assertRaises(AssertionError):
@@ -468,6 +470,7 @@ class TestOrbitProperties(unittest.TestCase):
 
     def test_z(self):
         assert self.orb.z == self.cart[2]
+
     def test_set_z(self):
         self.orb.z = 2
         with self.assertRaises(AssertionError):
@@ -475,6 +478,7 @@ class TestOrbitProperties(unittest.TestCase):
 
     def test_vx(self):
         assert self.orb.vx == self.cart[3]
+
     def test_set_vx(self):
         self.orb.vx = 2
         with self.assertRaises(AssertionError):
@@ -482,6 +486,7 @@ class TestOrbitProperties(unittest.TestCase):
 
     def test_vy(self):
         assert self.orb.vy == self.cart[4]
+
     def test_set_vy(self):
         self.orb.vy = 2
         with self.assertRaises(AssertionError):
@@ -489,10 +494,8 @@ class TestOrbitProperties(unittest.TestCase):
 
     def test_vz(self):
         assert self.orb.vz == self.cart[5]
+
     def test_set_vz(self):
         self.orb.vz = 2
         with self.assertRaises(AssertionError):
             nt.assert_array_almost_equal(self.orb.kepler, self.kep)
-
-
-
