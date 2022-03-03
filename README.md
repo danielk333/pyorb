@@ -2,7 +2,7 @@
 
 PyOrb is a lightweight package designed to convert back and forth between cartesian and kepler coordinates seamlessly and in a physically consistent manner, following defined rules. It provides a convenience class for handling orbits and is tested for special cases such as planar and circular orbits.
 
-See full documentation at [pyorb github](https://danielk333.github.io/pyorb/docs/index.html).
+See full documentation [here](https://danielk.developer.irf.se/pyorb/).
 
 ## Feature list
 
@@ -50,14 +50,14 @@ import pyorb
 orb = pyorb.Orbit(M0 = pyorb.M_sol, degrees=True)
 orb.update(a=1*pyorb.AU, e=0, i=0, omega=0, Omega=0, anom=0)
 
-#Convert and get cartesian elements
+# Convert and get cartesian elements
 print(orb.cartesian)
 
-#Make eccentric and place at aphelion
+# Make eccentric and place at aphelion
 orb.e = 0.2
 orb.anom = 180
 
-#print cartesian position in AU at aphelion after the above changes
+# print cartesian position in AU at aphelion after the above changes
 print(orb.r/pyorb.AU)
 ```
 
