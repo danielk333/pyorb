@@ -385,9 +385,10 @@ class TestOrbitProperties(unittest.TestCase):
         nt.assert_almost_equal(self.orb.velocity, vel0*1.1)
         nt.assert_almost_equal(np.linalg.norm(self.orb.cartesian[3:]), vel0*1.1)
 
-    def test_speed(self):
-        nt.assert_almost_equal(self.orb.speed, self.orb.velocity)
+    def test_speed_vs_velocity(self):
+        nt.assert_almost_equal(self.orb.speed, self.orb.velocity, decimal=2)
 
+    def test_speed(self):
         # circular orbits have same speed
         self.orb.e = 0
         s0 = self.orb.speed
