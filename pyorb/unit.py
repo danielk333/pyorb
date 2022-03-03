@@ -19,11 +19,12 @@ from .kepler import M_sol, AU
 def get_G(length, mass, time):
 
     if isinstance(mass, str):
+        mass = mass.lower().replace('_', '').replace(' ', '').replace('-', '')
         if mass == 'kg':
             _mass = 1.0
         elif mass == 'g':
             _mass = 1e-3
-        elif mass == 'Msun' or mass == 'Msol':
+        elif mass == 'msun' or mass == 'msol':
             _mass = M_sol
         else:
             raise TypeError(f'Unit "{mass}" not recognized')
@@ -33,6 +34,7 @@ def get_G(length, mass, time):
         raise TypeError(f'Type "{type(mass)}" for mass not supported')
 
     if isinstance(time, str):
+        time = time.lower()
         if time == 's':
             _time = 1.0
         elif time == 'h':
@@ -49,13 +51,14 @@ def get_G(length, mass, time):
         raise TypeError(f'Type "{type(time)}" for time not supported')
 
     if isinstance(length, str):
+        length = length.lower()
         if length == 'm':
             _length = 1.0
         elif length == 'cm':
             _length = 1e-2
         elif length == 'km':
             _length = 1e3
-        elif length == 'AU':
+        elif length == 'au':
             _length = AU
         elif length == 'pc':
             _length = 3.08567758149137e16 #IAU 2012 exact SI def
