@@ -4,7 +4,7 @@
 #gh-pages
 docs/build/
 docs/source/autosummary/
-docs/source/auto_gallery/
+docs/source/autogallery/
 
 #Sublime
 *.sublime*
