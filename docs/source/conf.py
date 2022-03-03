@@ -60,6 +60,7 @@ exclude_patterns = ['autogallery/*.ipynb', 'examples']
 # The master toctree document.
 master_doc = 'index'
 
+nbsphinx_kernel_name = 'python3'
 
 # -- Options for HTML output -------------------------------------------------
 
