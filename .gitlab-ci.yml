@@ -125,7 +125,7 @@ pages:
     - if: $CI_COMMIT_BRANCH == "main"
 
 #Publish package on local PyPI if
-# the commit has a version tag
+# the commit has a version tag and is on develop
 upload:
   stage: deploy
   script:
@@ -140,8 +140,8 @@ upload:
     - if: $CI_COMMIT_BRANCH == "develop"
 
 
-#Publish package on local PyPI if
-# the commit has a version tag
+#Publish package on public PyPI if
+# the commit has a version tag and is on main
 pypi:
   stage: deploy
   script:
