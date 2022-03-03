@@ -45,7 +45,8 @@ cache:
   - source venv/bin/activate
   # install the develop dependancies
   - pip install .[develop]
-  - alias python3=python
+  - apt update
+  - apt install pandoc
 
 
 default:
@@ -95,6 +96,8 @@ default:
 
 python:
   <<: *python-test # Merge the contents of the alias
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
 
 # python3.9:
 #   <<: *python-test # Merge the contents of the alias
