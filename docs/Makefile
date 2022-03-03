@@ -17,5 +17,5 @@ html:
 
 clean:
 	rm -rv $(BUILDDIR)
-	rm -rv $(SOURCEDIR)/auto_gallery
+	rm -rv $(SOURCEDIR)/autogallery
 	rm -rv $(SOURCEDIR)/autosummary

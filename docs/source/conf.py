@@ -35,6 +35,8 @@ author = 'Daniel Kastinen'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'nbsphinx',
+    'sphinx_gallery.load_style',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.doctest',
@@ -50,10 +52,10 @@ templates_path = ['templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
+exclude_patterns = ['autogallery/*.ipynb', 'examples']
 
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+# source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
@@ -64,7 +66,10 @@ master_doc = 'index'
 html_theme = 'basic'
 html_css_files = [
     'https://www.irf.se/branding/irf.css',
+    'https://www.irf.se/branding/irf-sphinx-basic.css',
 ]
+html_favicon = 'static/favicon.png'
+html_logo = 'static/logo.png'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -74,9 +79,9 @@ html_static_path = ['static']
 
 # -- Options for gallery extension ---------------------------------------
 sphinx_gallery_conf = {
-     'examples_dirs': '../../examples',   # path to your example scripts
-     'gallery_dirs': 'auto_gallery',  # path where to save gallery generated examples
-     'filename_pattern': '/*.py',
+     'examples_dirs': 'examples',   # path to your example scripts
+     'gallery_dirs': 'autogallery',  # path where to save gallery generated examples
+     'filename_pattern': r'.*\.py',
      'ignore_pattern': r'.*__no_agl\.py',
 }
 

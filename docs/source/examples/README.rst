@@ -1,4 +1,8 @@
 Python examples
 ================
 
-These are all the python examples
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   ./*
