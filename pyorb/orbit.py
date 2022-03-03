@@ -1044,14 +1044,13 @@ class Orbit:
         '''Orbital speed (from kepler)
         '''
         self._kep_check()
-        assert False, 'fix other cases'
         return functions.orbital_speed(
-                functions.elliptic_radius(
-                    self.eccentric_anomaly, 
-                    self.a, 
-                    self.e, 
-                    degrees=self.degrees,
-                ), 
+            functions.elliptic_radius(
+                self.eccentric_anomaly, 
                 self.a, 
-                self.G*(self.M0 + self.m),
-            )
+                self.e, 
+                degrees=self.degrees,
+            ), 
+            self.a, 
+            self.G*(self.M0 + self.m),
+        )
