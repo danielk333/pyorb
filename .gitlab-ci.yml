@@ -45,6 +45,7 @@ cache:
   - source venv/bin/activate
   # install the develop dependancies
   - pip install .[develop]
+  - alias python3=python
 
 
 default:
