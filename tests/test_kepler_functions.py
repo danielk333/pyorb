@@ -555,6 +555,7 @@ class TestKepCart(unittest.TestCase):
         nt.assert_almost_equal(x[1], 0, decimal = 6)
         nt.assert_almost_equal(x[2], q*np.sqrt(2)*0.5, decimal = 6)
 
+    @unittest.skip("TBD in v0.5.0")
     def test_planar_detection(self):
         '''Longitude of ascending node gets transfered to argument of periapsis 
         in planar orbits. Test if this is true for retro-grade and pro-grade 
@@ -581,6 +582,7 @@ class TestKepCart(unittest.TestCase):
 
         nt.assert_almost_equal(orb_ref, orb_out)
 
+    @unittest.skip("TBD in v0.5.0")
     def test_cart_kep_inverse(self):
         a = np.linspace(self.a, self.a + self.R_e, num=2, dtype=np.float64)
         e = np.linspace(0.0, 0.99, num=10, dtype=np.float64)
