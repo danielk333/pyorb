@@ -28,10 +28,6 @@ cache:
     - .cache/pip
     - .venv
 
-# #
-# Template information: 
-#   https://docs.gitlab.com/ee/ci/yaml/yaml_specific_features.html
-# #
 
 #Template script for all jobs that installs
 # the package and dependancies into a virtualenv
@@ -59,45 +55,42 @@ default:
 #Template for testing on python images, 
 # extend this for each python-platform 
 # the package is intended to work on
+# Template information: 
+#   https://docs.gitlab.com/ee/ci/yaml/yaml_specific_features.html
 .py-test-template: &python-test
   stage: test
   allow_failure: true
   script: 
-    - coverage run -m pytest
-    - coverage report -m
+    - pytest
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
 
 
-#Run flake8 to check code-style adherance to PEP8
-# check-flake8:
-#   stage: test
-#   script: 
-#     - python -m flake8 --extend-exclude venv
-#   allow_failure: true
+# Run all diagnostics
+diagnostics:
+  stage: test
+  script: 
+    - coverage run -m pytest > pytest_report
+    - coverage report -m > coverage_report
+    - python -m flake8 --extend-exclude venv pyorb > flake8_report
+    - radon cc -a --md pyorb/ > radon_cc_report
+    - radon raw -s pyorb/ > radon_raw_report
+    - radon mi -s pyorb/ > radon_mi_report
+    - radon hal pyorb/ > radon_hal_report
+  allow_failure: true
+  artifacts:
+    paths:
+      - "*_report"
 
+  # rules:
+  #   - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG
 
 ##########################
 ## Platforms to test on ##
-#
-# 
-#Official language images, look for the different tagged releases at:
-# https://hub.docker.com/r/library/python/tags/
-# And use the `python-test` alias
-# 
-#To test on OS distributions, find the OS images, e.g:
-# https://hub.docker.com/_/ubuntu
-# and use the `os-test` alias to allow for specific 
-# os-dependancy setup (e.g. gcc or gfortran) before 
-# install of the pacakge trough `before_script`
-# 
 
 # python3.7:
 #   <<: *python-test # Merge the contents of the alias
 #   image: python:3.7
-
-python:
-  <<: *python-test # Merge the contents of the alias
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
 
 # python3.9:
 #   <<: *python-test # Merge the contents of the alias
@@ -127,8 +120,8 @@ pages:
   artifacts:
     paths:
       - public
-  rules:
-    # - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG
+  # rules:
+  #   - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG
 
 #Publish package on local PyPI if
 # the commit has a version tag and is on develop

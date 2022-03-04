@@ -64,6 +64,15 @@ To contribute please issue pull-requests trough GitHub.
 Before doing so please have a look at our [software contribution guide](https://danielk.developer.irf.se/software_contribution_guide/).
 
 
+Repository diagnostics
+-----------------------
+
+.. toctree::
+   :maxdepth: 2
+
+   diagnostics
+
+
 API Reference
 ===============
 
