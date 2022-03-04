@@ -41,7 +41,7 @@ Then get started with this quick "getting started" guide
 
 .. toctree::
 
-   ipynbgallery/getting_started_tutorial
+   ipython_examples/getting_started_tutorial
 
 
 Examples
