@@ -46,7 +46,7 @@ cache:
   # install the develop dependancies
   - pip install .[develop]
   - apt update
-  - apt install pandoc
+  - apt install -y pandoc
 
 
 default:
