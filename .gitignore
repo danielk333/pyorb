@@ -1,10 +1,11 @@
 # Compiled source #
 ###################
 
-#gh-pages
+#docs
 docs/build/
 docs/source/autosummary/
 docs/source/autogallery/
+*_report
 
 #Sublime
 *.sublime*
