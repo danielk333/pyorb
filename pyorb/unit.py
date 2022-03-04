@@ -4,14 +4,14 @@
 
 '''
 
-#Python standard import
+# Python standard import
 
 
-#Third party import
+# Third party import
 import numpy as np
 
 
-#Local import
+# Local import
 from .kepler import G as G_SI
 from .kepler import M_sol, AU
 
@@ -61,7 +61,7 @@ def get_G(length, mass, time):
         elif length == 'au':
             _length = AU
         elif length == 'pc':
-            _length = 3.08567758149137e16 #IAU 2012 exact SI def
+            _length = 3.08567758149137e16  # IAU 2012 exact SI def
         else:
             raise TypeError(f'Unit "{length}" not recognized')
     elif isinstance(length, float):
