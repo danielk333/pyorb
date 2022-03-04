@@ -22,7 +22,8 @@ Flake8
 Cyclomatic Complexity
 -----------------------
 
-.. mdinclude:: ../../radon_cc_report
+.. include:: ../../radon_cc_report
+   :literal:
 
 Raw Metrics
 ------------
