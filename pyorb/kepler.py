@@ -117,26 +117,34 @@ def equi_to_cart(equi, mu=M_sol*G, degrees=False):
 
 def kep_to_equi(kep, degrees=False):
     '''TODO
+
+    a, h, k, p, q, lambda0,
+
+    **Reference:**
+        Broucke, R.A., Cefola, P.J., 1972. On the equinoctial orbit elements. 
+        Celestial Mechanics 5, 303–310. https://doi.org/10.1007/BF01228432
+
     '''
 
-    lam = kep[3, ...] + kep[4, ...]
+    om_bar = kep[3, ...] + kep[4, ...]
     om = kep[4, ...]
     hi = 0.5*kep[2, ...]
+    lambda0 = om_bar + kep[5, ...]
     if degrees:
-        lam = np.radians(lam)
+        om_bar = np.radians(om_bar)
         om = np.radians(om)
         hi = np.radians(hi)
 
     elems = np.empty(kep.shape, dtype=kep.dtype)
 
     elems[0, ...] = kep[0, ...]
-    elems[1, ...] = kep[1, ...]*np.sin(lam)
-    elems[2, ...] = kep[1, ...]*np.cos(lam)
+    elems[1, ...] = kep[1, ...]*np.sin(om_bar)
+    elems[2, ...] = kep[1, ...]*np.cos(om_bar)
 
     elems[3, ...] = np.sin(hi)*np.sin(om)
     elems[4, ...] = np.sin(hi)*np.cos(om)
 
-    elems[5, ...] = kep[5, ...] + lam
+    elems[5, ...] = lambda0
 
     return elems
 
