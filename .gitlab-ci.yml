@@ -122,20 +122,6 @@ pages:
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG
 
-#Publish package on local PyPI if
-# the commit has a version tag and is on develop
-upload:
-  stage: deploy
-  script:
-    - >
-      TWINE_USERNAME=gitlab-ci-token
-      TWINE_PASSWORD=$CI_JOB_TOKEN
-      python -m twine upload
-      --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi
-      dist/*
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG
-
 
 #Publish package on public PyPI if
 # the commit has a version tag and is on main
