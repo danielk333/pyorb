@@ -1066,7 +1066,7 @@ class Orbit:
         '''Orbital velocity (from cartesian)
         '''
         self._cart_check()
-        return np.linalg.norm(self.v)
+        return np.linalg.norm(self.v, axis=0)
 
     @velocity.setter
     def velocity(self, value):
