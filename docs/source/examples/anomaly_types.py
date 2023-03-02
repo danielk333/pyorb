@@ -11,8 +11,8 @@ import pyorb
 
 num = 500
 [ecc, anom] = np.meshgrid(
-    np.linspace(0,0.99,num=num), 
-    np.linspace(0,360,num=num),
+    np.linspace(0, 0.99, num=num), 
+    np.linspace(0, 360, num=num),
 )
 
 orb = pyorb.Orbit(
@@ -28,13 +28,13 @@ orb = pyorb.Orbit(
     type = 'true'
 )
 
-true = orb.true_anomaly.reshape(num,num)
-mean = orb.mean_anomaly.reshape(num,num)
+true = orb.true_anomaly.reshape(num, num)
+mean = orb.mean_anomaly.reshape(num, num)
 
 print(orb)
 print(f'Orbit anomaly type: {orb.type}')
 
-fig, ax = plt.subplots(1,1)
+fig, ax = plt.subplots(1, 1)
 
 c = ax.pcolormesh(ecc, true, mean-true)
 ax.set_xlabel('Eccentricity [1]')

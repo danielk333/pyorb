@@ -4,11 +4,6 @@ Performance testing
 '''
 import timeit
 
-import pyorb
-
-import numpy as np
-import matplotlib.pyplot as plt
-
 str_format = '{} executions: average {:.3e} seconds per execution'
 
 number = 1000
