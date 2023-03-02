@@ -94,8 +94,6 @@ warnings.filterwarnings("ignore", category=UserWarning,
             ' non-GUI backend, so cannot show the figure.')
 
 
-nbsphinx_kernel_name = 'python3'
-
 # -----------------------------------------------------------------------------
 # Autosummary
 # -----------------------------------------------------------------------------
