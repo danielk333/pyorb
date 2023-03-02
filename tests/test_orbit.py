@@ -3,9 +3,6 @@
 '''
 Test Orbit class
 '''
-
-import time
-
 import unittest
 import numpy as np
 import numpy.testing as nt
@@ -17,8 +14,8 @@ from pyorb import Orbit
 class TestOrbit(unittest.TestCase):
 
     def setUp(self):
-        self.cart_orb = dict(x=8e-01,y=0,z=0,vx=0,vy=7.7,vz=0)
-        self.kep_orb = dict(a=1,e=0.2,i=0,omega=0,Omega=0,anom=0)
+        self.cart_orb = dict(x=8e-01, y=0, z=0, vx=0, vy=7.7, vz=0)
+        self.kep_orb = dict(a=1, e=0.2, i=0, omega=0, Omega=0, anom=0)
         self.G = pyorb.get_G(length='AU', mass='Msol', time='y')
         self.M = 1
 
@@ -28,26 +25,27 @@ class TestOrbit(unittest.TestCase):
     def test_init_exception(self):
         with self.assertRaises(TypeError):
             orb = Orbit()
-            
+
     def test_dtype(self):
         orb = Orbit(1)
-        assert orb.cartesian.dtype==np.float64
-        assert orb.dtype==np.float64
+        assert orb.cartesian.dtype == np.float64
+        assert orb.dtype == np.float64
         orb = Orbit(1, dtype = np.float32)
-        assert orb.cartesian.dtype==np.float32
-        assert orb.kepler.dtype==np.float32
-        assert orb.dtype==np.float32
+        assert orb.cartesian.dtype == np.float32
+        assert orb.kepler.dtype == np.float32
+        assert orb.dtype == np.float32
 
         orb.add(num=10)
         orb.x = 2.0
 
-        assert orb.cartesian.dtype==np.float32
-        assert orb.kepler.dtype==np.float32
-        assert orb.x.dtype==np.float32
-        assert orb.dtype==np.float32
+        assert orb.cartesian.dtype == np.float32
+        assert orb.kepler.dtype == np.float32
+        assert orb.x.dtype == np.float32
+        assert orb.dtype == np.float32
 
     def test_disable_update_anoms(self):
-        orb = Orbit(M0=self.M, G=self.G, direct_update=False, auto_update=False, **self.cart_orb)
+        orb = Orbit(M0=self.M, G=self.G, direct_update=False,
+                    auto_update=False, **self.cart_orb)
         orb.calculate_kepler()
 
         mu0 = orb.mean_anomaly
@@ -79,7 +77,8 @@ class TestOrbit(unittest.TestCase):
         nt.assert_array_equal(cart0, cart)
 
     def test_disable_update(self):
-        orb = Orbit(M0=self.M, G=self.G, direct_update=False, auto_update=False, **self.cart_orb)
+        orb = Orbit(M0=self.M, G=self.G, direct_update=False,
+                    auto_update=False, **self.cart_orb)
         assert np.all(np.isnan(orb.kepler))
         orb.x += 1
         assert np.all(np.isnan(orb.kepler))
@@ -98,7 +97,8 @@ class TestOrbit(unittest.TestCase):
 
         nt.assert_array_equal(kep0, kep)
 
-        orb = Orbit(M0=self.M, G=self.G, direct_update=False, auto_update=False, **self.kep_orb)
+        orb = Orbit(M0=self.M, G=self.G, direct_update=False,
+                    auto_update=False, **self.kep_orb)
         assert np.all(np.isnan(orb.cartesian))
         orb.a += 1
         assert np.all(np.isnan(orb.cartesian))
@@ -138,8 +138,10 @@ class TestOrbit(unittest.TestCase):
 
         orb = Orbit(M0=self.M, G=self.G, direct_update=False, **self.cart_orb)
         assert orb.direct_update is False
-        assert np.all(np.isnan(orb._kep)), 'internally before access should be nan'
-        assert np.all(np.logical_not(np.isnan(orb.kepler))), 'With auto_update should be calculated'
+        assert np.all(np.isnan(orb._kep)
+                      ), 'internally before access should be nan'
+        assert np.all(np.logical_not(np.isnan(orb.kepler))
+                      ), 'With auto_update should be calculated'
 
         kep0 = orb.kepler
         print('Before cart change')
@@ -152,7 +154,7 @@ class TestOrbit(unittest.TestCase):
         print(orb)
 
         kep2 = orb.kepler
-        
+
         nt.assert_array_equal(kep0, kep)
         with self.assertRaises(AssertionError):
             nt.assert_array_equal(kep0, kep2)
@@ -177,8 +179,10 @@ class TestOrbit(unittest.TestCase):
 
         orb = Orbit(M0=self.M, G=self.G, direct_update=False, **self.kep_orb)
         assert orb.direct_update is False
-        assert np.all(np.isnan(orb._cart)), 'internally before access should be nan'
-        assert np.all(np.logical_not(np.isnan(orb.cartesian))), 'With auto_update should be calculated'
+        assert np.all(np.isnan(orb._cart)
+                      ), 'internally before access should be nan'
+        assert np.all(np.logical_not(np.isnan(orb.cartesian))
+                      ), 'With auto_update should be calculated'
 
         kep0 = orb.cartesian
         print('Before cart change')
@@ -191,13 +195,14 @@ class TestOrbit(unittest.TestCase):
         print(orb)
 
         kep2 = orb.cartesian
-        
+
         nt.assert_array_equal(kep0, kep)
         with self.assertRaises(AssertionError):
             nt.assert_array_equal(kep0, kep2)
 
     def test_cart_read_only(self):
-        orb = Orbit(M0=self.M, G=self.G, kepler_read_only=True, **self.cart_orb)
+        orb = Orbit(M0=self.M, G=self.G,
+                    kepler_read_only=True, **self.cart_orb)
 
         a = orb.a
 
@@ -210,7 +215,8 @@ class TestOrbit(unittest.TestCase):
             nt.assert_array_equal(a, orb.a)
 
     def test_kepler_read_only(self):
-        orb = Orbit(M0=self.M, G=self.G, cartesian_read_only=True, **self.cart_orb)
+        orb = Orbit(M0=self.M, G=self.G,
+                    cartesian_read_only=True, **self.cart_orb)
 
         x = orb.x
 
@@ -223,29 +229,36 @@ class TestOrbit(unittest.TestCase):
             nt.assert_array_equal(x, orb.x)
 
     def test_solver_options(self):
-        orb1 = Orbit(M0=self.M, G=self.G, solver_options=dict(max_iter=1), **self.kep_orb)
-        orb2 = Orbit(M0=self.M, G=self.G, solver_options=dict(max_iter=500), **self.kep_orb)
+        orb1 = Orbit(M0=self.M, G=self.G, solver_options=dict(
+            max_iter=1), **self.kep_orb)
+        orb2 = Orbit(M0=self.M, G=self.G, solver_options=dict(
+            max_iter=500), **self.kep_orb)
 
         orb1.mean_anomaly += 0.545657871
         orb2.mean_anomaly += 0.545657871
 
         assert orb1.true_anomaly != orb2.true_anomaly
 
-        orb1 = Orbit(M0=self.M, G=self.G, solver_options=dict(tol=1e-12), **self.kep_orb)
-        orb2 = Orbit(M0=self.M, G=self.G, solver_options=dict(tol=1e-1), **self.kep_orb)
+        orb1 = Orbit(M0=self.M, G=self.G, solver_options=dict(
+            tol=1e-12), **self.kep_orb)
+        orb2 = Orbit(M0=self.M, G=self.G, solver_options=dict(
+            tol=1e-1), **self.kep_orb)
 
         orb1.mean_anomaly += 0.545657871
         orb2.mean_anomaly += 0.545657871
 
         assert orb1.true_anomaly != orb2.true_anomaly
 
-        orb1 = Orbit(M0=self.M, G=self.G, solver_options=dict(tol=1e-12), **self.kep_orb)
-        orb2 = Orbit(M0=self.M, G=self.G, solver_options=dict(tol=1e-9), **self.kep_orb)
+        orb1 = Orbit(M0=self.M, G=self.G, solver_options=dict(
+            tol=1e-12), **self.kep_orb)
+        orb2 = Orbit(M0=self.M, G=self.G, solver_options=dict(
+            tol=1e-9), **self.kep_orb)
 
         orb1.mean_anomaly += 0.545657871
         orb2.mean_anomaly += 0.545657871
 
-        nt.assert_almost_equal(orb1.eccentric_anomaly, orb2.eccentric_anomaly, decimal=8)
+        nt.assert_almost_equal(orb1.eccentric_anomaly,
+                               orb2.eccentric_anomaly, decimal=8)
 
     def test_mass(self):
         orb1 = Orbit(M0=self.M, G=self.G, m=0.1, **self.kep_orb)
@@ -266,7 +279,7 @@ class TestOrbit(unittest.TestCase):
         i = 0
         for o in orb:
             i += 1
-        assert i==10
+        assert i == 10
 
     def test_update(self):
         orb = Orbit(M0=self.M, G=self.G, m=0.1, **self.kep_orb)
@@ -317,7 +330,8 @@ class TestOrbit(unittest.TestCase):
         nt.assert_array_almost_equal(orb.kepler, kep0)
         nt.assert_array_almost_equal(orb.cartesian, cart0)
 
-        orb = Orbit(M0=self.M, G=self.G, a=1, e=0, i=0, omega=0, Omega=0, anom=0)
+        orb = Orbit(M0=self.M, G=self.G, a=1, e=0,
+                    i=0, omega=0, Omega=0, anom=0)
         cart0 = orb.cartesian
         orb.propagate(orb.period*0.5)
         nt.assert_almost_equal(-orb.cartesian[0], cart0[0])
@@ -326,13 +340,11 @@ class TestOrbit(unittest.TestCase):
         nt.assert_almost_equal(orb.cartesian[3], cart0[3])
         nt.assert_almost_equal(orb.cartesian[5], cart0[5])
 
-
-
     def test_delete(self):
         orb = Orbit(M0=self.M, G=self.G, m=0.1, **self.kep_orb)
 
         a0 = self.kep_orb['a']
-        inds = [2,4,6]
+        inds = [2, 4, 6]
 
         orb.add(num=9, **self.kep_orb)
         a = orb.a
@@ -343,7 +355,6 @@ class TestOrbit(unittest.TestCase):
 
         assert orb.num == 10-3
         assert np.all(orb.a < a0 + 1)
-
 
     def test_type(self):
         orb = Orbit(M0=self.M, G=self.G, m=0.1, degrees=True, **self.kep_orb)
@@ -383,7 +394,8 @@ class TestOrbitProperties(unittest.TestCase):
         nt.assert_almost_equal(vel0, np.linalg.norm(self.orb.cartesian[3:]))
         self.orb.velocity = vel0*1.1
         nt.assert_almost_equal(self.orb.velocity, vel0*1.1)
-        nt.assert_almost_equal(np.linalg.norm(self.orb.cartesian[3:]), vel0*1.1)
+        nt.assert_almost_equal(np.linalg.norm(
+            self.orb.cartesian[3:]), vel0*1.1)
 
     def test_speed_vs_velocity(self):
         nt.assert_almost_equal(self.orb.speed, self.orb.velocity, decimal=2)

@@ -3,15 +3,11 @@
 '''
 Test Units
 '''
-
-import time
-
 import unittest
 import numpy as np
-import numpy.testing as nt
 
 import pyorb
-from pyorb import Orbit
+
 
 class TestUnits(unittest.TestCase):
 
@@ -24,23 +20,23 @@ class TestUnits(unittest.TestCase):
         G_SI = pyorb.G
 
         with self.assertRaises(TypeError):
-            G = pyorb.get_G(1,1.0,1.0)
+            _ = pyorb.get_G(1, 1.0, 1.0)
         with self.assertRaises(TypeError):
-            G = pyorb.get_G(2.0,'test',1.0)
+            _ = pyorb.get_G(2.0, 'test', 1.0)
         with self.assertRaises(TypeError):
             class A:
                 pass
-            G = pyorb.get_G(2.0,A,1.0)
+            _ = pyorb.get_G(2.0, A, 1.0)
 
-        assert G_SI == pyorb.get_G(1.0,1.0,1.0)
-        assert G_SI == 0.5*pyorb.get_G(1.0,2.0,1.0)
-        assert G_SI == pyorb.get_G('m','kg','s')
-        assert G_SI == pyorb.get_G(length='m',mass='kg',time='s')
+        assert G_SI == pyorb.get_G(1.0, 1.0, 1.0)
+        assert G_SI == 0.5*pyorb.get_G(1.0, 2.0, 1.0)
+        assert G_SI == pyorb.get_G('m', 'kg', 's')
+        assert G_SI == pyorb.get_G(length='m', mass='kg', time='s')
 
-        pc = 3.08567758149137e16 #IAU 2012 exact SI def [meter]
+        pc = 3.08567758149137e16  # IAU 2012 exact SI def [meter]
         G_ast = pyorb.get_G(length='km', mass='Msol', time='s')
-        #Change one unit of "km" to "pc"
-        #to get (km/s)^2 pc / M_sol
+        # Change one unit of "km" to "pc"
+        # to get (km/s)^2 pc / M_sol
         G_ast /= pc*1e-3
 
         assert np.abs(G_ast - 4.30091e-3) < 1e-6
