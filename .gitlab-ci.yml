@@ -50,8 +50,7 @@ default:
     - IRF
   before_script:
     - *install-deps # execute script in alias
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+
 
 #Template for testing on python images, 
 # extend this for each python-platform 
@@ -63,7 +62,8 @@ default:
   allow_failure: true
   script: 
     - pytest
-
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
 
 # Run all diagnostics
 diagnostics:
@@ -94,6 +94,8 @@ diagnostics:
 #   <<: *python-test # Merge the contents of the alias
 #   image: python:3.9
 
+python3.8:
+  <<: *python-test
 
 #Build and check integrity of distribution
 package:
@@ -107,7 +109,6 @@ package:
   only:
     - tags
 
-
 #Compile documentation for publication
 pages:
   stage: deploy
@@ -120,7 +121,6 @@ pages:
       - public
   only:
     - tags
-
 
 #Publish package on public PyPI if
 # the commit has a version tag and is on main
