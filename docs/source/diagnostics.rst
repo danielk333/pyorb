@@ -13,11 +13,6 @@ Coverage
 .. include:: ../../coverage_report
    :literal:
 
-Flake8
---------
-
-.. include:: ../../flake8_report
-   :literal:
 
 Cyclomatic Complexity
 -----------------------

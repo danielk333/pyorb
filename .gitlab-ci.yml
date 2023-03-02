@@ -71,7 +71,6 @@ diagnostics:
   script: 
     - coverage run -m pytest > pytest_report
     - coverage report -m > coverage_report
-    - python -m flake8 --extend-exclude venv pyorb > flake8_report
     - radon cc -a pyorb/ > radon_cc_report
     - radon raw -s pyorb/ > radon_raw_report
     - radon mi -s pyorb/ > radon_mi_report
@@ -93,9 +92,6 @@ diagnostics:
 # python3.9:
 #   <<: *python-test # Merge the contents of the alias
 #   image: python:3.9
-
-python3.8:
-  <<: *python-test
 
 #Build and check integrity of distribution
 package:
