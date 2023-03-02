@@ -36,6 +36,7 @@ author = 'Daniel Kastinen'
 # ones.
 extensions = [
     'nbsphinx',
+    'numpydoc',
     'sphinx_gallery.load_style',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
@@ -92,6 +93,8 @@ warnings.filterwarnings("ignore", category=UserWarning,
     message='Matplotlib is currently using agg, which is a'
             ' non-GUI backend, so cannot show the figure.')
 
+
+nbsphinx_kernel_name = 'python3'
 
 # -----------------------------------------------------------------------------
 # Autosummary
