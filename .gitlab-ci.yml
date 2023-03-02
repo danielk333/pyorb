@@ -50,7 +50,8 @@ default:
     - IRF
   before_script:
     - *install-deps # execute script in alias
-
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
 
 #Template for testing on python images, 
 # extend this for each python-platform 
@@ -62,8 +63,6 @@ default:
   allow_failure: true
   script: 
     - pytest
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
 
 
 # Run all diagnostics
@@ -81,8 +80,8 @@ diagnostics:
   artifacts:
     paths:
       - "*_report"
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG
+  only:
+    - tags
 
 ##########################
 ## Platforms to test on ##
@@ -105,8 +104,8 @@ package:
   artifacts:
     paths:
       - dist/*
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG
+  only:
+    - tags
 
 
 #Compile documentation for publication
@@ -119,8 +118,8 @@ pages:
   artifacts:
     paths:
       - public
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG
+  only:
+    - tags
 
 
 #Publish package on public PyPI if
@@ -132,5 +131,5 @@ pypi:
       TWINE_USERNAME=__token__
       TWINE_PASSWORD=$PYPI_TOKEN
       python -m twine upload dist/*
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG
+  only:
+    - tags
