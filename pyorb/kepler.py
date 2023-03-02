@@ -50,7 +50,9 @@ considered not inclined
 
 
 def cart_to_equi(cart, mu=M_sol*G, degrees=False):
-    '''Converts set of Cartesian state vectors to set of Equinoctial orbital 
+    '''TODO
+
+    Converts set of Cartesian state vectors to set of Equinoctial orbital 
     elements.
     '''
     if not isinstance(cart, np.ndarray):
@@ -83,7 +85,9 @@ def cart_to_equi(cart, mu=M_sol*G, degrees=False):
 
 
 def equi_to_cart(equi, mu=M_sol*G, degrees=False):
-    '''Converts set of Equinoctial orbital elements to set of Cartesian state 
+    '''TODO
+
+    Converts set of Equinoctial orbital elements to set of Cartesian state 
     vectors.
     '''
     if not isinstance(equi, np.ndarray):
@@ -177,96 +181,108 @@ def cart_to_kep(cart, mu=M_sol*G, degrees=False):
     '''Converts set of Cartesian state vectors to set of Keplerian orbital 
     elements.
 
-    **Units:**
-        Using default :code:`mu`, all variables are in 
-        `SI Units <https://www.nist.gov/pml/
-        weights-and-measures/metric-si/si-units>`_
+    Parameters
+    ----------
+    kep : numpy.ndarray kep
+        (6, N) or (6, ) array of Cartesian state vectors where rows correspond 
+        to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`, :math:`v_y`, 
+        :math:`v_z` and columns correspond to different objects.
+    mu : float or numpy.ndarray
+        Float or (N, ) array with the standard gravitational parameter of 
+        objects. If :code:`mu` is a numpy vector, the element corresponding to 
+        each column of :code:`cart` will be used for its element calculation, 
+        Default value is in SI units a massless object orbiting the Sun.
+    degrees : bool
+        If :code:`True`, use degrees. Else all angles are given in radians.
 
-       If a standard gravitational parameter :code:`mu` is given in other 
-       units, all other input variables should also use the same unit system.
+    Returns
+    -------
+    numpy.ndarray
+        (6, N) or (6, ) array of Keplerian orbital elements where rows 
+        correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\\omega`, 
+        :math:`\\Omega`, :math:`\\nu` and columns correspond to different 
+        objects.
+    
+    Notes
+    -----
+    Transform
+        Basic functionality is largley based on standard literature like [1]_. 
+        Some open source material is avalible like these `Orbital-mechanics notes on GitHub <https://orbital-mechanics.space/intro.html>`_ .
 
-       Angles are by default given as radians, all angles are radians 
-       internally in functions, input and output angles can be both radians 
-       and degrees depending on the :code:`degrees` boolean.
-
-
-    **Variables:**
-       * :math:`a`: Semi-major axis
-       * :math:`e`: Eccentricity
-       * :math:`i`: Inclination
-       * :math:`\\omega`: Argument of perihelion
-       * :math:`\\Omega`: Longitude of ascending node
-       * :math:`\\nu`: True anomaly
-       * :math:`\\mu`: Standard gravitational parameter for the two body 
-            problem: :math:`G(M_1 + M_2)`.
-
-
-    **Orientation of the ellipse in the coordinate system:**
-
-      * For zero inclination :math:`i`: the ellipse is located in the x-y plane
-      * The direction of motion as True anoamly :math:`\\nu`: increases for a 
-        zero inclination :math:`i`: orbit is anti-coockwise, i.e. 
-        from +x towards +y.
-      * If the eccentricity :math:`e`: is increased, the periapsis will lie in
-         +x direction.
-      * If the inclination :math:`i`: is increased, the ellipse will rotate 
-        around the x-axis, so that +y is rotated toward +z.
-      * An increase in Longitude of ascending node :math:`\\Omega`: corresponds 
-        to a rotation around the z-axis so that +x is rotated toward +y.
-      * Changing argument of perihelion :math:`\\omega`: will not change the 
-        plane of the orbit, it will rotate the orbit in the plane.
-      * The periapsis is shifted in the direction of motion.
-      * True anomaly measures from the +x axis, i.e :math:`\\nu = 0` is located 
-        at periapsis and :math:`\\nu = \\pi` at apoapsis.
-      * All anomalies and orientation angles reach between 0 and :math:`2\\pi`
-
-       *Reference:* "Orbital Motion" by A.E. Roy.
-
-
-    **Constants:**
+    Arbitrary constants used
        * :mod:`~pyorb.kepler.e_lim`: Used to determine circular orbits
        * :mod:`~pyorb.kepler.i_lim`: Used to determine non-inclined orbits
 
-
-    :param numpy.ndarray cart: Cartesian state vectors where rows 1-6 
-        correspond to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`, 
-        :math:`v_y`, :math:`v_z` and columns correspond to different objects.
-    :param float/numpy.ndarray mu: Standard gravitational parameter of objects.
-        If `mu` is a numpy vector, the element corresponding to each column of 
-        `cart` will be used for its element calculation, Default value is in SI 
-        units a massless object orbiting the Sun.
-    :param bool degrees: If `true`, degrees are used. Else all angles are given 
-        in radians.
-
-    :return: Keplerian orbital elements where rows 1-6 correspond to :math:`a`, 
-        :math:`e`, :math:`i`, :math:`\\omega`, :math:`\\Omega`, :math:`\\nu` 
-        and columns correspond to different objects.
-    :rtype: numpy.ndarray
-
-    **Example:**
-
-       Convert an orbit around the sun from Kepler elements to cartesian 
-       elements:
-
-       .. code-block:: python
-
-            import pyorb
-            import numpy as np
-
-            orb = np.array([1*pyorb.AU, 0.5, 30, 10, 55, 2], dtype=np.float64)
-
-            x = pyorb.kep_to_cart(orb, mu=pyorb.M_sol*pyorb.G, degrees=True)
-
-            print('Position in the solar-system for an orbit of')
-            for j,var in enumerate(pyorb.Orbit.KEPLER):
-                print(f'{var}: {orb[j]}')
-            print('is:')
-            for j,var in enumerate(pyorb.Orbit.CARTESIAN):
-                print(f'{var}: {x[j]}')
+    Variables
+        * :math:`a`: Semi-major axis
+        * :math:`e`: Eccentricity
+        * :math:`i`: Inclination
+        * :math:`\\omega`: Argument of perihelion
+        * :math:`\\Omega`: Longitude of ascending node
+        * :math:`\\nu`: True anoamly
+        * :math:`\\mu`: Standard gravitational parameter for the two body problem: :math:`G(M_1 + M_2)`.
+    
+    Units
+       Using default standard gravitational parameter :code:`mu` 
+       (:math:`\\mu`), all variables are in `SI Units 
+       <https://www.nist.gov/pml/weights-and-measures/metric-si/si-units>`_ 
+       If a :code:`mu` is given in other units, all other input variables 
+       should also use the same unit system. Angles are by default given as 
+       radians, all angles are radians internally in functions, input and 
+       output angles can be both radians and degrees depending on the 
+       :code:`degrees` boolean.
 
 
-    *Reference:* Daniel Kastinen Master Thesis: Meteors and Celestial Dynamics 
-        and references therein.
+    Orientation of the ellipse in the coordinate system [2]_
+        For 0 inclination :math:`i`: the ellipse is located in the x-y plane.
+
+        The direction of motion as True anoamly :math:`\\nu`: increases for a 
+        zero inclination :math:`i`: orbit is anti-coockwise, i.e. from +x 
+        towards +y.
+
+        If the eccentricity :math:`e`: is increased, the periapsis will lie in 
+        +x direction.
+
+        If the inclination :math:`i`: is increased, the ellipse will rotate 
+        around the x-axis, so that +y is rotated toward +z.
+
+        An increase in Longitude of ascending node :math:`\\Omega`: 
+        corresponds to a rotation around the z-axis so that +x is rotated 
+        toward +y.
+
+        Changing argument of perihelion :math:`\\omega`: will not change the 
+        plane of the orbit, it will rotate the orbit in the plane.
+
+        The periapsis is shifted in the direction of motion.
+
+    .. [1] A.E. Roy. "Orbital Motion"
+    .. [2] D.A. Vallado. "Fundamentals of Astrodynamics and Applications"
+
+    Examples
+    --------
+    
+    Example of using the base conversion function to transform from
+    kepler elements to cartesian coordinates
+
+    >>> import pyorb
+    >>> import numpy as np
+    >>> G = pyorb.get_G(length='AU', mass='Msol', time='y')
+    >>> G
+    39.47812018693255
+    >>> cart = np.array([
+    ...     0.70710678,  0.70710678, 0.,
+    ...     -4.4428662, 4.4428662, 0.,
+    ... ])
+    >>> kep = pyorb.cart_to_kep(
+    ...     cart, 
+    ...     mu=1*G, 
+    ...     degrees=True,
+    ... )
+
+    See Also
+    --------
+    kep_to_cart : Convert from cartesian to kepler
+
     '''
 
     if not isinstance(cart, np.ndarray):
@@ -1273,9 +1289,12 @@ def euler_rotation_matrix(inc, omega, Omega, degrees=False):
     '''Generate the rotation matrix for the intrinsic rotation sequence Z-X-Z 
     used by keplerian orbital elements of (i, Omega, omega). 
 
-    If any of the input angles are vectors the matrix will expand along a the remaining axis.
+    If any of the input angles are vectors the matrix will expand along a the 
+    remaining axis.
 
-    Appendix I (p. 483) of: Roithmayr, Carlos M.; Hodges, Dewey H. (2016), Dynamics: Theory and Application of Kane's Method (1st ed.), Cambridge University Press
+    Appendix I (p. 483) of: Roithmayr, Carlos M.; Hodges, Dewey H. (2016), 
+    Dynamics: Theory and Application of Kane's Method (1st ed.), 
+    Cambridge University Press
     '''
     if isinstance(inc, np.ndarray):
         R = np.empty((3, 3, inc.size), dtype=np.float64)
@@ -1329,26 +1348,31 @@ def kep_to_cart(kep, mu=M_sol*G, degrees=False):
     Parameters
     ----------
     kep : numpy.ndarray kep
-        Keplerian orbital elements where rows 1-6 correspond to 
-        :math:`a`, :math:`e`, :math:`i`, :math:`\\omega`, :math:`\\Omega`, :math:`\\nu` 
-        and columns correspond to different objects.
+        (6, N) or (6, ) array of Keplerian orbital elements where rows 
+        correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\\omega`, 
+        :math:`\\Omega`, :math:`\\nu` and columns correspond to different 
+        objects.
     mu : float or numpy.ndarray
-        Standard gravitational parameter of objects. If :code:`mu` is a numpy vector,
-        the element corresponding to each column of :code:`cart` will be used for 
-        its element calculation, Default value is in SI units a massless 
-        object orbiting the Sun.
+        Float or (N, ) array with the standard gravitational parameter of 
+        objects. If :code:`mu` is a numpy vector, the element corresponding to 
+        each column of :code:`cart` will be used for its element calculation, 
+        Default value is in SI units a massless object orbiting the Sun.
     degrees : bool
-        If :code:`True`, degrees are used. Else all angles are given in radians.
+        If :code:`True`, use degrees. Else all angles are given in radians.
 
     Returns
     -------
     numpy.ndarray
-        Cartesian state vectors where rows 1-6 correspond to 
-        :math:`x`, :math:`y`, :math:`z`, :math:`v_x`, :math:`v_y`, :math:`v_z` and 
-        columns correspond to different objects.
+        (6, N) or (6, ) array of cartesian state vector(s) where rows 
+        correspond to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`, 
+        :math:`v_y`, :math:`v_z` and columns correspond to different objects.
     
     Notes
     -----
+    Transform
+        Basic functionality is largley based on standard literature like [1]_. 
+        Some open source material is avalible like these `Orbital-mechanics notes on GitHub <https://orbital-mechanics.space/intro.html>`_ .
+
     Variables
         * :math:`a`: Semi-major axis
         * :math:`e`: Eccentricity
@@ -1356,46 +1380,67 @@ def kep_to_cart(kep, mu=M_sol*G, degrees=False):
         * :math:`\\omega`: Argument of perihelion
         * :math:`\\Omega`: Longitude of ascending node
         * :math:`\\nu`: True anoamly
+        * :math:`\\mu`: Standard gravitational parameter for the two body problem: :math:`G(M_1 + M_2)`.
     
     Units
-       Using default standard gravitational parameter :code:`mu` (:math:`\\mu`), 
-       all variables are in `SI Units 
-       <https://www.nist.gov/pml/weights-and-measures/metric-si/si-units>`_
-       If a :code:`mu` is given in other units, all other input variables should 
-       also use the same unit system.
-       Angles are by default given as radians, all angles are radians 
-       internally in functions, input and output angles can be both radians 
-       and degrees depending on the :code:`degrees` boolean.
+       Using default standard gravitational parameter :code:`mu` 
+       (:math:`\\mu`), all variables are in `SI Units 
+       <https://www.nist.gov/pml/weights-and-measures/metric-si/si-units>`_ 
+       If a :code:`mu` is given in other units, all other input variables 
+       should also use the same unit system. Angles are by default given as 
+       radians, all angles are radians internally in functions, input and 
+       output angles can be both radians and degrees depending on the 
+       :code:`degrees` boolean.
 
+    Orientation of the ellipse in the coordinate system [2]_
+        For 0 inclination :math:`i`: the ellipse is located in the x-y plane.
 
-    Orientation of the ellipse in the coordinate system [1][2]
-        * For 0 inclination :math:`i`: the ellipse is located in the x-y plane.
-        * The direction of motion as True anoamly :math:`\\nu`: increases for a 
-            zero inclination :math:`i`: orbit is anti-coockwise, i.e. from +x 
-            towards +y.
-        * If the eccentricity :math:`e`: is increased, the periapsis will lie 
-            in +x direction.
-        * If the inclination :math:`i`: is increased, the ellipse will rotate 
-            around the x-axis, so that +y is rotated toward +z.
-        * An increase in Longitude of ascending node :math:`\\Omega`: 
-            corresponds to a rotation around the z-axis so that +x is rotated 
-            toward +y.
-        * Changing argument of perihelion :math:`\\omega`: will not change the 
-            plane of the orbit, it will rotate the orbit in the plane.
-        * The periapsis is shifted in the direction of motion.
+        The direction of motion as True anoamly :math:`\\nu`: increases for a 
+        zero inclination :math:`i`: orbit is anti-coockwise, i.e. from +x 
+        towards +y.
+
+        If the eccentricity :math:`e`: is increased, the periapsis will lie in 
+        +x direction.
+
+        If the inclination :math:`i`: is increased, the ellipse will rotate 
+        around the x-axis, so that +y is rotated toward +z.
+
+        An increase in Longitude of ascending node :math:`\\Omega`: 
+        corresponds to a rotation around the z-axis so that +x is rotated 
+        toward +y.
+
+        Changing argument of perihelion :math:`\\omega`: will not change the 
+        plane of the orbit, it will rotate the orbit in the plane.
+
+        The periapsis is shifted in the direction of motion.
+
+    .. [1] A.E. Roy. "Orbital Motion"
+    .. [2] D.A. Vallado. "Fundamentals of Astrodynamics and Applications"
 
     Examples
     --------
-    >>> import pyorb
-    >>> G = pyorb.get_G(length='AU', mass='Msol', time='y')
-    >>> cart = pyorb.kep_to_cart(
-        [1, 0, 0, 0, 0, 45], 
-        mu=1*G, 
-        degrees=True,
-    )
+    
+    Example of using the base conversion function to transform from
+    kepler elements to cartesian coordinates
 
-    .. [1] "Orbital Motion" by A.E. Roy.
-    .. [2] Daniel Kastinen Master Thesis: Meteors and Celestial Dynamics
+    >>> import pyorb
+    >>> import numpy as np
+    >>> G = pyorb.get_G(length='AU', mass='Msol', time='y')
+    >>> G
+    39.47812018693255
+    >>> kep = np.array([1, 0, 0, 0, 0, 45.0])
+    >>> cart = pyorb.kep_to_cart(
+    ...     kep, 
+    ...     mu=1*G, 
+    ...     degrees=True,
+    ... )
+    >>> cart
+    array([ 0.70710678,  0.70710678,  0.        , -4.4428662 ,  4.4428662 ,
+            0.        ])
+
+    See Also
+    --------
+    cart_to_kep : Convert from cartesian to kepler
 
     '''
     if not isinstance(kep, np.ndarray):
@@ -1415,6 +1460,9 @@ def kep_to_cart(kep, mu=M_sol*G, degrees=False):
             raise
     else:
         input_is_vector = False
+    
+    if not isinstance(mu, np.ndarray):
+        mu = np.full((kep.shape[1],), mu, dtype=np.float64)
 
     x = np.empty(kep.shape, dtype=kep.dtype)
 
@@ -1428,13 +1476,11 @@ def kep_to_cart(kep, mu=M_sol*G, degrees=False):
     e = kep[1, :]
     a = kep[0, :]
 
-    hyp = e > 1
     per = e == 1
-    # eli = e < 1
-
     nper = np.logical_not(per)
 
-    a[hyp] *= -1
+    # In the consistent equations hyperbolas have negative semi-major axis
+    a[e > 1] *= -1
 
     h = np.empty_like(a)
     h[nper] = orbit_total_angular_momentum(a[nper], e[nper], mu[nper])
@@ -1468,10 +1514,8 @@ def kep_to_cart(kep, mu=M_sol*G, degrees=False):
     if input_is_vector:
         x.shape = (6,)
         kep.shape = (6,)
-        if degrees:
-            kep[2:] = np.degrees(kep[2:])
-    else:
-        if degrees:
-            kep[2:, :] = np.degrees(kep[2:, :])
+
+    if degrees:
+        kep[2:, ...] = np.degrees(kep[2:, ...])
 
     return x
