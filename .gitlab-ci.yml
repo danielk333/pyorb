@@ -8,11 +8,11 @@ stages:
   - deploy
 
 variables:
-  #Change pip's cache directory to be inside 
+  #Change pip's cache directory to be inside
   # the project directory since we can
   # only cache local items.
   PIP_CACHE_DIR: "${CI_PROJECT_DIR}/.cache/pip"
-  #Use a gitlab variable to securly store the 
+  #Use a gitlab variable to securly store the
   # user token used to upload to PyPI
   PYPI_TOKEN: $PYPI_TOKEN
 
@@ -52,15 +52,15 @@ default:
     - *install-deps # execute script in alias
 
 
-#Template for testing on python images, 
-# extend this for each python-platform 
+#Template for testing on python images,
+# extend this for each python-platform
 # the package is intended to work on
-# Template information: 
+# Template information:
 #   https://docs.gitlab.com/ee/ci/yaml/yaml_specific_features.html
 .py-test-template: &python-test
   stage: test
   allow_failure: true
-  script: 
+  script:
     - pytest
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
@@ -68,7 +68,7 @@ default:
 # Run all diagnostics
 diagnostics:
   stage: test
-  script: 
+  script:
     - coverage run -m pytest > pytest_report
     - coverage report -m > coverage_report
     - radon cc -a pyorb/ > radon_cc_report
@@ -125,7 +125,7 @@ pypi:
   script:
     - >
       TWINE_USERNAME=__token__
-      TWINE_PASSWORD=$PYPI_TOKEN
+      TWINE_PASSWORD="${PYPI_TOKEN}"
       python -m twine upload dist/*
   only:
     - tags
