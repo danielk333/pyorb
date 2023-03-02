@@ -4,6 +4,8 @@ PyOrb is a lightweight package designed to convert back and forth between cartes
 
 See full documentation [here](https://danielk.developer.irf.se/pyorb/).
 
+![Example interactive orbit](/docs/source/static/example.gif)
+
 ## Feature list
 
 Current features:
