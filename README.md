@@ -63,6 +63,35 @@ orb.anom = 180
 print(orb.r/pyorb.AU)
 ```
 
+## To develop
+
+First clone and branch off develop
+
+```bash
+git clone https://github.com/danielk333/pyorb
+cd pyorb
+git checkout develop
+git checkout -b my-name/my-feature
+```
+
+then editable install with development extras and install the pre-commit hooks
+
+```bash
+pip install -e .[develop]
+pre-commit install
+```
+
+and get to hacking!
+
+### Internal development
+
+Please refer to the style and contribution guidelines documented in the
+[IRF Software Contribution Guide](https://danielk.developer.irf.se/software_contribution_guide/).
+
+### External code-contributions
+
+Generally external code-contributions are made trough a "Fork-and-pull"
+workflow towards the `develop` branch.
 
 ## Ellipse and angle definitions
 
@@ -94,27 +123,27 @@ Orientation of the ellipse in the coordinate system and angle definitions:
  - For parabolic and hyperbolic orbits the true and eccentric anomaly wraps at **pi** to the same trajectory, not the mirror version.
 
  Shape definitions:
- - The Semi-major axis is always positive. 
+ - The Semi-major axis is always positive.
  - In the case of a parabolic orbit, as the Semi-major axis is undefined it is used as the periapsis distance instead.
 
 ## Notes
 
 ### Disabling direct conversion
 
-There are two toggle flags in the ``pyorb.Orbit`` class for changing the conversion behavior: ``direct_update`` and ``auto_update`` that are ``True`` by default. 
+There are two toggle flags in the ``pyorb.Orbit`` class for changing the conversion behavior: ``direct_update`` and ``auto_update`` that are ``True`` by default.
 
-Disabling ``direct_update`` will stop automatic conversion between elements if any element is changed. This would allow for e.g. 
+Disabling ``direct_update`` will stop automatic conversion between elements if any element is changed. This would allow for e.g.
 ```python
 orb.a = 1
 orb.omega = 0
 ```
 without any conversion to be done. However, as the kepler elements changed, the class has internally tracked this change and if ``auto_update=True`` once an access to a cartesian property is performed, e.g. ``print(orb.x)``, the conversion is performed so that the pair of cartesian-kepler elements are never contradictory.
 
-If also ``auto_update`` is disabled, the update between kepler and cartesian needs to be manually by calling 
+If also ``auto_update`` is disabled, the update between kepler and cartesian needs to be manually by calling
 ```python
 orb.calculate_cartesian()
 ```
-or 
+or
 ```python
 orb.calculate_kepler()
 ```
