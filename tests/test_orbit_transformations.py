@@ -5,6 +5,7 @@ Test basic kepler functions
 '''
 
 import unittest
+import pytest
 import numpy as np
 import numpy.testing as nt
 
@@ -122,8 +123,8 @@ class TestKepCart(unittest.TestCase):
         nt.assert_almost_equal(x[2], q*np.sqrt(2)*0.5, decimal = 6)
 
     def test_planar_detection(self):
-        '''Longitude of ascending node gets transfered to argument of periapsis 
-        in planar orbits. Test if this is true for retro-grade and pro-grade 
+        '''Longitude of ascending node gets transfered to argument of periapsis
+        in planar orbits. Test if this is true for retro-grade and pro-grade
         planar orbits.
         '''
 
@@ -147,6 +148,7 @@ class TestKepCart(unittest.TestCase):
 
         nt.assert_almost_equal(orb_ref, orb_out)
 
+    @pytest.mark.slow
     def test_cart_kep_inverse(self):
         a = np.linspace(self.a, self.a + self.R_e, num=2, dtype=np.float64)
         e = np.linspace(0.0, 0.99, num=10, dtype=np.float64)
@@ -184,7 +186,7 @@ class TestKepCart(unittest.TestCase):
                     decimal = 6,
                 )
                 nt.assert_array_almost_equal(
-                    x[3:, ind]/o[0, ind], x_calc[3:, ind]/o[0, ind], 
+                    x[3:, ind]/o[0, ind], x_calc[3:, ind]/o[0, ind],
                     decimal = 6,
                 )
             except AssertionError:
@@ -208,13 +210,13 @@ class TestKepCart(unittest.TestCase):
 
         inds = np.logical_and(il, el)
         o[5, np.logical_and(il, el)] += o_orig[4, inds]
-        
+
         inds = np.logical_and(il, np.logical_not(el))
         o[3, np.logical_and(il, np.logical_not(el))] += o_orig[4, inds]
 
         inds = np.logical_and(il_ret, el)
         o[5, np.logical_and(il_ret, el)] -= o_orig[4, inds]
-        
+
         inds = np.logical_and(il_ret, np.logical_not(el))
         o[3, np.logical_and(il_ret, np.logical_not(el))] -= o_orig[4, inds]
 

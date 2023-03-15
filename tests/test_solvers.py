@@ -5,6 +5,7 @@ Test basic kepler functions
 '''
 
 import unittest
+import pytest
 import numpy as np
 import numpy.testing as nt
 
@@ -30,12 +31,13 @@ class TestKeplerSolver(unittest.TestCase):
             np.full(test_accuracy.shape, True)
         )
 
+    @pytest.mark.slow
     def test_laguerre_solve_hyperbolic_kepler(self):
         E = np.linspace(0.0, np.pi, num=300, dtype=np.float64)
         e = np.linspace(1.001, 10, num=500, dtype=np.float64)
 
-        for I, eit in enumerate(e):
-            for J, Eit in enumerate(E):
+        for eit in e:
+            for Eit in E:
                 M = kep.eccentric_to_mean(Eit, eit)
 
                 E0 = kep.kepler_guess(M, eit)
@@ -63,12 +65,13 @@ class TestKeplerSolver(unittest.TestCase):
             np.full(test_accuracy.shape, True)
         )
 
+    @pytest.mark.slow
     def test_laguerre_solve_kepler(self):
         E = np.linspace(0.0, 2.0*np.pi, num=300, dtype=np.float64)
         e = np.linspace(0, 0.99, num=500, dtype=np.float64)
 
-        for I, eit in enumerate(e):
-            for J, Eit in enumerate(E):
+        for eit in e:
+            for Eit in E:
                 M = kep.eccentric_to_mean(Eit, eit)
 
                 E0 = kep.kepler_guess(M, eit)
