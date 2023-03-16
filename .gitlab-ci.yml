@@ -12,6 +12,20 @@ default:
     - IRF
 
 # Base to prepare the enviornment before every job
+.devsetup:
+  before_script:
+    - python -V
+    # Prepare and activate virtualenv
+    - pip install -U pip
+    - pip install virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
+    # install the package and develop dependancies
+    - pip install .[develop]
+    - apt update
+    - apt install -y pandoc
+
+# Base to prepare the enviornment before every job
 .setup:
   before_script:
     - python -V
@@ -20,10 +34,8 @@ default:
     - pip install virtualenv
     - virtualenv venv
     - source venv/bin/activate
-    # install the develop dependancies
-    - pip install .[develop]
-    - apt update
-    - apt install -y pandoc
+    # install the package
+    - pip install .
 
 
 #######################
@@ -51,10 +63,10 @@ python3.10:
 ###############
 ## Releasing ##
 
-#Compile documentation for publication
+# Compile documentation for publication
 pages:
   stage: release
-  extends: .setup
+  extends: .devsetup
   script:
     - coverage run -m pytest > pytest_report
     - coverage report -m > coverage_report
@@ -75,7 +87,7 @@ pages:
 # Then publish package on public PyPI
 pypi:
   stage: release
-  extends: .setup
+  extends: .devsetup
   variables:
     #Use a gitlab variable to securly store the token
     PYPI_TOKEN: $PYPI_TOKEN
@@ -85,7 +97,7 @@ pypi:
     - >
       TWINE_USERNAME=__token__
       TWINE_PASSWORD=$PYPI_TOKEN
-      python -m twine upload dist/*
+      python -m twine upload --verbose dist/*
   artifacts:
     paths:
       - dist/*
