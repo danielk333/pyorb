@@ -98,7 +98,7 @@ pypi:
     - >
       TWINE_USERNAME=__token__
       TWINE_PASSWORD=$PYPI_TOKEN
-      python -m twine upload --verbose dist/*
+      python -m twine upload dist/*
   artifacts:
     paths:
       - dist/*
