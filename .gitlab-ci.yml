@@ -49,6 +49,7 @@ default:
   extends: .setup
   allow_failure: true
   script:
+    - pip install pytest
     - pytest
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
