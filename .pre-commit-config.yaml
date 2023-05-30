@@ -13,10 +13,24 @@ repos:
     -   id: flake8
 -   repo: local
     hooks:
-    -   id: pytest-check
-        name: pytest-check
+    -   id: pytest
+        name: pytest
         entry: pytest
         args: [--skipslow]
+        language: system
+        pass_filenames: false
+        always_run: true
+-   repo: https://github.com/rubik/xenon
+    rev: v0.9.0
+    hooks:
+      - id: xenon
+        args: [ --max-absolute B, --max-modules A, --max-average A ]
+-   repo: local
+    hooks:
+    -   id: coverage
+        name: coverage
+        entry: coverage report
+        args: [--fail-under=80]
         language: system
         pass_filenames: false
         always_run: true
