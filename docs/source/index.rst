@@ -30,7 +30,7 @@ alternatively we have our nightly local repository
 
    pip install X
 
-To install directly from source, please use 
+To install directly from source, please use
 
 .. code-block:: bash
 
@@ -56,24 +56,15 @@ Example gallery of the different functionality of the package
    :maxdepth: 2
 
    autogallery/index
-   ipynbgallery
+   notebookgallery
 
 
 Contributing
 -------------
 
-To contribute please issue pull-requests trough GitHub. 
+To contribute please issue pull-requests trough GitHub.
 
 Before doing so please have a look at our [software contribution guide](https://danielk.developer.irf.se/software_contribution_guide/).
-
-
-Repository diagnostics
------------------------
-
-.. toctree::
-   :maxdepth: 2
-
-   diagnostics
 
 
 API Reference

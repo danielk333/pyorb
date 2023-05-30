@@ -69,12 +69,6 @@ pages:
   stage: release
   extends: .devsetup
   script:
-    - coverage run -m pytest > pytest_report
-    - coverage report -m > coverage_report
-    - radon cc -a pyorb/ > radon_cc_report
-    - radon raw -s pyorb/ > radon_raw_report
-    - radon mi -s pyorb/ > radon_mi_report
-    - radon hal pyorb/ > radon_hal_report
     - cd docs
     - make html
     - mv build ../public

@@ -1,10 +1,10 @@
-IPython examples
-=================
+Notebook tutorials
+==================
 
 .. nbgallery::
     :caption: These are the notebook tutorials and examples
-    :name: ipython-gallery
+    :name: notebook-gallery
     :glob:
     :reversed:
 
-    ipython_examples/*
+    notebooks/*
