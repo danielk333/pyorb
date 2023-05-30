@@ -72,14 +72,15 @@ def get_G(length, mass, time):
     return G_SI*(_mass*_time**2/_length**3)
 
 
-def angle_units(in_arg_inds, in_arg_keys, out_arg_inds):
-    '''Wrapper to automatically convert input arguemnts from degrees to radians 
-    and back to degrees if the keyword argument `degrees = True`.
+def angle_units(in_arg_inds, in_arg_keys, out_arg_inds, degrees=False):
+    '''Wrapper to automatically convert input arguments from degrees to radians
+    and back to degrees if the keyword argument `degrees = True`. The default
+    behavior is dictated by the wrapper `degrees` keyword argument.
     '''
 
     def angle_converter_warpper(func):
         def wrapped_func(*args, **kwargs):
-            if not kwargs.pop('degrees', False):
+            if not kwargs.pop('degrees', degrees):
                 return func(*args, **kwargs)
 
             args = list(args)
@@ -93,11 +94,15 @@ def angle_units(in_arg_inds, in_arg_keys, out_arg_inds):
 
             ret = func(*args, **kwargs)
 
-            ret = list(ret)
-            if out_arg_inds is not None:
-                for ind in out_arg_inds:
-                    ret[ind] = np.degrees(ret[ind])
+            if out_arg_inds is not None and ret is not None:
+                if isinstance(out_arg_inds, bool):
+                    ret = np.degrees(ret)
+                else:
+                    ret = list(ret)
+                    for ind in out_arg_inds:
+                        ret[ind] = np.degrees(ret[ind])
+                    ret = tuple(ret)
 
-                return ret
+            return ret
         return wrapped_func
     return angle_converter_warpper

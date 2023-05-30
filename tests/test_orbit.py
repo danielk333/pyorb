@@ -372,10 +372,11 @@ class TestOrbitProperties(unittest.TestCase):
 
     def setUp(self):
         self.kep_orb = dict(
-            a=1, e=0.2, i=3, 
-            omega=10, Omega=20, anom=90, 
-            degrees=True,
+            a=1, e=0.2, i=3,
+            omega=10, Omega=20, anom=90,
+            degrees=True, type='true',
         )
+        self.d_ang = 130.0
         self.G = pyorb.get_G(length='AU', mass='Msol', time='y')
         self.M0 = 1
         self.m = 0.1
@@ -459,6 +460,45 @@ class TestOrbitProperties(unittest.TestCase):
 
     def test_anom(self):
         assert self.orb.anom == self.kep_orb['anom']
+
+    def test_mean_anomaly(self):
+        M = pyorb.true_to_mean(
+            self.kep_orb['anom'],
+            self.kep_orb['e'],
+            degrees=self.kep_orb['degrees'],
+        )
+        assert self.orb.mean_anomaly[0] == M
+
+        self.orb.mean_anomaly = M + self.d_ang
+        nt.assert_almost_equal(self.orb.mean_anomaly[0], M + self.d_ang)
+        assert self.orb.anom[0] == pyorb.mean_to_true(
+            M + self.d_ang,
+            self.kep_orb['e'],
+            degrees=self.kep_orb['degrees'],
+        )
+
+    def test_eccentric_anomaly(self):
+        ecc = pyorb.true_to_eccentric(
+            self.kep_orb['anom'],
+            self.kep_orb['e'],
+            degrees=self.kep_orb['degrees'],
+        )
+        assert self.orb.eccentric_anomaly[0] == ecc
+
+        self.orb.eccentric_anomaly = ecc + self.d_ang
+
+        nt.assert_almost_equal(self.orb.eccentric_anomaly[0], ecc + self.d_ang)
+        assert self.orb.anom[0] == pyorb.eccentric_to_true(
+            ecc + self.d_ang,
+            self.kep_orb['e'],
+            degrees=self.kep_orb['degrees'],
+        )
+
+    def test_true_anomaly(self):
+        assert self.orb.true_anomaly == self.kep_orb['anom']
+        self.orb.true_anomaly = self.kep_orb['anom'] + self.d_ang
+        assert self.orb.true_anomaly == self.kep_orb['anom'] + self.d_ang
+
 
     def test_set_anom(self):
         self.orb.anom = 0
