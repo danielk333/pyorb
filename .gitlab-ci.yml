@@ -6,10 +6,10 @@ stages:
   - test
   - release
 
-# Runners need the IRF tag
+# Select correct runner
 default:
   tags:
-    - IRF
+    - generic
 
 # Prepare the development enviornment
 .devsetup:
