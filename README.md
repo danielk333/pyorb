@@ -161,3 +161,13 @@ Remember that an Keplerian orbit only makes sense in an inertial frame if gravit
 - Properties act on ALL orbits in the class
 - Only way to update individual orbits of a set is to use ``self.update`` with the ``inds`` keyword
 - Iterations are passive, the objects are copies from the array so the array itself is NOT modified
+
+
+### Rebound
+
+The very excellent multi-purpose N-body integrator [rebound](https://github.com/hannorein/rebound) has also implemented conversion from their particles to orbital elements. Important to note is that their conventions differ somewhat from ours by:
+
+- Semi-major axis becomes negative when the orbit is hyperbolic
+- Longitude of ascending node can become negative
+
+otherwise the orbit routines should produce identical results.
