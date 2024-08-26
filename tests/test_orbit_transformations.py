@@ -10,30 +10,108 @@ import numpy as np
 import numpy.testing as nt
 
 import pyorb.kepler as kep
+from pyorb import const
 import pyorb
 
 
-@unittest.skip("Not yet implemented")
 class TestAlternativeParameters(unittest.TestCase):
 
     def setUp(self):
-        pass
+        self.a = 7500e3         # around 800 km above Earth
+        self.orb_init = np.array(
+            [self.a, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=np.float64)
+        self.m = 1.0
+        self.mu = pyorb.GM_earth
 
+        s2 = np.sqrt(2)/2
+        s3 = np.sqrt(3)/2
+        t3 = 1/np.sqrt(3)
+        a = self.a
+        cases = np.array([
+            # kepl a e i o O n equi a h k p q l
+            [[a, 0, 0,   0,  0, 0], [a,  0,  0,  0, 0,   0]],
+            [[a, 0, 0,  30,  0, 0], [a,  0,  0,  0, 0,  30]], # not invertible
+            [[a, 0, 90,  0,  0, 0], [a,  0,  0,  0, 1,   0]],
+            [[a, 0, 90,  0, 60, 0], [a,  0,  0, s3, .5, 60]],
+            [[a, 0, 90, 45, 30, 0], [a,  0,  0, .5, s3, 75]],
+            [[a, .5, 0, 45,  0, 0], [a, s2/2, s2/2,  0, 0,  45]],
+            [[a, .5, 60, 30, 30, 0],[a, s3/2, .25, t3/2, t3*s3, 60]]
+        ])
+        self.testcases = dict(kepl=cases[:,0], equi=cases[:,1])
+
+    @unittest.skip("Not yet implemented")
     def test_cart_to_equi(self):
         assert False
 
+    @unittest.skip("Not yet implemented")
     def test_equi_to_cart(self):
         assert False
 
+    @unittest.skip("Not yet implemented")
     def test_equi_cart_consistency(self):
         assert False
 
     def test_kep_to_equi(self):
-        assert False
+        orb_init = self.orb_init.copy()
+
+        x = kep.kep_to_equi(orb_init, degrees=True)
+        try:
+            nt.assert_array_almost_equal(x, orb_init)
+        except AssertionError:
+            print(x)
+            raise
+
+        # one at a time
+        for ix in range(len(self.testcases['kepl'])):
+            try:
+                assert np.allclose(kep.kep_to_equi(self.testcases['kepl'][ix], degrees=True),
+                                self.testcases['equi'][ix])
+            except:
+                print(f"kep_to_equi, case {ix}")
+                print(f"input {self.testcases['kepl'][ix]}")
+                print(f"      =>  {kep.kep_to_equi(self.testcases['kepl'][ix], degrees=True)}")
+                print(f" expected {self.testcases['equi'][ix]}")
+                raise
+
+
+        # Then all at once
+        assert np.allclose(kep.kep_to_equi(self.testcases['kepl'].T, degrees=True).T,
+                        self.testcases['equi'])
+
+
 
     def test_equi_to_kep(self):
-        assert False
+        orb_init = self.orb_init.copy()
 
+        x = kep.equi_to_kep(orb_init, degrees=True)
+        try:
+            # This test case looks the same in Kepler and Equinoctial
+            nt.assert_array_almost_equal(x, orb_init)
+        except AssertionError:
+            print('Problem!')
+            raise
+
+        # one at a time
+        for ix in range(len(self.testcases['equi'])):
+            try:
+                nt.assert_(kep.kep_equivalent(
+                        kep.equi_to_kep(self.testcases['equi'][ix], degrees=True),
+                        self.testcases['kepl'][ix]),
+                        f'Error in test case [{ix}]')
+            except AssertionError:
+                print(f"equi_to_kep, case {ix}")
+                print(f"input {self.testcases['equi'][ix]}")
+                print(f"      =>  {kep.equi_to_kep(self.testcases['equi'][ix], degrees=True)}")
+                print(f" expected {self.testcases['kepl'][ix]}")
+                raise
+
+        # Then all at once
+        # assert np.allclose(kep.equi_to_kep(self.testcases['equi'].T, degrees=True).T,
+        #                 self.testcases['kepl'])
+
+
+
+    @unittest.skip("Not yet implemented")
     def test_equi_kep_consistency(self):
         assert False
 
