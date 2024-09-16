@@ -326,23 +326,22 @@ def equi_to_kep(equi, degrees=False):
 
     kep = np.empty(equi.shape, dtype=equi.dtype)
 
-    kep[K_a, ...] = equi[E_a, ...]                                  # a
-    kep[K_e, ...] = np.sqrt(equi[E_h, ...]**2 + equi[E_k, ...]**2)    # e
+    kep[K_a, ...] = equi[E_a, ...]  # a
+    kep[K_e, ...] = np.sqrt(equi[E_h, ...] ** 2 + equi[E_k, ...] ** 2)  # e
 
-    om_bar = np.arctan2(equi[E_h, ...], equi[E_k, ...])             # om + Om, radians
-    Omega  = np.arctan2(equi[E_p, ...], equi[E_q, ...])
+    om_bar = np.arctan2(equi[E_h, ...], equi[E_k, ...])  # om + Om, radians
 
-    hi = np.arctan(np.sqrt(equi[E_p, ...]**2 + equi[E_q, ...]**2))  # i/2, radians
-    kep[K_i, ...] = 2*hi
-    kep[K_OM, ...] = np.arctan2(equi[E_p, ...], equi[E_q, ...])        # Omega, radians
+    hi = np.arctan(np.sqrt(equi[E_p, ...] ** 2 + equi[E_q, ...] ** 2))  # i/2, radians
+    kep[K_i, ...] = 2 * hi
+    kep[K_OM, ...] = np.arctan2(equi[E_p, ...], equi[E_q, ...])  # Omega, radians
 
     if degrees:
         om_bar = np.degrees(om_bar)
         kep[K_OM, ...] = np.degrees(kep[K_OM, ...])
         kep[K_i, ...] = np.degrees(kep[K_i, ...])
 
-    kep[K_om, ...] = om_bar - kep[K_OM, ...]                          # omega
-    kep[K_nu, ...] = equi[E_lam, ...] - om_bar                         # nu
+    kep[K_om, ...] = om_bar - kep[K_OM, ...]  # omega
+    kep[K_nu, ...] = equi[E_lam, ...] - om_bar  # nu
 
     return kep
 
