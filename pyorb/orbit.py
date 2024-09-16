@@ -10,10 +10,12 @@ import numpy as np
 from .const import G as G_SI
 from . import kepler as functions
 
+# TODO: update to numpydoc style
+# TODO: make init function more readable without kw args jumble
+
 
 class Orbit:
     '''Main encapsulating class for the concept of an orbit.
-
 
     :Pointers:
         All properties return copies of the internal variables rather then

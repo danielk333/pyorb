@@ -11,7 +11,7 @@ from .const import wgs84_GM as GM_earth
 from .const import wgs84_M_earth as M_earth
 
 from .kepler import cart_to_kep, kep_to_cart
-from .kepler import equi_to_kep, kep_to_equi
+from .kepler import equi_to_kep, kep_to_equi, equi_to_cart, cart_to_equi
 from .kepler import true_to_eccentric, mean_to_eccentric
 from .kepler import mean_to_true, eccentric_to_true
 from .kepler import eccentric_to_mean, true_to_mean
