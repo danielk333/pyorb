@@ -3,15 +3,11 @@
 '''Orbit class definition.
 '''
 
-# Python standard import
 import copy
 
-# Third party import
 import numpy as np
 
-
-# Local import
-from .kepler import G as G_SI
+from .const import G as G_SI
 from . import kepler as functions
 
 
@@ -20,76 +16,76 @@ class Orbit:
 
 
     :Pointers:
-        All properties return copies of the internal variables rather then 
-        return a pointer to the internal variable, e.g. `self.cartesian` 
-        accesses and creates a copy of the internal storage `self._cart`, 
-        while the pointer can technically be used this may cause unexpected 
+        All properties return copies of the internal variables rather then
+        return a pointer to the internal variable, e.g. `self.cartesian`
+        accesses and creates a copy of the internal storage `self._cart`,
+        while the pointer can technically be used this may cause unexpected
         behavior in variables as internal parameters can be set without passing
-        trough the setter functions and previously accessed variables can be 
+        trough the setter functions and previously accessed variables can be
         changed by the instance after access and should be avoided.
 
     :Copy:
-        The `Orbit` class has a `self.copy` method that returns a completely 
-        independent copy of the instance. The `copy` function from the `copy` 
+        The `Orbit` class has a `self.copy` method that returns a completely
+        independent copy of the instance. The `copy` function from the `copy`
         standard python package can also be used to the same effect.
 
     :Iteration:
-        The `Orbit` instance has an iteration method that iterates trough each 
-        orbit in the instance and upon each iteration returns an `Orbit` 
+        The `Orbit` instance has an iteration method that iterates trough each
+        orbit in the instance and upon each iteration returns an `Orbit`
         instance with only the member of the current iteration step.
 
 
-    :param numpy.dtype dtype: A numpy dtype that will be used to store all 
+    :param numpy.dtype dtype: A numpy dtype that will be used to store all
         orbit information. Defaults to `np.float64`. To save RAM footprint and
         if memory usage is a problem, consider if `np.float32` can support your
         required precision.
-    :param bool direct_update: Toggles if the corresponding kepler/cartesian 
-        elements are directly updated when a cartesian/kepler element is 
-        changed. Consider disabling if performance is an issue or multiple 
-        properties should be set prior to cartesian or kepler calculation. 
+    :param bool direct_update: Toggles if the corresponding kepler/cartesian
+        elements are directly updated when a cartesian/kepler element is
+        changed. Consider disabling if performance is an issue or multiple
+        properties should be set prior to cartesian or kepler calculation.
         To completely disable automatic conversion between kepler and cartesian
         elements, `direct_update` also needs to be disabled.
     :param bool auto_update: Advanced configuration, toggles automatic updating
-        of the kepler/cartesian elements when accessed if any cartesian/kepler 
-        element has changed trough a property setter since last access. Does 
+        of the kepler/cartesian elements when accessed if any cartesian/kepler
+        element has changed trough a property setter since last access. Does
         not affect behavior if `direct_update` is `True`.
-    :param bool kepler_read_only: Toggles if the kepler variables can be only 
+    :param bool kepler_read_only: Toggles if the kepler variables can be only
         read or the properties can also be set, e.g. if `kepler_read_only=True`
-        an access of `self.a` is fine but `self.a = 1` would raise an 
+        an access of `self.a` is fine but `self.a = 1` would raise an
         `AttributeError`.
-    :param bool cartesian_read_only: Same as `kepler_read_only` but for the 
+    :param bool cartesian_read_only: Same as `kepler_read_only` but for the
     cartesian variables.
     :param float G: Gravitational constant, should match the set of units used.
         Defaults to SI units. See :func:`pyorb.get_G` for more information.
-    :param epoch: Storage for the epoch of the orbit. Not used internally for 
+    :param epoch: Storage for the epoch of the orbit. Not used internally for
         any calculations.
-    :param bool degrees: Toggles if angles are given in degrees instead of 
+    :param bool degrees: Toggles if angles are given in degrees instead of
         radians. Radians are used by default, i.e `degrees=False`.
-    :param str type: Specifies the type of anomaly is used to describe the 
-        position on the orbit. The string values for the available options are 
+    :param str type: Specifies the type of anomaly is used to describe the
+        position on the orbit. The string values for the available options are
         listed in `Orbit.ANOMALY`. The setter is not case sensitive.
-    :param numpy.ndarray m: Masses of the objects for which to calculate 
+    :param numpy.ndarray m: Masses of the objects for which to calculate
         orbits. Used to calculate the gravitational parameter.
-    :param int num: Integer describing the number of orbits in this instance. 
-        As the orbit calculations are vectorized, for performance when 
-        converting large amounts of orbits a single instance should be used 
+    :param int num: Integer describing the number of orbits in this instance.
+        As the orbit calculations are vectorized, for performance when
+        converting large amounts of orbits a single instance should be used
         with many orbits.
-    :param dict solver_options: Settings for the numerical solving of Kepler's 
+    :param dict solver_options: Settings for the numerical solving of Kepler's
         equation. See description below.
 
 
     :Kepler's equation:
-        The Kepler equation is solved using the The Laguerre Algorithm, 
-        an algorithm that guarantees global convergence. This algorithm has 
-        been split into two, one branch adjusted for solving only real roots 
-        (non-hyperbolic orbits) and for solving only imaginary roots 
+        The Kepler equation is solved using the The Laguerre Algorithm,
+        an algorithm that guarantees global convergence. This algorithm has
+        been split into two, one branch adjusted for solving only real roots
+        (non-hyperbolic orbits) and for solving only imaginary roots
         (hyperbolic orbits). The options for this algorithm are currently:
 
-        - _float_ **tol**: Numerical tolerance for solving Kepler's equation 
+        - _float_ **tol**: Numerical tolerance for solving Kepler's equation
             in units of radians.
-        - _int_ **max_iter**: Maximum number of iterations to reach error 
+        - _int_ **max_iter**: Maximum number of iterations to reach error
             tolerance.
-        - _int_ **degree**: Polynomial degree used in derivation of Laguerre 
+        - _int_ **degree**: Polynomial degree used in derivation of Laguerre
             Algorithm.
 
     '''
@@ -233,7 +229,7 @@ class Orbit:
             self.__type = val
 
     def propagate(self, dt):
-        '''Propagate all orbits in time by modifying the anomaly of the orbit, 
+        '''Propagate all orbits in time by modifying the anomaly of the orbit,
         i.e. by updating the kepler elements
         '''
         if self.degrees:
@@ -271,8 +267,8 @@ class Orbit:
         :return: None
 
         :Keyword arguments:
-            - Any valid Cartesian or Keplerian variable name can be given as a 
-                key to update that parameter. 
+            - Any valid Cartesian or Keplerian variable name can be given as a
+                key to update that parameter.
 
         '''
         inds = slice(self.num, self.num + num, None)
@@ -327,7 +323,7 @@ class Orbit:
     def allocate(self, num):
         '''Changes the current allocation of orbits to a fixed number.
 
-        **Warning**: This method overrides all currently stored data to 
+        **Warning**: This method overrides all currently stored data to
             allocate new space.
 
         :param int num: Number of orbits to change allocation to
@@ -347,24 +343,24 @@ class Orbit:
 
         **Note**: Cannot update BOTH cartesian and Keplerian elements.
 
-        :param int/list/numpy.ndarray/slice inds: Incidences of orbits to 
+        :param int/list/numpy.ndarray/slice inds: Incidences of orbits to
             update, defaults to all
         :return: None
 
         :Keyword arguments:
-            - Any valid Cartesian or Keplerian variable name can be given as a 
-                key to update that parameter. 
-            - If `kepler` is given, it is interpreted as an input array the 
-                same as using `orb.kepler = kepler` and no other updates are 
+            - Any valid Cartesian or Keplerian variable name can be given as a
+                key to update that parameter.
+            - If `kepler` is given, it is interpreted as an input array the
+                same as using `orb.kepler = kepler` and no other updates are
                 done.
-            - If `cartesian` is given, it is interpreted as an input array the 
+            - If `cartesian` is given, it is interpreted as an input array the
                 same as using `orb.cartesian = cartesian` and no other updates
                 are done.
             - Mass can also be updated this way but this assumes that if kepler
                 elements are updated, they stay constant due to the mass change
-                and the cartesian are changed. Vice versa with updating mass 
-                and cartesian elements. If only mass is updated 
-                :code:`calculate_cartesian` or :code:`calculate_kepler` must be 
+                and the cartesian are changed. Vice versa with updating mass
+                and cartesian elements. If only mass is updated
+                :code:`calculate_cartesian` or :code:`calculate_kepler` must be
                 called manually depending on which are to remain constant.
         '''
 
@@ -441,7 +437,7 @@ class Orbit:
     def calculate_cartesian(self, inds=slice(None, None, None)):
         '''Calculates Cartesian elements based on Keplerian elements
 
-        :param int/list/numpy.ndarray/slice inds: Incidences of orbits to 
+        :param int/list/numpy.ndarray/slice inds: Incidences of orbits to
             calculate, defaults to all
         :return: None
         '''
@@ -470,7 +466,7 @@ class Orbit:
     def calculate_kepler(self, inds=slice(None, None, None)):
         '''Calculates Keplerian elements based on Cartesian elements
 
-        :param int/list/numpy.ndarray/slice inds: Incidences of orbits to 
+        :param int/list/numpy.ndarray/slice inds: Incidences of orbits to
             calculate, defaults to all
         :return: None
         '''
@@ -800,7 +796,7 @@ class Orbit:
 
     @property
     def anom(self):
-        '''The orbital anomaly, depending on :code:`self.type` 
+        '''The orbital anomaly, depending on :code:`self.type`
         it is either the True, Eccentric or Mean anomaly
         '''
         self._kep_check()
@@ -844,7 +840,7 @@ class Orbit:
             self.__cart_calculated[:] = False
 
     def calc_true_anomaly(self, inds=slice(None, None, None)):
-        '''Calculates the true anomaly and stores it in 
+        '''Calculates the true anomaly and stores it in
         :code:`self._true_anomaly`.
         '''
         if self.type == 'eccentric':
@@ -864,7 +860,7 @@ class Orbit:
             self._true_anomaly[inds] = self.anom[inds]
 
     def calc_mean_anomaly(self, inds=slice(None, None, None)):
-        '''Calculates the mean anomaly and stores it in 
+        '''Calculates the mean anomaly and stores it in
         :code:`self._mean_anomaly`.
         '''
         if self.type == 'eccentric':
@@ -883,7 +879,7 @@ class Orbit:
             self._mean_anomaly[inds] = self.anom[inds]
 
     def calc_eccentric_anomaly(self, inds=slice(None, None, None)):
-        '''Calculates the eccentric anomaly and stores it in 
+        '''Calculates the eccentric anomaly and stores it in
         :code:`self._eccentric_anomaly`.
         '''
         if self.type == 'mean':

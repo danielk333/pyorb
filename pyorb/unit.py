@@ -4,16 +4,10 @@
 
 '''
 
-# Python standard import
-
-
-# Third party import
 import numpy as np
 
-
-# Local import
-from .kepler import G as G_SI
-from .kepler import M_sol, AU
+from .const import G as G_SI
+from .const import M_sol, AU
 
 
 def get_G(length, mass, time):

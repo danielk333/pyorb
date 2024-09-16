@@ -120,42 +120,11 @@ transformations between these and inertial system Cartesian state vectors.
 # TODO: Maybe?  Modified equinoctial elements:
 # https://spsweb.fltops.jpl.nasa.gov/portaldataops/mpg/MPG_Docs/Source Docs/EquinoctalElements-modified.pdf
 
-
 import numpy as np
 
-# TODO: import astropy to transform to/from Earth-fixed cartesian coordinates
-
-from . import const
-from .const import G     # G = 6.6743e-11
-'''float: Newtons gravitational constant [m^3 kg^-1 s^-2]
-
-**Reference**: NIST - http://physics.nist.gov/cgi-bin/cuu/Value?bg
-'''
-
-from .const import AU    # AU = 1.495978707e11
-'''float: Astronomical Unit [m]
-
-The mean distance between the sun and the earth as defined in
-"International Astronomical Union, 31 August 2012"
-'''
-
-
-from .const import wgs84_M_earth as M_earth      # = 398600.5e9/G
-'''float: Mass of the Earth using the WGS84 convention [kg]
-'''
-
-from .const import M_sol         # M_sol = 1.98847e30
-"""float: The mass of the sun :math:`M_\\odot` given in kg
-
-**Reference**: The Astronomical Almanac -
-http://asa.usno.navy.mil/static/files/2014/Astronomical_Constants_2014.pdf
-"""
-
-from .const import wgs84_GM as GM_Earth
-"""float: the gravitational parameter of the Earth :math:`GM_e = G M_e` in m^3 s^{-2}
-but the product GM is known to much higher precision than
-either :math:`G` or :math:`M_e`.
-"""
+# Shorthands for indices into vectors of elements:
+from .const import K_a, K_e, K_i, K_om, K_OM, K_nu
+from .const import E_a, E_h, E_k, E_p, E_q, E_lam
 
 from .const import GM_sol
 """float: the gravitational parameter of the Sun :math:`GM_\\odot = G M_\\odot` in m^3 s^{-2}
@@ -171,10 +140,6 @@ i_lim = np.pi*1e-9
 """float: The limit on inclination in radians below witch an orbit is
 considered not inclined
 """
-
-# Shorthands for indices into vectors of elements:
-from .const import K_a, K_e, K_i, K_om, K_OM, K_nu
-from .const import E_a, E_h, E_k, E_p, E_q, E_lam
 
 
 def cart_to_equi(cart, mu=GM_sol, degrees=False):
@@ -267,6 +232,12 @@ def kep_to_equi(kep, degrees=False):
     degrees : bool
         If :code:`True`, use degrees. Else (default) all angles are given in
         radians.
+
+    Notes
+    -----
+    Assumes the anomaly type is Mean for the docs to be correct,
+    e.g. if the anomaly type is true the sixth element in
+    the return will be the true longitude (L) instead of the mean longitude (lambda)
 
     Returns
     -------
