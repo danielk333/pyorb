@@ -7,7 +7,8 @@ transformations between these and inertial system Cartesian state vectors.
     -----
     Transforms
         Basic functionality is largely based on standard literature like [1]_.
-        Some open source material is avalible like these `Orbital-mechanics notes on GitHub <https://orbital-mechanics.space/intro.html>`_ .
+        Some open source material is avalible like these
+        `Orbital-mechanics notes on GitHub <https://orbital-mechanics.space/intro.html>`_ .
 
     Arbitrary constants used
        * :mod:`~pyorb.kepler.e_lim`: Used to determine circular orbits
@@ -346,13 +347,13 @@ def equi_to_kep(equi, degrees=False):
     return kep
 
 
-def cart_to_kep(cart, mu=M_sol*G, degrees=False):
+def cart_to_kep(cart, mu=GM_sol, degrees=False):
     '''Converts set of Cartesian state vectors to set of Keplerian orbital
     elements.
 
     Parameters
     ----------
-    kep : numpy.ndarray
+    cart : numpy.ndarray
         (6, N) or (6, ) array of Cartesian state vectors where rows correspond
         to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`, :math:`v_y`,
         :math:`v_z` and columns correspond to different objects.
@@ -561,7 +562,7 @@ def cart_to_kep(cart, mu=M_sol*G, degrees=False):
 
 def kep_equivalent(kep1, kep2):
     '''Given two sets of Keplerian elements, decide if they are equivalent'''
-    #TODO: Need unit tests for this one
+    # TODO: Need unit tests for this one
 
     if len(kep1.shape) > 1 or len(kep2.shape) > 1:
         raise ValueError('Only vector inputs for now')
@@ -575,16 +576,20 @@ def kep_equivalent(kep1, kep2):
     if kep1[K_e] < e_lim and kep2[K_e] < e_lim:
         if not np.isclose(kep1[K_om] + kep1[K_nu], kep2[K_om] + kep2[K_nu]):
             return False
-    else: # otherwise, they must match up individually
-        if not np.isclose(kep1[K_om], kep2[K_om]) \
-            or not np.isclose(kep1[K_nu], kep2[K_nu]):
-                return False
+    else:  # otherwise, they must match up individually
+        if (
+            not np.isclose(kep1[K_om], kep2[K_om])
+            or not np.isclose(kep1[K_nu], kep2[K_nu])
+        ):
+            return False
 
     # if inclination is non-zero, then Omega matters
     if kep1[K_i] > i_lim or kep2[K_i] > i_lim:
-        if not np.isclose(kep1[K_i], kep2[K_i]) \
-            or not np.isclose(kep1[K_OM], kep2[K_OM]):
-                return False
+        if (
+            not np.isclose(kep1[K_i], kep2[K_i])
+            or not np.isclose(kep1[K_OM], kep2[K_OM])
+        ):
+            return False
     # Otherwise, we should be good
     return True
 
