@@ -44,7 +44,7 @@ stages:
   extends: .setup
   allow_failure: true
   script:
-    - pip install pytest
+    - pip install pytest pytest-cov
     - pytest
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
