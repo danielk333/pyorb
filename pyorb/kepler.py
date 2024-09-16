@@ -114,17 +114,12 @@ transformations between these and inertial system Cartesian state vectors.
     ...     degrees=True,
     ... )
 
-    TODO: examples with equinoctial elements.
 '''
 
 # TODO: Maybe?  Modified equinoctial elements:
 # https://spsweb.fltops.jpl.nasa.gov/portaldataops/mpg/MPG_Docs/Source Docs/EquinoctalElements-modified.pdf
 
 
-# Python standard import
-
-
-# Third party import
 import numpy as np
 
 # TODO: import astropy to transform to/from Earth-fixed cartesian coordinates
@@ -180,77 +175,84 @@ considered not inclined
 from .const import K_a, K_e, K_i, K_om, K_OM, K_nu
 from .const import E_a, E_h, E_k, E_p, E_q, E_lam
 
+
 def cart_to_equi(cart, mu=GM_sol, degrees=False):
-    '''TODO
-
-    Converts set of Cartesian state vectors to set of Equinoctial orbital
+    '''Converts set of Cartesian state vectors to set of Equinoctial orbital
     elements.
+
+    Parameters
+    ----------
+    cart : numpy.ndarray
+        (6, N) or (6, ) array of Cartesian state vectors where rows correspond
+        to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`, :math:`v_y`,
+        :math:`v_z` and columns correspond to different objects.
+    mu : float or numpy.ndarray
+        Float or (N, ) array with the standard gravitational parameter of
+        objects. If :code:`mu` is a numpy vector, the element corresponding to
+        each column of :code:`cart` will be used for its element calculation,
+        Default value is in SI units a massless object orbiting the Sun.
+    degrees : bool
+        If :code:`True`, use degrees. Else (default) all angles are given in
+        radians.
+
+    Returns
+    -------
+    numpy.ndarray
+        (6, N) or (6, ) array of Equinoctial orbital elements where rows
+        correspond to :math:`a`, :math:`h`, :math:`k`, :math:`p`,
+        :math:`q`, :math:`\\lambda_0` and columns correspond to different
+        objects.
+
+    Notes
+    -----
+    This function uses `cart_to_kep` and `kep_to_equi` to implement its functionality.
+
     '''
-    raise NotImplementedError()
-    if not isinstance(cart, np.ndarray):
-        raise TypeError('Input type {} not supported: must be {}'.format(
-            type(cart), np.ndarray))
-    if cart.shape[0] != 6:
-        raise ValueError(
-            f'Input data must have at least 6 variables along axis 0: \
-            input shape is {cart.shape}')
-
-    if len(cart.shape) < 2:
-        input_is_vector = True
-        try:
-            cart.shape = (6, 1)
-        except ValueError as e:
-            print(f'Error {e} while trying to cast vector into single column.')
-            print(f'Input array shape: {cart.shape}')
-            raise
-    else:
-        input_is_vector = False
-
-    if degrees:
-        pass
-
-    if input_is_vector:
-        cart.shape = (6,)
-        # o.shape = (6,)
+    return kep_to_equi(
+        cart_to_kep(cart, mu=mu, degrees=degrees),
+        degrees = degrees,
+    )
 
 
 def equi_to_cart(equi, mu=GM_sol, degrees=False):
-    '''TODO
-
-    Converts set of Equinoctial orbital elements to set of Cartesian state
+    '''Converts set of Equinoctial orbital elements to set of Cartesian state
     vectors.
 
+    Parameters
+    ----------
+    equi : numpy.ndarray
+        (6, N) or (6, ) array of Equinoctial orbital elements where rows
+        correspond to :math:`a`, :math:`h`, :math:`k`, :math:`p`,
+        :math:`q`, :math:`\\lambda_0` and columns correspond to different
+        objects.
+    mu : float or numpy.ndarray
+        Float or (N, ) array with the standard gravitational parameter of
+        objects. If :code:`mu` is a numpy vector, the element corresponding to
+        each column of :code:`cart` will be used for its element calculation,
+        Default value is in SI units a massless object orbiting the Sun.
+    degrees : bool
+        If :code:`True`, use degrees. Else (default) all angles are given in
+        radians.
+
+    Returns
+    -------
+    numpy.ndarray
+        (6, N) or (6, ) array of Cartesian state vectors where rows correspond
+        to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`, :math:`v_y`,
+        :math:`v_z` and columns correspond to different objects.
+
+    Notes
+    -----
+    This function uses `cart_to_kep` and `kep_to_equi` to implement its functionality.
     '''
-    raise NotImplementedError()
-    if not isinstance(equi, np.ndarray):
-        raise TypeError('Input type {} not supported: must be {}'.format(
-            type(equi), np.ndarray))
-    if equi.shape[0] != 6:
-        raise ValueError(
-            f'Input data must have at least 6 variables along axis 0: \
-            input shape is {equi.shape}')
-
-    if len(equi.shape) < 2:
-        input_is_vector = True
-        try:
-            equi.shape = (6, 1)
-        except ValueError as e:
-            print(f'Error {e} while trying to cast vector into single column.')
-            print(f'Input array shape: {equi.shape}')
-            raise
-    else:
-        input_is_vector = False
-
-    if degrees:
-        pass
-
-    if input_is_vector:
-        equi.shape = (6,)
-        # o.shape = (6,)
+    return kep_to_cart(
+        equi_to_kep(equi, degrees=degrees),
+        mu = mu,
+        degrees = degrees,
+    )
 
 
 def kep_to_equi(kep, degrees=False):
-    # '''TODO
     '''Converts set of Keplerian orbital elements to set of Equinoctial
     orbital elements.
 
