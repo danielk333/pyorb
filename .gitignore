@@ -5,6 +5,7 @@
 docs/build/
 docs/source/autosummary/
 docs/source/autogallery/
+docs/source/sg_execution_times.rst
 *_report
 
 #editor
