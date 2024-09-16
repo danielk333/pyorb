@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # :encoding=utf-8
 
+# Documentation for this module is in `_const_docs.py` due to
+# difficulties of extracting docstrings when masquerading instances as modules
+
 # Recipes from Python Cookbook
 # const class masquerading as a module:
 #   https://www.safaribooksonline.com/library/view/python-cookbook/0596001673/ch05s16.html
