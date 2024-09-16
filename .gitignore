@@ -13,6 +13,7 @@ docs/source/sg_execution_times.rst
 *.code*
 .spyderproject
 .spyproject
+.vscode
 
 
 # Byte-compiled / optimized / DLL files

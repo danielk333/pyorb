@@ -89,6 +89,10 @@ transformations between these and inertial system Cartesian state vectors.
         a (6, N) array where the first index selects the element and the second
         index selects the object.
 
+        This assumes the anomaly type is Mean for the above varibale naming to be correct,
+        e.g. if the anomaly type is true the sixth element will be the true longitude (:math:`L`)
+        instead of the mean longitude (:math:`\\lambda_0`).
+
     .. [1] A.E. Roy. "Orbital Motion"
     .. [2] D.A. Vallado. "Fundamentals of Astrodynamics and Applications"
     .. [3] Broucke, R.A., Cefola, P.J., 1972. On the equinoctial orbit elements.
@@ -125,6 +129,7 @@ import numpy as np
 # Shorthands for indices into vectors of elements:
 from .const import K_a, K_e, K_i, K_om, K_OM, K_nu
 from .const import E_a, E_h, E_k, E_p, E_q, E_lam
+from .const import _2pi
 
 from .const import GM_sol
 """float: the gravitational parameter of the Sun :math:`GM_\\odot = G M_\\odot` in m^3 s^{-2}
@@ -174,13 +179,15 @@ def cart_to_equi(cart, mu=GM_sol, degrees=False):
     This function uses `cart_to_kep` and `kep_to_equi` to implement its functionality.
 
     '''
-    return kep_to_equi(
-        cart_to_kep(cart, mu=mu, degrees=degrees),
-        degrees = degrees,
-    )
+    kep = cart_to_kep(cart, mu=mu, degrees=degrees)
+    # We assume its mean longitude, so we convert to mean anomaly
+    # special cases - mean and true is same if e=0 so we skip those
+    eg = kep[K_e, ...] > e_lim  # elliptic
+    kep[K_nu, eg] = true_to_mean(kep[K_nu, eg], kep[K_e, eg], degrees=degrees)
+    return kep_to_equi(kep, degrees=degrees)
 
 
-def equi_to_cart(equi, mu=GM_sol, degrees=False):
+def equi_to_cart(equi, mu=GM_sol, solver_options=None, degrees=False):
     '''Converts set of Equinoctial orbital elements to set of Cartesian state
     vectors.
 
@@ -211,11 +218,17 @@ def equi_to_cart(equi, mu=GM_sol, degrees=False):
     -----
     This function uses `cart_to_kep` and `kep_to_equi` to implement its functionality.
     '''
-    return kep_to_cart(
-        equi_to_kep(equi, degrees=degrees),
-        mu = mu,
+    kep = equi_to_kep(equi, degrees = degrees)
+    # We assume its mean longitude, so we convert to true anomaly
+    # special cases - mean and true is same if e=0 so we skip those
+    eg = kep[K_e, ...] > e_lim  # elliptic
+    kep[K_nu, eg] = mean_to_true(
+        kep[K_nu, eg],
+        kep[K_e, eg],
+        solver_options = solver_options,
         degrees = degrees,
     )
+    return kep_to_cart(kep, mu=mu, degrees=degrees)
 
 
 def kep_to_equi(kep, degrees=False):
@@ -233,12 +246,6 @@ def kep_to_equi(kep, degrees=False):
         If :code:`True`, use degrees. Else (default) all angles are given in
         radians.
 
-    Notes
-    -----
-    Assumes the anomaly type is Mean for the docs to be correct,
-    e.g. if the anomaly type is true the sixth element in
-    the return will be the true longitude (L) instead of the mean longitude (lambda)
-
     Returns
     -------
     numpy.ndarray
@@ -247,7 +254,7 @@ def kep_to_equi(kep, degrees=False):
         :math:`q`, :math:`\\lambda_0`, and columns correspond to different
         objects.  If input is in degrees, :math:`\\lambda_0` is in degrees.
     '''
-
+    _circ = 360.0 if degrees else _2pi
     om_bar = kep[K_om, ...] + kep[K_OM, ...]
     OM = kep[K_OM, ...]
     hi = 0.5*kep[K_i, ...]
@@ -266,8 +273,8 @@ def kep_to_equi(kep, degrees=False):
     elems[E_p, ...] = np.tan(hi)*np.sin(OM)       # p
     elems[E_q, ...] = np.tan(hi)*np.cos(OM)       # q
 
-    elems[E_lam, ...] = lambda0     # if input was in degrees, lambda0 is in degrees
-
+    # elements in [0, 2pi or 360]
+    elems[E_lam, ...] = np.mod(lambda0 + _circ, _circ)     # if input was in degrees, lambda0 is in degrees
     return elems
 
 
@@ -296,6 +303,7 @@ def equi_to_kep(equi, degrees=False):
 
     '''
 
+    _circ = 360.0 if degrees else _2pi
     kep = np.empty(equi.shape, dtype=equi.dtype)
 
     kep[K_a, ...] = equi[E_a, ...]  # a
@@ -312,9 +320,17 @@ def equi_to_kep(equi, degrees=False):
         kep[K_OM, ...] = np.degrees(kep[K_OM, ...])
         kep[K_i, ...] = np.degrees(kep[K_i, ...])
 
-    kep[K_om, ...] = om_bar - kep[K_OM, ...]  # omega
-    kep[K_nu, ...] = equi[E_lam, ...] - om_bar  # nu
+    # special cases - no information in h-k angle since e=0
+    eg = kep[K_e, ...] > e_lim  # elliptic
+    el = np.logical_not(eg)  # circular
 
+    kep[K_om, eg] = om_bar[eg] - kep[K_OM, eg]  # omega
+    kep[K_om, el] = 0  # omega
+
+    kep[K_nu, eg] = equi[E_lam, eg] - om_bar[eg]  # nu
+    kep[K_nu, el] = equi[E_lam, el] - kep[K_OM, el]  # nu
+    # elements in [0, 2pi or 360]
+    kep[K_om:, ...] = np.mod(kep[K_om:, ...] + _circ, _circ)
     return kep
 
 
@@ -1278,8 +1294,9 @@ def mean_to_eccentric(M, e, solver_options=None, degrees=False):
         if _M.shape != e.shape:
             raise TypeError(f'Input dimensions does not agree \
                 M:{_M.shape} != e:{e.shape}')
-
         E = np.empty(_M.shape, dtype=_M.dtype)
+        if _M.size == 0:
+            return E
 
         out_it = E.size
         Mit = np.nditer(_M)

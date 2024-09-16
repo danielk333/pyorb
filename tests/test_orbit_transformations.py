@@ -10,7 +10,6 @@ import numpy as np
 import numpy.testing as nt
 
 import pyorb.kepler as kep
-from pyorb import const
 import pyorb
 
 
@@ -30,26 +29,79 @@ class TestAlternativeParameters(unittest.TestCase):
         cases = np.array([
             # kepl a e i o O n equi a h k p q l
             [[a, 0, 0,   0,  0, 0], [a,  0,  0,  0, 0,   0]],
-            [[a, 0, 0,  30,  0, 0], [a,  0,  0,  0, 0,  30]], # not invertible
+            [[a, 0, 0,  30,  0, 0], [a,  0,  0,  0, 0,  30]],
             [[a, 0, 90,  0,  0, 0], [a,  0,  0,  0, 1,   0]],
             [[a, 0, 90,  0, 60, 0], [a,  0,  0, s3, .5, 60]],
             [[a, 0, 90, 45, 30, 0], [a,  0,  0, .5, s3, 75]],
             [[a, .5, 0, 45,  0, 0], [a, s2/2, s2/2,  0, 0,  45]],
             [[a, .5, 60, 30, 30, 0],[a, s3/2, .25, t3/2, t3*s3, 60]]
         ])
-        self.testcases = dict(kepl=cases[:,0], equi=cases[:,1])
+        cart = kep.kep_to_cart(cases[:, 0].T, mu=self.mu, degrees=True).T
+        self.testcases = dict(kepl=cases[:, 0], equi=cases[:, 1], cart=cart)
 
-    @unittest.skip("Not yet implemented")
     def test_cart_to_equi(self):
-        assert False
+        total_tests = len(self.testcases['kepl'])
+        for ix in range(len(self.testcases['kepl'])):
+            _cart = self.testcases['cart'][ix]
+            _equi = kep.cart_to_equi(_cart, mu=self.mu, degrees=True)
+            nt.assert_array_almost_equal(
+                _equi,
+                self.testcases['equi'][ix],
+                decimal = 6,
+                err_msg = f"from cart to equi case {ix}/{total_tests}",
+            )
 
-    @unittest.skip("Not yet implemented")
     def test_equi_to_cart(self):
-        assert False
+        total_tests = len(self.testcases['equi'])
+        for ix in range(len(self.testcases['equi'])):
+            _equi = self.testcases['equi'][ix]
+            _cart = kep.equi_to_cart(_equi, mu=self.mu, degrees=True)
+            nt.assert_array_almost_equal(
+                _cart,
+                self.testcases['cart'][ix],
+                decimal = 6,
+                err_msg = f"from equi to cart case {ix}/{total_tests}",
+            )
 
-    @unittest.skip("Not yet implemented")
     def test_equi_cart_consistency(self):
-        assert False
+        total_tests = len(self.testcases['equi'])*2
+        test_num = 0
+
+        for ix in range(len(self.testcases['equi'])):
+            _equi0 = self.testcases['equi'][ix].copy()
+            _cart = kep.equi_to_cart(_equi0, degrees=True)
+            _equi = kep.cart_to_equi(_cart, degrees=True)
+
+            nt.assert_array_almost_equal(
+                _equi,
+                _equi0,
+                decimal = 6,
+                err_msg = (
+                    f"from equi to cart to equi case {ix} [{test_num=}/{total_tests}]\n"
+                    f"Input kepler {self.testcases['kepl'][ix]}\n"
+                    f"Input cart {self.testcases['cart'][ix]}\n"
+                ),
+            )
+            test_num += 1
+
+        for ix in range(len(self.testcases['cart'])):
+            _cart0 = self.testcases['cart'][ix]
+            _equi = kep.cart_to_equi(_cart0, degrees=True)
+            _cart = kep.equi_to_cart(_equi, degrees=True)
+
+            # we are comparing absolute values to decimals in SI so we can relax to account
+            # for numerical unstabillity of some of the trig functions
+            nt.assert_array_almost_equal(
+                _cart,
+                _cart0,
+                decimal = 1,
+                err_msg = (
+                    f"from cart to equi to cart case {ix} [{test_num=}/{total_tests}]\n"
+                    f"Input kepler {self.testcases['kepl'][ix]}\n"
+                    f"Input equi {self.testcases['equi'][ix]}\n"
+                ),
+            )
+            test_num += 1
 
     def test_kep_to_equi(self):
         orb_init = self.orb_init.copy()
@@ -64,21 +116,22 @@ class TestAlternativeParameters(unittest.TestCase):
         # one at a time
         for ix in range(len(self.testcases['kepl'])):
             try:
-                assert np.allclose(kep.kep_to_equi(self.testcases['kepl'][ix], degrees=True),
-                                self.testcases['equi'][ix])
-            except:
+                assert np.allclose(
+                    kep.kep_to_equi(self.testcases['kepl'][ix], degrees=True),
+                    self.testcases['equi'][ix],
+                )
+            except AssertionError:
                 print(f"kep_to_equi, case {ix}")
                 print(f"input {self.testcases['kepl'][ix]}")
-                print(f"      =>  {kep.kep_to_equi(self.testcases['kepl'][ix], degrees=True)}")
+                print(f"     =>  {kep.kep_to_equi(self.testcases['kepl'][ix], degrees=True)}")
                 print(f" expected {self.testcases['equi'][ix]}")
                 raise
 
-
         # Then all at once
-        assert np.allclose(kep.kep_to_equi(self.testcases['kepl'].T, degrees=True).T,
-                        self.testcases['equi'])
-
-
+        assert np.allclose(
+            kep.kep_to_equi(self.testcases['kepl'].T, degrees=True).T,
+            self.testcases['equi'],
+        )
 
     def test_equi_to_kep(self):
         orb_init = self.orb_init.copy()
@@ -94,10 +147,13 @@ class TestAlternativeParameters(unittest.TestCase):
         # one at a time
         for ix in range(len(self.testcases['equi'])):
             try:
-                nt.assert_(kep.kep_equivalent(
+                nt.assert_(
+                    kep.kep_equivalent(
                         kep.equi_to_kep(self.testcases['equi'][ix], degrees=True),
-                        self.testcases['kepl'][ix]),
-                        f'Error in test case [{ix}]')
+                        self.testcases['kepl'][ix]
+                    ),
+                    f'Error in test case [{ix}]',
+                )
             except AssertionError:
                 print(f"equi_to_kep, case {ix}")
                 print(f"input {self.testcases['equi'][ix]}")
@@ -109,11 +165,40 @@ class TestAlternativeParameters(unittest.TestCase):
         # assert np.allclose(kep.equi_to_kep(self.testcases['equi'].T, degrees=True).T,
         #                 self.testcases['kepl'])
 
-
-
-    @unittest.skip("Not yet implemented")
     def test_equi_kep_consistency(self):
-        assert False
+        total_tests = len(self.testcases['equi'])*2
+        test_num = 0
+
+        for ix in range(len(self.testcases['equi'])):
+            _equi0 = self.testcases['equi'][ix].copy()
+            _kep = kep.equi_to_kep(_equi0, degrees=True)
+            _equi = kep.kep_to_equi(_kep, degrees=True)
+
+            nt.assert_array_almost_equal(
+                _equi,
+                _equi0,
+                decimal = 6,
+                err_msg = f"from equi to kep to equi case {ix} [{test_num=}/{total_tests}]",
+            )
+            test_num += 1
+
+        for ix in range(len(self.testcases['kepl'])):
+            _kep0 = self.testcases['kepl'][ix]
+            _equi = kep.kep_to_equi(_kep0, degrees=True)
+            _kep = kep.equi_to_kep(_equi, degrees=True)
+
+            if _kep0[kep.K_e] <= kep.e_lim:
+                # This means all aop information will be lost and put into anomaly/longitude
+                _kep0[kep.K_nu] += _kep0[kep.K_om]
+                _kep0[kep.K_om] = 0
+
+            nt.assert_array_almost_equal(
+                _kep,
+                _kep0,
+                decimal = 6,
+                err_msg = f"from kep to equi to kep case {ix} [{test_num=}/{total_tests}]",
+            )
+            test_num += 1
 
 
 class TestKepCart(unittest.TestCase):
