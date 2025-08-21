@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-'''Functions related to Keplerian and equinoctial orbital elements, and
+"""Functions related to Keplerian and equinoctial orbital elements, and
 transformations between these and inertial system Cartesian state vectors.
 
     Notes
@@ -119,36 +119,54 @@ transformations between these and inertial system Cartesian state vectors.
     ...     degrees=True,
     ... )
 
-'''
+"""
 
 # TODO: Maybe?  Modified equinoctial elements:
 # https://spsweb.fltops.jpl.nasa.gov/portaldataops/mpg/MPG_Docs/Source Docs/EquinoctalElements-modified.pdf
 
+import typing
 import numpy as np
+
+from .types import NDArray_N, NDArray_3xN, NDArray_6xN
+from .types import NDArray_3, NDArray_6
 
 # Shorthands for indices into vectors of elements:
 from .const import K_a, K_e, K_i, K_om, K_OM, K_nu
 from .const import E_a, E_h, E_k, E_p, E_q, E_lam
-from .const import _2pi
 
-from .const import GM_sol
-"""float: the gravitational parameter of the Sun :math:`GM_\\odot = G M_\\odot` in m^3 s^{-2}
-but the product GM is known to much higher precision than
-either :math:`G` or :math:`M_\\odot`.
-"""
+# Frequently used constants
+from .const import _2pi, GM_sol
+
 
 e_lim = 1e-9
 """float: The limit on eccentricity below witch an orbit is considered circular
 """
 
-i_lim = np.pi*1e-9
+i_lim = np.pi * 1e-9
 """float: The limit on inclination in radians below witch an orbit is
 considered not inclined
 """
 
 
-def cart_to_equi(cart, mu=GM_sol, degrees=False):
-    '''Converts set of Cartesian state vectors to set of Equinoctial orbital
+class LaguerreOptions(typing.TypedDict):
+    """Options for the Laguerre solver used in solving the Kepler equation"""
+
+    tol: float
+    max_iter: int
+    degree: int
+
+
+laguerre_defaults = LaguerreOptions(
+    tol=1e-12,
+    max_iter=5000,
+    degree=5,
+)
+
+
+def cart_to_equi(
+    cart: NDArray_6 | NDArray_6xN, mu: float = GM_sol, degrees: bool = False
+) -> NDArray_6 | NDArray_6xN:
+    """Converts set of Cartesian state vectors to set of Equinoctial orbital
     elements.
 
     Parameters
@@ -178,7 +196,7 @@ def cart_to_equi(cart, mu=GM_sol, degrees=False):
     -----
     This function uses `cart_to_kep` and `kep_to_equi` to implement its functionality.
 
-    '''
+    """
     kep = cart_to_kep(cart, mu=mu, degrees=degrees)
     # We assume its mean longitude, so we convert to mean anomaly
     # special cases - mean and true is same if e=0 so we skip those
@@ -187,8 +205,13 @@ def cart_to_equi(cart, mu=GM_sol, degrees=False):
     return kep_to_equi(kep, degrees=degrees)
 
 
-def equi_to_cart(equi, mu=GM_sol, solver_options=None, degrees=False):
-    '''Converts set of Equinoctial orbital elements to set of Cartesian state
+def equi_to_cart(
+    equi: NDArray_6 | NDArray_6xN,
+    mu: NDArray_N | float = GM_sol,
+    solver_options: LaguerreOptions | None = None,
+    degrees: bool = False,
+) -> NDArray_6 | NDArray_6xN:
+    """Converts set of Equinoctial orbital elements to set of Cartesian state
     vectors.
 
     Parameters
@@ -217,22 +240,22 @@ def equi_to_cart(equi, mu=GM_sol, solver_options=None, degrees=False):
     Notes
     -----
     This function uses `cart_to_kep` and `kep_to_equi` to implement its functionality.
-    '''
-    kep = equi_to_kep(equi, degrees = degrees)
+    """
+    kep = equi_to_kep(equi, degrees=degrees)
     # We assume its mean longitude, so we convert to true anomaly
     # special cases - mean and true is same if e=0 so we skip those
     eg = kep[K_e, ...] > e_lim  # elliptic
     kep[K_nu, eg] = mean_to_true(
         kep[K_nu, eg],
         kep[K_e, eg],
-        solver_options = solver_options,
-        degrees = degrees,
+        solver_options=solver_options,
+        degrees=degrees,
     )
     return kep_to_cart(kep, mu=mu, degrees=degrees)
 
 
-def kep_to_equi(kep, degrees=False):
-    '''Converts set of Keplerian orbital elements to set of Equinoctial
+def kep_to_equi(kep: NDArray_6 | NDArray_6xN, degrees: bool = False) -> NDArray_6 | NDArray_6xN:
+    """Converts set of Keplerian orbital elements to set of Equinoctial
     orbital elements.
 
     Parameters
@@ -253,11 +276,11 @@ def kep_to_equi(kep, degrees=False):
         correspond to :math:`a`, :math:`h`, :math:`k`, :math:`p`,
         :math:`q`, :math:`\\lambda_0`, and columns correspond to different
         objects.  If input is in degrees, :math:`\\lambda_0` is in degrees.
-    '''
+    """
     _circ = 360.0 if degrees else _2pi
     om_bar = kep[K_om, ...] + kep[K_OM, ...]
     OM = kep[K_OM, ...]
-    hi = 0.5*kep[K_i, ...]
+    hi = 0.5 * kep[K_i, ...]
     lambda0 = om_bar + kep[K_nu, ...]
     if degrees:
         om_bar = np.radians(om_bar)
@@ -267,19 +290,19 @@ def kep_to_equi(kep, degrees=False):
     elems = np.empty(kep.shape, dtype=kep.dtype)
 
     elems[E_a, ...] = kep[K_a, ...]
-    elems[E_h, ...] = kep[K_e, ...]*np.sin(om_bar)  # h
-    elems[E_k, ...] = kep[K_e, ...]*np.cos(om_bar)  # k
+    elems[E_h, ...] = kep[K_e, ...] * np.sin(om_bar)  # h
+    elems[E_k, ...] = kep[K_e, ...] * np.cos(om_bar)  # k
 
-    elems[E_p, ...] = np.tan(hi)*np.sin(OM)       # p
-    elems[E_q, ...] = np.tan(hi)*np.cos(OM)       # q
+    elems[E_p, ...] = np.tan(hi) * np.sin(OM)  # p
+    elems[E_q, ...] = np.tan(hi) * np.cos(OM)  # q
 
     # elements in [0, 2pi or 360]
-    elems[E_lam, ...] = np.mod(lambda0 + _circ, _circ)     # if input was in degrees, lambda0 is in degrees
+    elems[E_lam, ...] = np.mod(lambda0 + _circ, _circ)  # if input was in degrees, lambda0 is in degrees
     return elems
 
 
-def equi_to_kep(equi, degrees=False):
-    '''Converts set of Equinoctial orbital elements
+def equi_to_kep(equi: NDArray_6 | NDArray_6xN, degrees: bool = False) -> NDArray_6 | NDArray_6xN:
+    """Converts set of Equinoctial orbital elements
     to set of Keplerian orbital elements.
 
     Parameters
@@ -301,7 +324,7 @@ def equi_to_kep(equi, degrees=False):
         :math:`\\Omega`, :math:`\\nu`
         and columns correspond to different objects.
 
-    '''
+    """
 
     _circ = 360.0 if degrees else _2pi
     kep = np.empty(equi.shape, dtype=equi.dtype)
@@ -334,8 +357,10 @@ def equi_to_kep(equi, degrees=False):
     return kep
 
 
-def cart_to_kep(cart, mu=GM_sol, degrees=False):
-    '''Converts set of Cartesian state vectors to set of Keplerian orbital
+def cart_to_kep(
+    cart: NDArray_6 | NDArray_6xN, mu: NDArray_N | float = GM_sol, degrees: bool = False
+) -> NDArray_6 | NDArray_6xN:
+    """Converts set of Cartesian state vectors to set of Keplerian orbital
     elements.
 
     Parameters
@@ -364,23 +389,23 @@ def cart_to_kep(cart, mu=GM_sol, degrees=False):
     --------
     kep_to_cart : Convert from cartesian to kepler
 
-    '''
+    """
 
     if not isinstance(cart, np.ndarray):
-        raise TypeError('Input type {} not supported: must be {}'.format(
-            type(cart), np.ndarray))
+        raise TypeError("Input type {} not supported: must be {}".format(type(cart), np.ndarray))
     if cart.shape[0] != 6:
         raise ValueError(
-            f'Input data must have at least 6 variables along axis 0:\
-             input shape is {cart.shape}')
+            f"Input data must have at least 6 variables along axis 0:\
+             input shape is {cart.shape}"
+        )
 
     if len(cart.shape) < 2:
         input_is_vector = True
         try:
             cart.shape = (6, 1)
         except ValueError as e:
-            print(f'Error {e} while trying to cast vector into single column.')
-            print(f'Input array shape: {cart.shape}')
+            print(f"Error {e} while trying to cast vector into single column.")
+            print(f"Input array shape: {cart.shape}")
             raise
     else:
         input_is_vector = False
@@ -394,13 +419,13 @@ def cart_to_kep(cart, mu=GM_sol, degrees=False):
     rn = np.linalg.norm(r, axis=0)
     vn = np.linalg.norm(v, axis=0)
 
-    vr = np.sum((r/rn)*v, axis=0)
+    vr = np.sum((r / rn) * v, axis=0)
 
-    epsilon = vn**2*0.5 - mu/rn
+    epsilon = vn**2 * 0.5 - mu / rn
 
     # ## ECCENTRICITY ###
-    e = 1.0/mu*((vn**2 - mu/rn)*r - (rn*vr)*v)
-    o[1, :] = np.linalg.norm(e, axis=0)
+    ecc = 1.0 / mu * ((vn**2 - mu / rn) * r - (rn * vr) * v)
+    o[1, :] = np.linalg.norm(ecc, axis=0)
 
     # ## SEMI MAJOR AXIS ###
     # possible cases
@@ -408,13 +433,13 @@ def cart_to_kep(cart, mu=GM_sol, degrees=False):
     # and
     # e >= 1
     e_hyp = o[1, :] >= 1
-    o[0, :] = -mu/(2.0*epsilon)
+    o[0, :] = -mu / (2.0 * epsilon)
     o[0, e_hyp] = -o[0, e_hyp]
 
     # ## ANUGLAR MOMENTUM ###
     h = np.cross(r, v, axisa=0, axisb=0, axisc=0)
     hn = np.linalg.norm(h, axis=0)
-    o[2, :] = np.arccos(h[2, :]/hn)
+    o[2, :] = np.arccos(h[2, :] / hn)
 
     # possible cases
     eg = o[1, :] > e_lim  # e grater
@@ -444,8 +469,8 @@ def cart_to_kep(cart, mu=GM_sol, degrees=False):
 
     # ensure [0,2pi]
     ny_neg = np.logical_and(n[1, :] < 0.0, ig)
-    o[4, ig] = np.arccos(n[0, ig]/nn[ig])
-    o[4, ny_neg] = 2.0*np.pi - o[4, ny_neg]
+    o[4, ig] = np.arccos(n[0, ig] / nn[ig])
+    o[4, ny_neg] = 2.0 * np.pi - o[4, ny_neg]
 
     # non inclined: no ascending node
     o[4, il] = 0
@@ -460,13 +485,13 @@ def cart_to_kep(cart, mu=GM_sol, degrees=False):
     # first case: eg and ig (n-vector)
     # use vector angle between the two
     cos_om[eg_ig] = np.sum(
-        n[:, eg_ig]*e[:, eg_ig],
+        n[:, eg_ig] * ecc[:, eg_ig],
         axis=0,
-    )/(nn[eg_ig]*o[1, eg_ig])
+    ) / (nn[eg_ig] * o[1, eg_ig])
 
     # second case: eg and il (no n-vector)
     # use e vector angle
-    cos_om[eg_il] = e[0, eg_il]/o[1, eg_il]
+    cos_om[eg_il] = ecc[0, eg_il] / o[1, eg_il]
 
     # remove unused array positions
     cos_om = cos_om[eg]
@@ -478,37 +503,37 @@ def cart_to_kep(cart, mu=GM_sol, degrees=False):
     o[3, eg] = np.arccos(cos_om)
 
     # first case: e and n vector angle
-    ez_neg = np.logical_and(e[2, :] < 0.0, eg_ig)
-    o[3, ez_neg] = 2.0*np.pi - o[3, ez_neg]
+    ez_neg = np.logical_and(ecc[2, :] < 0.0, eg_ig)
+    o[3, ez_neg] = 2.0 * np.pi - o[3, ez_neg]
 
     # second case: ex component
     # prograde
-    ey_neg = np.logical_and(o[2, :] < np.pi*0.5, eg_il)
-    ey_neg2 = np.logical_and(ey_neg, e[1, :] < 0.0)
-    o[3, ey_neg2] = 2.0*np.pi - o[3, ey_neg2]
+    ey_neg = np.logical_and(o[2, :] < np.pi * 0.5, eg_il)
+    ey_neg2 = np.logical_and(ey_neg, ecc[1, :] < 0.0)
+    o[3, ey_neg2] = 2.0 * np.pi - o[3, ey_neg2]
 
     # retrograde
-    ey_neg = np.logical_and(o[2, :] > np.pi*0.5, eg_il)
-    ey_neg2 = np.logical_and(ey_neg, e[1, :] >= 0.0)
-    o[3, ey_neg2] = 2.0*np.pi - o[3, ey_neg2]
+    ey_neg = np.logical_and(o[2, :] > np.pi * 0.5, eg_il)
+    ey_neg2 = np.logical_and(ey_neg, ecc[1, :] >= 0.0)
+    o[3, ey_neg2] = 2.0 * np.pi - o[3, ey_neg2]
 
     # ## TRUE ANOMALY ###
     cos_nu = np.empty_like(hn)
 
     # three cases
     # elliptical and hyperbolic: (angle from periapsis using e and r)
-    cos_nu[eg] = np.sum(e[:, eg]*r[:, eg], axis=0)/(o[1, eg]*rn[eg])
+    cos_nu[eg] = np.sum(ecc[:, eg] * r[:, eg], axis=0) / (o[1, eg] * rn[eg])
 
     # circular and inclined: (angle from periapsis using n and r)
     # if e=0 and omega := 0, with inclination +y -> +z perihelion is ascending
     # node
     cos_nu[el_ig] = np.sum(
-        (n[:, el_ig]/nn[el_ig])*(r[:, el_ig]/rn[el_ig]),
+        (n[:, el_ig] / nn[el_ig]) * (r[:, el_ig] / rn[el_ig]),
         axis=0,
     )
 
     # circular and planar: (use angle of position vector)
-    cos_nu[el_il] = r[0, el_il]/rn[el_il]
+    cos_nu[el_il] = r[0, el_il] / rn[el_il]
 
     # do not fail due to number precision fluctuation
     cos_nu[cos_nu > 1.0] = 1.0
@@ -519,22 +544,22 @@ def cart_to_kep(cart, mu=GM_sol, degrees=False):
     # ensure [0,2pi]
     # elliptical and hyperbolic
     tmp_ind_ = np.logical_and(vr < 0.0, eg)
-    o[5, tmp_ind_] = 2.0*np.pi - o[5, tmp_ind_]
+    o[5, tmp_ind_] = 2.0 * np.pi - o[5, tmp_ind_]
 
     # circular and inclined
     tmp_ind_ = np.logical_and(r[2, :] < 0.0, el_ig)
-    o[5, tmp_ind_] = 2.0*np.pi - o[5, tmp_ind_]
+    o[5, tmp_ind_] = 2.0 * np.pi - o[5, tmp_ind_]
 
     # circular and planar
     # prograde
-    tmp_ind_ = np.logical_and(o[2, :] < np.pi*0.5, el_il)
+    tmp_ind_ = np.logical_and(o[2, :] < np.pi * 0.5, el_il)
     tmp_ind2_ = np.logical_and(tmp_ind_, r[1, :] < 0.0)
-    o[5, tmp_ind2_] = 2.0*np.pi - o[5, tmp_ind2_]
+    o[5, tmp_ind2_] = 2.0 * np.pi - o[5, tmp_ind2_]
 
     # if retrograde, its reversed
-    tmp_ind_ = np.logical_and(o[2, :] > np.pi*0.5, el_il)
+    tmp_ind_ = np.logical_and(o[2, :] > np.pi * 0.5, el_il)
     tmp_ind2_ = np.logical_and(tmp_ind_, r[1, :] >= 0.0)
-    o[5, tmp_ind2_] = 2.0*np.pi - o[5, tmp_ind2_]
+    o[5, tmp_ind2_] = 2.0 * np.pi - o[5, tmp_ind2_]
 
     # # OUTPUT FORMATTING ##
     if degrees:
@@ -547,13 +572,13 @@ def cart_to_kep(cart, mu=GM_sol, degrees=False):
     return o
 
 
-def kep_equivalent(kep1, kep2):
-    '''Given two sets of Keplerian elements, decide if they are equivalent'''
+def kep_equivalent(kep1: NDArray_6, kep2: NDArray_6) -> bool:
+    """Given two sets of Keplerian elements, decide if they are equivalent"""
     # TODO: Need unit tests for this one
     # TODO: docstring here
 
     if len(kep1.shape) > 1 or len(kep2.shape) > 1:
-        raise ValueError('Only vector inputs for now')
+        raise ValueError("Only vector inputs for now")
     if np.allclose(kep1, kep2):
         return True
 
@@ -565,25 +590,21 @@ def kep_equivalent(kep1, kep2):
         if not np.isclose(kep1[K_om] + kep1[K_nu], kep2[K_om] + kep2[K_nu]):
             return False
     else:  # otherwise, they must match up individually
-        if (
-            not np.isclose(kep1[K_om], kep2[K_om])
-            or not np.isclose(kep1[K_nu], kep2[K_nu])
-        ):
+        if not np.isclose(kep1[K_om], kep2[K_om]) or not np.isclose(kep1[K_nu], kep2[K_nu]):
             return False
 
     # if inclination is non-zero, then Omega matters
     if kep1[K_i] > i_lim or kep2[K_i] > i_lim:
-        if (
-            not np.isclose(kep1[K_i], kep2[K_i])
-            or not np.isclose(kep1[K_OM], kep2[K_OM])
-        ):
+        if not np.isclose(kep1[K_i], kep2[K_i]) or not np.isclose(kep1[K_OM], kep2[K_OM]):
             return False
     # Otherwise, we should be good
     return True
 
 
-def orbit_total_angular_momentum(a, e, mu):
-    '''Calculates the total angular momentum from orbital parameters.
+def orbit_total_angular_momentum(
+    a: NDArray_N | float, e: NDArray_N | float, mu: NDArray_N | float
+) -> NDArray_N | float:
+    """Calculates the total angular momentum from orbital parameters.
 
     Parameters
     ----------
@@ -599,12 +620,12 @@ def orbit_total_angular_momentum(a, e, mu):
     numpy.ndarray or float
         Total angular momentum.
 
-    '''
-    return np.sqrt(mu*a*(1 - e**2))
+    """
+    return np.sqrt(mu * a * (1 - e**2))
 
 
-def parabolic_total_angular_momentum(q, mu):
-    '''Calculates the total angular momentum from orbital parameters.
+def parabolic_total_angular_momentum(q: NDArray_N | float, mu: NDArray_N | float) -> NDArray_N | float:
+    """Calculates the total angular momentum from orbital parameters.
 
     Parameters
     ----------
@@ -618,12 +639,14 @@ def parabolic_total_angular_momentum(q, mu):
     numpy.ndarray or float
         Total angular momentum.
 
-    '''
-    return np.sqrt(mu*2*q)
+    """
+    return np.sqrt(mu * 2 * q)
 
 
-def true_to_eccentric(nu, e, degrees=False):
-    '''Calculates the eccentric anomaly from the true anomaly.
+def true_to_eccentric(
+    nu: NDArray_N | float, e: NDArray_N | float, degrees: bool = False
+) -> NDArray_N | float:
+    """Calculates the eccentric anomaly from the true anomaly.
 
     Parameters
     ----------
@@ -639,7 +662,7 @@ def true_to_eccentric(nu, e, degrees=False):
     numpy.ndarray or float
         Eccentric anomaly.
 
-    '''
+    """
     if degrees:
         _nu = np.radians(nu)
     else:
@@ -647,33 +670,29 @@ def true_to_eccentric(nu, e, degrees=False):
 
     if isinstance(_nu, np.ndarray) or isinstance(e, np.ndarray):
         if not isinstance(_nu, np.ndarray):
-            _nu = np.ones(e.shape, dtype=e.dtype)*_nu
+            _nu = np.ones(e.shape, dtype=e.dtype) * _nu
         if not isinstance(e, np.ndarray):
-            e = np.ones(_nu.shape, dtype=_nu.dtype)*e
+            e = np.ones(_nu.shape, dtype=_nu.dtype) * e
         if _nu.shape != e.shape:
-            raise TypeError('Input dimensions does not agree')
+            raise TypeError("Input dimensions does not agree")
 
         E = np.empty(_nu.shape, dtype=_nu.dtype)
         hyp = e > 1
         per = e == 1
         eli = e < 1
 
-        E[hyp] = 2.0*np.arctanh(
-            np.sqrt((e[hyp] - 1.0)/(e[hyp] + 1.0))*np.tan(_nu[hyp]*0.5)
-        )
-        E[per] = np.tan(_nu[per]*0.5)
-        E[eli] = 2.0*np.arctan(
-            np.sqrt((1.0 - e[eli])/(1.0 + e[eli]))*np.tan(_nu[eli]*0.5)
-        )
+        E[hyp] = 2.0 * np.arctanh(np.sqrt((e[hyp] - 1.0) / (e[hyp] + 1.0)) * np.tan(_nu[hyp] * 0.5))
+        E[per] = np.tan(_nu[per] * 0.5)
+        E[eli] = 2.0 * np.arctan(np.sqrt((1.0 - e[eli]) / (1.0 + e[eli])) * np.tan(_nu[eli] * 0.5))
     else:
         if e > 1:
-            E = 2.0*np.arctanh(np.sqrt((e - 1.0)/(e + 1.0))*np.tan(_nu*0.5))
+            E = 2.0 * np.arctanh(np.sqrt((e - 1.0) / (e + 1.0)) * np.tan(_nu * 0.5))
         elif e == 1:
-            E = np.tan(_nu*0.5)
+            E = np.tan(_nu * 0.5)
         else:
-            E = 2.0*np.arctan(np.sqrt((1.0 - e)/(1.0 + e))*np.tan(_nu*0.5))
+            E = 2.0 * np.arctan(np.sqrt((1.0 - e) / (1.0 + e)) * np.tan(_nu * 0.5))
 
-    E = np.mod(E + 2.*np.pi, 2.*np.pi)
+    E = np.mod(E + 2.0 * np.pi, 2.0 * np.pi)
 
     if degrees:
         E = np.degrees(E)
@@ -681,8 +700,8 @@ def true_to_eccentric(nu, e, degrees=False):
     return E
 
 
-def eccentric_to_true(E, e, degrees=False):
-    '''Calculates the true anomaly from the eccentric anomaly.
+def eccentric_to_true(E: NDArray_N | float, e: NDArray_N | float, degrees: bool = False) -> NDArray_N | float:
+    """Calculates the true anomaly from the eccentric anomaly.
 
     Parameters
     ----------
@@ -698,7 +717,7 @@ def eccentric_to_true(E, e, degrees=False):
     numpy.ndarray or float
         True anomaly.
 
-    '''
+    """
     if degrees:
         _E = np.radians(E)
     else:
@@ -706,41 +725,37 @@ def eccentric_to_true(E, e, degrees=False):
 
     if isinstance(_E, np.ndarray) or isinstance(e, np.ndarray):
         if not isinstance(_E, np.ndarray):
-            _E = np.ones(e.shape, dtype=e.dtype)*_E
+            _E = np.ones(e.shape, dtype=e.dtype) * _E
         if not isinstance(e, np.ndarray):
-            e = np.ones(_E.shape, dtype=_E.dtype)*e
+            e = np.ones(_E.shape, dtype=_E.dtype) * e
         if _E.shape != e.shape:
-            raise TypeError('Input dimensions does not agree')
+            raise TypeError("Input dimensions does not agree")
 
         nu = np.empty(_E.shape, dtype=_E.dtype)
         hyp = e > 1
         per = e == 1
         eli = e < 1
 
-        nu[hyp] = 2.0*np.arctan(
-            np.sqrt((e[hyp] + 1.0)/(e[hyp] - 1.0))*np.tanh(_E[hyp]*0.5)
-        )
-        nu[per] = 2.0*np.arctan(_E[per])
-        nu[eli] = 2.0*np.arctan(
-            np.sqrt((1.0 + e[eli])/(1.0 - e[eli]))*np.tan(_E[eli]*0.5)
-        )
+        nu[hyp] = 2.0 * np.arctan(np.sqrt((e[hyp] + 1.0) / (e[hyp] - 1.0)) * np.tanh(_E[hyp] * 0.5))
+        nu[per] = 2.0 * np.arctan(_E[per])
+        nu[eli] = 2.0 * np.arctan(np.sqrt((1.0 + e[eli]) / (1.0 - e[eli])) * np.tan(_E[eli] * 0.5))
     else:
         if e > 1:
-            nu = 2.0*np.arctan(np.sqrt((e + 1.0)/(e - 1.0))*np.tanh(_E*0.5))
+            nu = 2.0 * np.arctan(np.sqrt((e + 1.0) / (e - 1.0)) * np.tanh(_E * 0.5))
         elif e == 1:
-            nu = 2.0*np.arctan(_E)
+            nu = 2.0 * np.arctan(_E)
         else:
-            nu = 2.0*np.arctan(np.sqrt((1.0 + e)/(1.0 - e))*np.tan(_E*0.5))
+            nu = 2.0 * np.arctan(np.sqrt((1.0 + e) / (1.0 - e)) * np.tan(_E * 0.5))
 
-    nu = np.mod(nu + 2.*np.pi, 2.*np.pi)
+    nu = np.mod(nu + 2.0 * np.pi, 2.0 * np.pi)
     if degrees:
         nu = np.degrees(nu)
 
     return nu
 
 
-def eccentric_to_mean(E, e, degrees=False):
-    '''Calculates the mean anomaly from the (elliptic, parabolic or hyperbolic)
+def eccentric_to_mean(E: NDArray_N | float, e: NDArray_N | float, degrees: bool = False) -> NDArray_N | float:
+    """Calculates the mean anomaly from the (elliptic, parabolic or hyperbolic)
     eccentric anomaly using Kepler equation.
 
     Parameters
@@ -757,7 +772,7 @@ def eccentric_to_mean(E, e, degrees=False):
     numpy.ndarray or float
         Mean anomaly.
 
-    '''
+    """
     if degrees:
         _E = np.radians(E)
     else:
@@ -765,35 +780,35 @@ def eccentric_to_mean(E, e, degrees=False):
 
     if isinstance(_E, np.ndarray) or isinstance(e, np.ndarray):
         if not isinstance(_E, np.ndarray):
-            _E = np.ones(e.shape, dtype=e.dtype)*_E
+            _E = np.ones(e.shape, dtype=e.dtype) * _E
         if not isinstance(e, np.ndarray):
-            e = np.ones(_E.shape, dtype=_E.dtype)*e
+            e = np.ones(_E.shape, dtype=_E.dtype) * e
         if _E.shape != e.shape:
-            raise TypeError('Input dimensions does not agree')
+            raise TypeError("Input dimensions does not agree")
 
         M = np.empty(_E.shape, dtype=_E.dtype)
         hyp = e > 1
         per = e == 1
         eli = e < 1
 
-        M[hyp] = e[hyp]*np.sinh(_E[hyp]) - _E[hyp]
-        M[per] = _E[per] + _E[per]**3/3.0
-        M[eli] = _E[eli] - e[eli]*np.sin(_E[eli])
+        M[hyp] = e[hyp] * np.sinh(_E[hyp]) - _E[hyp]
+        M[per] = _E[per] + _E[per] ** 3 / 3.0
+        M[eli] = _E[eli] - e[eli] * np.sin(_E[eli])
     else:
         if e > 1:
-            M = e*np.sinh(_E) - _E
+            M = e * np.sinh(_E) - _E
         elif e == 1:
-            M = _E + _E**3/3.0
+            M = _E + _E**3 / 3.0
         else:
-            M = _E - e*np.sin(_E)
+            M = _E - e * np.sin(_E)
 
     if degrees:
         M = np.degrees(M)
     return M
 
 
-def true_to_mean(nu, e, degrees=False):
-    '''Transforms true anomaly to mean anomaly.
+def true_to_mean(nu: NDArray_N | float, e: NDArray_N | float, degrees: bool = False) -> NDArray_N | float:
+    """Transforms true anomaly to mean anomaly.
 
     Parameters
     ----------
@@ -809,7 +824,7 @@ def true_to_mean(nu, e, degrees=False):
     numpy.ndarray or float
         Mean anomaly.
 
-    '''
+    """
     if degrees:
         _nu = np.radians(nu)
     else:
@@ -823,8 +838,14 @@ def true_to_mean(nu, e, degrees=False):
     return M
 
 
-def orbital_distance(h, mu, e, nu, degrees=False):
-    '''Calculates the distance between the left focus point of an
+def orbital_distance(
+    h: NDArray_N | float,
+    mu: NDArray_N | float,
+    e: NDArray_N | float,
+    nu: NDArray_N | float,
+    degrees: bool = False,
+) -> NDArray_N | float:
+    """Calculates the distance between the left focus point of an
     ellipse (e<1), parabola (e==1) or hyperbola (e>1) and a
     point on the orbit defined by the true anomaly.
 
@@ -846,17 +867,19 @@ def orbital_distance(h, mu, e, nu, degrees=False):
     numpy.ndarray or float
         Radius from left focus point.
 
-    '''
+    """
     if degrees:
         _nu = np.radians(nu)
     else:
         _nu = nu
 
-    return h**2/(mu*(1 + e*np.cos(_nu)))
+    return h**2 / (mu * (1 + e * np.cos(_nu)))
 
 
-def elliptic_radius(E, a, e, degrees=False):
-    '''Calculates the distance between the left focus point of an ellipse and a
+def elliptic_radius(
+    E: NDArray_N | float, a: NDArray_N | float, e: NDArray_N | float, degrees: bool = False
+) -> NDArray_N | float:
+    """Calculates the distance between the left focus point of an ellipse and a
     point on the ellipse defined by the eccentric anomaly.
 
     Parameters
@@ -875,17 +898,17 @@ def elliptic_radius(E, a, e, degrees=False):
     numpy.ndarray or float
         Radius from left focus point.
 
-    '''
+    """
     if degrees:
         _E = np.radians(E)
     else:
         _E = E
 
-    return a*(1.0 - e*np.cos(_E))
+    return a * (1.0 - e * np.cos(_E))
 
 
-def parabolic_radius(nu, q, degrees=False):
-    '''Calculates the distance between the left focus point of an parabola and
+def parabolic_radius(nu, q, degrees: bool = False):
+    """Calculates the distance between the left focus point of an parabola and
     a point on the parabola defined by the eccentric anomaly.
 
     Parameters
@@ -902,17 +925,17 @@ def parabolic_radius(nu, q, degrees=False):
     numpy.ndarray or float
         Radius from left focus point.
 
-    '''
+    """
     if degrees:
         _nu = np.radians(nu)
     else:
         _nu = nu
 
-    return 2.0*q/(1.0 + np.cos(_nu))
+    return 2.0 * q / (1.0 + np.cos(_nu))
 
 
-def hyperbolic_radius(nu, a, e, degrees=False):
-    '''Calculates the distance between the left focus point of an hyperbola and
+def hyperbolic_radius(nu, a, e, degrees: bool = False):
+    """Calculates the distance between the left focus point of an hyperbola and
         a point on the hyperbola defined by the hyperbolic anomaly.
 
     Parameters
@@ -931,17 +954,17 @@ def hyperbolic_radius(nu, a, e, degrees=False):
     numpy.ndarray or float
         Radius from left focus point.
 
-    '''
+    """
     if degrees:
         _nu = np.radians(nu)
     else:
         _nu = nu
 
-    return a*(e**2 - 1.0)/(1.0 + e*np.cos(_nu))
+    return a * (e**2 - 1.0) / (1.0 + e * np.cos(_nu))
 
 
 def rot_mat_x(theta, dtype=np.float64):
-    '''Generates the 3D transformation matrix for rotation around X-axis.
+    """Generates the 3D transformation matrix for rotation around X-axis.
 
     Parameters
     ----------
@@ -955,7 +978,7 @@ def rot_mat_x(theta, dtype=np.float64):
     (3,3) numpy.ndarray
         Rotation matrix
 
-    '''
+    """
     R = np.zeros((3, 3), dtype=dtype)
     R[1, 1] = np.cos(theta)
     R[1, 2] = -np.sin(theta)
@@ -966,7 +989,7 @@ def rot_mat_x(theta, dtype=np.float64):
 
 
 def rot_mat_y(theta, dtype=np.float64):
-    '''Generates the 3D transformation matrix for rotation around Y-axis.
+    """Generates the 3D transformation matrix for rotation around Y-axis.
 
     Parameters
     ----------
@@ -980,7 +1003,7 @@ def rot_mat_y(theta, dtype=np.float64):
     (3,3) numpy.ndarray
         Rotation matrix
 
-    '''
+    """
     R = np.zeros((3, 3), dtype=dtype)
     R[0, 0] = np.cos(theta)
     R[0, 2] = np.sin(theta)
@@ -991,7 +1014,7 @@ def rot_mat_y(theta, dtype=np.float64):
 
 
 def rot_mat_z(theta, dtype=np.float64):
-    '''Generates the 3D transformation matrix for rotation around Z-axis.
+    """Generates the 3D transformation matrix for rotation around Z-axis.
 
     Parameters
     ----------
@@ -1005,7 +1028,7 @@ def rot_mat_z(theta, dtype=np.float64):
     (3,3) numpy.ndarray
         Rotation matrix
 
-    '''
+    """
     R = np.zeros((3, 3), dtype=dtype)
     R[0, 0] = np.cos(theta)
     R[0, 1] = -np.sin(theta)
@@ -1015,8 +1038,8 @@ def rot_mat_z(theta, dtype=np.float64):
     return R
 
 
-def laguerre_solve_kepler(E0, M, e, tol=1e-12, max_iter=5000, degree=5):
-    '''Solve the Kepler equation using the The Laguerre Algorithm, a algorithm
+def laguerre_solve_kepler(E0, M, e, options: LaguerreOptions = laguerre_defaults):
+    """Solve the Kepler equation using the The Laguerre Algorithm, a algorithm
     that guarantees global convergence [1]_.
 
     Absolute numerical tolerance is defined as :math:`|f(E)| < tol` where
@@ -1068,33 +1091,35 @@ def laguerre_solve_kepler(E0, M, e, tol=1e-12, max_iter=5000, degree=5):
           e = e,
           tol = 1e-12,
        )
-    '''
-
-    degree = float(degree)
+    """
+    tol = options["tol"]
+    max_iter = options["max_iter"]
+    degree = float(options["degree"])
 
     if e > 1:
+
         def _f(E):
-            return M + E - e*np.sinh(E)
+            return M + E - e * np.sinh(E)
 
         def _fp(E):
-            return 1.0 - e*np.cosh(E)
+            return 1.0 - e * np.cosh(E)
 
         def _fpp(E):
-            return -e*np.sinh(E)
+            return -e * np.sinh(E)
+
     else:
+
         def _f(E):
-            return M - E + e*np.sin(E)
+            return M - E + e * np.sin(E)
 
         def _fp(E):
-            return e*np.cos(E) - 1.0
+            return e * np.cos(E) - 1.0
 
         def _fpp(E):
-            return -e*np.sin(E)
+            return -e * np.sin(E)
 
     E = E0
-
     f_eval = _f(E)
-
     it_num = 0
 
     while np.abs(f_eval) >= tol:
@@ -1102,17 +1127,17 @@ def laguerre_solve_kepler(E0, M, e, tol=1e-12, max_iter=5000, degree=5):
 
         fp_eval = _fp(E)
 
-        sqrt_term = np.sqrt(np.abs(
-            (degree - 1.0)**2*fp_eval**2 - degree*(degree - 1.0)*f_eval*_fpp(E)
-        ))
+        sqrt_term = np.sqrt(
+            np.abs((degree - 1.0) ** 2 * fp_eval**2 - degree * (degree - 1.0) * f_eval * _fpp(E))
+        )
 
         denom_p = fp_eval + sqrt_term
         denom_m = fp_eval - sqrt_term
 
         if np.abs(denom_p) > np.abs(denom_m):
-            delta = degree*f_eval/denom_p
+            delta = degree * f_eval / denom_p
         else:
-            delta = degree*f_eval/denom_m
+            delta = degree * f_eval / denom_m
 
         E = E - delta
 
@@ -1125,7 +1150,7 @@ def laguerre_solve_kepler(E0, M, e, tol=1e-12, max_iter=5000, degree=5):
 
 
 def _get_hyperbolic_kepler_guess(M, e):
-    '''Initial guesses for solving the Kepler equation for
+    """Initial guesses for solving the Kepler equation for
     hyperbolic orbits based on input mean anomaly from [1]_.
 
     Parameters
@@ -1143,13 +1168,13 @@ def _get_hyperbolic_kepler_guess(M, e):
     .. [1] T. M. Burkardt and J. M. A. Danby, “The solutions of Kepler’s
         equation. II,” Celestial Mechanics, vol. 31, pp. 317–328, Nov. 1983,
         doi: 10.1007/BF01844230.
-    '''
-    E0 = np.log(2*M/e + 1.8)
+    """
+    E0 = np.log(2 * M / e + 1.8)
     return E0
 
 
 def _get_kepler_guess(M, e):
-    '''Initial guesses for solving the Kepler equation for
+    """Initial guesses for solving the Kepler equation for
     elliptic orbits based on input mean anomaly from [1]_.
 
     Parameters
@@ -1167,27 +1192,27 @@ def _get_kepler_guess(M, e):
     .. [1] Esmaelzadeh, R., & Ghadiri, H. (2014). Appropriate starter for
         solving the Kepler's equation.
         International Journal of Computer Applications, 89(7).
-    '''
+    """
     if M > np.pi:
-        _M = 2.0*np.pi - M
+        _M = 2.0 * np.pi - M
     else:
         _M = M
 
     if _M < 0.25:
-        E0 = _M + e*np.sin(_M)/(1.0 - np.sin(_M + e) + np.sin(_M))
+        E0 = _M + e * np.sin(_M) / (1.0 - np.sin(_M + e) + np.sin(_M))
     elif _M < 2.0:
         E0 = _M + e
     else:
-        E0 = _M + (e*(np.pi - _M))/(1.0 + e)
+        E0 = _M + (e * (np.pi - _M)) / (1.0 + e)
 
     if M > np.pi:
-        E0 = 2.0*np.pi - E0
+        E0 = 2.0 * np.pi - E0
 
     return E0
 
 
 def kepler_guess(M, e):
-    '''Guess the initial iteration point for newtons method using
+    """Guess the initial iteration point for newtons method using
     guessing formulas from [1]_ and [2]_.
 
     Parameters
@@ -1208,22 +1233,22 @@ def kepler_guess(M, e):
     .. [2] T. M. Burkardt and J. M. A. Danby, “The solutions of Kepler’s
         equation. II,” Celestial Mechanics, vol. 31, pp. 317–328, Nov. 1983,
         doi: 10.1007/BF01844230.
-    '''
+    """
 
     if isinstance(M, np.ndarray) or isinstance(e, np.ndarray):
         if not isinstance(M, np.ndarray):
-            M = np.ones(e.shape, dtype=e.dtype)*M
+            M = np.ones(e.shape, dtype=e.dtype) * M
         if not isinstance(e, np.ndarray):
-            e = np.ones(M.shape, dtype=M.dtype)*e
+            e = np.ones(M.shape, dtype=M.dtype) * e
         if M.shape != e.shape:
-            raise TypeError('Input dimensions does not agree')
+            raise TypeError("Input dimensions does not agree")
 
         E0 = np.empty(M.shape, dtype=M.dtype)
 
         out_it = E0.size
         Mit = np.nditer(M)
         eit = np.nditer(e)
-        Eit = np.nditer(E0, op_flags=['readwrite'])
+        Eit = np.nditer(E0, op_flags=["readwrite"])
 
         for it in range(out_it):
             Mc = next(Mit)
@@ -1246,8 +1271,8 @@ def kepler_guess(M, e):
     return E0
 
 
-def mean_to_eccentric(M, e, solver_options=None, degrees=False):
-    '''Calculates the eccentric anomaly from the mean anomaly by solving the
+def mean_to_eccentric(M, e, solver_options=None, degrees: bool = False):
+    """Calculates the eccentric anomaly from the mean anomaly by solving the
     Kepler equation.
 
     Parameters
@@ -1277,7 +1302,7 @@ def mean_to_eccentric(M, e, solver_options=None, degrees=False):
     .. [1] Montenbruck, Oliver; Pfleger, Thomas (2009). Astronomy on the
         Personal Computer. Springer-Verlag Berlin Heidelberg.
         ISBN 978-3-540-67221-0. p 64
-    '''
+    """
     if solver_options is None:
         solver_options = {}
 
@@ -1288,12 +1313,14 @@ def mean_to_eccentric(M, e, solver_options=None, degrees=False):
 
     if isinstance(_M, np.ndarray) or isinstance(e, np.ndarray):
         if not isinstance(_M, np.ndarray):
-            _M = np.ones(e.shape, dtype=e.dtype)*_M
+            _M = np.ones(e.shape, dtype=e.dtype) * _M
         if not isinstance(e, np.ndarray):
-            e = np.ones(_M.shape, dtype=_M.dtype)*e
+            e = np.ones(_M.shape, dtype=_M.dtype) * e
         if _M.shape != e.shape:
-            raise TypeError(f'Input dimensions does not agree \
-                M:{_M.shape} != e:{e.shape}')
+            raise TypeError(
+                f"Input dimensions does not agree \
+                M:{_M.shape} != e:{e.shape}"
+            )
         E = np.empty(_M.shape, dtype=_M.dtype)
         if _M.size == 0:
             return E
@@ -1301,7 +1328,7 @@ def mean_to_eccentric(M, e, solver_options=None, degrees=False):
         out_it = E.size
         Mit = np.nditer(_M)
         eit = np.nditer(e)
-        Eit = np.nditer(E, op_flags=['readwrite'])
+        Eit = np.nditer(E, op_flags=["readwrite"])
 
         for it in range(out_it):
             Mc = next(Mit)
@@ -1310,16 +1337,14 @@ def mean_to_eccentric(M, e, solver_options=None, degrees=False):
 
             if ec > 1:
                 E0 = _get_hyperbolic_kepler_guess(Mc, ec)
-                E_calc, it_num = laguerre_solve_kepler(
-                    E0, Mc, ec, **solver_options)
+                E_calc, it_num = laguerre_solve_kepler(E0, Mc, ec, **solver_options)
             elif ec == 1:
-                A = 3.0/2.0*Mc
+                A = 3.0 / 2.0 * Mc
                 B = np.cbrt(A + np.sqrt(A**2 + 1))
-                E_calc = B - 1.0/B
+                E_calc = B - 1.0 / B
             else:
                 E0 = _get_kepler_guess(Mc, ec)
-                E_calc, it_num = laguerre_solve_kepler(
-                    E0, Mc, ec, **solver_options)
+                E_calc, it_num = laguerre_solve_kepler(E0, Mc, ec, **solver_options)
 
             Ec[...] = E_calc
 
@@ -1331,9 +1356,9 @@ def mean_to_eccentric(M, e, solver_options=None, degrees=False):
             E0 = _get_hyperbolic_kepler_guess(_M, e)
             E, it_num = laguerre_solve_kepler(E0, _M, e, **solver_options)
         elif e == 1:
-            A = 3.0/2.0*_M
+            A = 3.0 / 2.0 * _M
             B = np.cbrt(A + np.sqrt(A**2 + 1))
-            E = B - 1.0/B
+            E = B - 1.0 / B
         else:
             E0 = _get_kepler_guess(_M, e)
             E, it_num = laguerre_solve_kepler(E0, _M, e, **solver_options)
@@ -1344,8 +1369,8 @@ def mean_to_eccentric(M, e, solver_options=None, degrees=False):
     return E
 
 
-def mean_to_true(M, e, solver_options=None, degrees=False):
-    '''Transforms mean anomaly to true anomaly.
+def mean_to_true(M, e, solver_options=None, degrees: bool = False):
+    """Transforms mean anomaly to true anomaly.
 
     Parameters
     ----------
@@ -1364,7 +1389,7 @@ def mean_to_true(M, e, solver_options=None, degrees=False):
     numpy.ndarray or float
         True anomaly.
 
-    '''
+    """
     if degrees:
         _M = np.radians(M)
     else:
@@ -1380,7 +1405,7 @@ def mean_to_true(M, e, solver_options=None, degrees=False):
 
 
 def orbital_speed(r, a, mu):
-    '''Calculates the orbital speed at a given radius for an Keplerian orbit
+    """Calculates the orbital speed at a given radius for an Keplerian orbit
     :math:`v = \\sqrt{\\mu \\left (\\frac{2}{r} - \\frac{1}{a} \\right )}`.
 
     Parameters
@@ -1397,12 +1422,12 @@ def orbital_speed(r, a, mu):
     numpy.ndarray or float
         Orbital speed.
 
-    '''
-    return np.sqrt(mu*(2.0/r - 1.0/a))
+    """
+    return np.sqrt(mu * (2.0 / r - 1.0 / a))
 
 
 def orbital_period(a, mu):
-    '''Calculates the orbital period of an Keplerian orbit based on the
+    """Calculates the orbital period of an Keplerian orbit based on the
     semi-major axis :math:`P = 2\\pi\\sqrt{\\frac{a^3}{\\mu}}`.
 
     Parameters
@@ -1417,12 +1442,12 @@ def orbital_period(a, mu):
     numpy.ndarray or float
         Orbital period.
 
-    '''
-    return 2.0*np.pi*np.sqrt(a**3.0/mu)
+    """
+    return 2.0 * np.pi * np.sqrt(a**3.0 / mu)
 
 
 def semi_major_axis(P, mu):
-    '''Calculates the orbital semi-major axis of an Keplerian orbit based on
+    """Calculates the orbital semi-major axis of an Keplerian orbit based on
     the orbital period :math:`a = \\mu^{\\frac{1}{3}}
     (\\frac{P}{2\\pi})^{\\frac{2}{3}}`.
 
@@ -1438,13 +1463,13 @@ def semi_major_axis(P, mu):
     numpy.ndarray or float
         Semi-major axis.
 
-    '''
-    a = np.cbrt((P/(2.0*np.pi))**2*mu)
+    """
+    a = np.cbrt((P / (2.0 * np.pi)) ** 2 * mu)
     return a
 
 
-def true_of_the_asymptote(e, degrees=False):
-    '''Calculate the True anomaly of the hyperbolic asymptotes.
+def true_of_the_asymptote(e, degrees: bool = False):
+    """Calculate the True anomaly of the hyperbolic asymptotes.
 
     Parameters
     ----------
@@ -1458,8 +1483,8 @@ def true_of_the_asymptote(e, degrees=False):
     numpy.ndarray or float
         True anomaly of the hyperbolic asymptote.
 
-    '''
-    theta_inf = np.arccos(-1.0/e)
+    """
+    theta_inf = np.arccos(-1.0 / e)
 
     if degrees:
         theta_inf = np.degrees(theta_inf)
@@ -1468,7 +1493,7 @@ def true_of_the_asymptote(e, degrees=False):
 
 
 def stumpff0(x):
-    '''Calculates the Stumpff function number 0 value [1]_.
+    """Calculates the Stumpff function number 0 value [1]_.
 
     Parameters
     ----------
@@ -1483,7 +1508,7 @@ def stumpff0(x):
     .. [1] Fundamentals of Celestial Mechanics
         (Second Edition) (Hardback) [J.M.A. Danby - 1992]
 
-    '''
+    """
     c0 = np.empty_like(x)
     inds = x > 0
     c0[inds] = np.cos(np.sqrt(x[inds]))
@@ -1496,7 +1521,7 @@ def stumpff0(x):
 
 
 def stumpff1(x):
-    '''Calculates the Stumpff function number 1 value [1]_.
+    """Calculates the Stumpff function number 1 value [1]_.
 
     Parameters
     ----------
@@ -1511,20 +1536,20 @@ def stumpff1(x):
     .. [1] Fundamentals of Celestial Mechanics
         (Second Edition) (Hardback) [J.M.A. Danby - 1992]
 
-    '''
+    """
     c1 = np.empty_like(x)
     inds = x > 0
-    c1[inds] = np.sin(np.sqrt(x[inds]))/np.sqrt(x[inds])
+    c1[inds] = np.sin(np.sqrt(x[inds])) / np.sqrt(x[inds])
 
     c1[x == 0] = 1
 
     inds = x < 0
-    c1[inds] = np.sinh(np.sqrt(-x[inds]))/np.sqrt(-x[inds])
+    c1[inds] = np.sinh(np.sqrt(-x[inds])) / np.sqrt(-x[inds])
     return c1
 
 
 def stumpff2(x):
-    '''Calculates the Stumpff function number 2 value [1]_.
+    """Calculates the Stumpff function number 2 value [1]_.
 
     Parameters
     ----------
@@ -1539,20 +1564,20 @@ def stumpff2(x):
     .. [1] Fundamentals of Celestial Mechanics
         (Second Edition) (Hardback) [J.M.A. Danby - 1992]
 
-    '''
+    """
     c2 = np.empty_like(x)
     inds = x > 0
-    c2[inds] = (1 - np.cos(np.sqrt(x[inds])))/x[inds]
+    c2[inds] = (1 - np.cos(np.sqrt(x[inds]))) / x[inds]
 
     c2[x == 0] = 0.5
 
     inds = x < 0
-    c2[inds] = (1 - np.cosh(np.sqrt(-x[inds])))/x[inds]
+    c2[inds] = (1 - np.cosh(np.sqrt(-x[inds]))) / x[inds]
     return c2
 
 
 def stumpff3(x):
-    '''Calculates the Stumpff function number 3 value [1]_.
+    """Calculates the Stumpff function number 3 value [1]_.
 
     Parameters
     ----------
@@ -1567,22 +1592,22 @@ def stumpff3(x):
     .. [1] Fundamentals of Celestial Mechanics
         (Second Edition) (Hardback) [J.M.A. Danby - 1992]
 
-    '''
+    """
     c3 = np.empty_like(x)
     inds = x > 0
     xsq = np.sqrt(x[inds])
-    c3[inds] = (xsq - np.sin(xsq))/(xsq*x[inds])
+    c3[inds] = (xsq - np.sin(xsq)) / (xsq * x[inds])
 
-    c3[x == 0] = 1/6
+    c3[x == 0] = 1 / 6
 
     inds = x < 0
     xsq = np.sqrt(-x[inds])
-    c3[inds] = (xsq - np.sinh(xsq))/(xsq*x[inds])
+    c3[inds] = (xsq - np.sinh(xsq)) / (xsq * x[inds])
     return c3
 
 
 def stumpff(x):
-    '''Calculate the 0-3 stumpff functions.
+    """Calculate the 0-3 stumpff functions.
 
     Notes
     -----
@@ -1607,12 +1632,12 @@ def stumpff(x):
     tuple of (stumpff0, stumpff1, stumpff2, stumpff3)
         Stumpff function values.
 
-    '''
+    """
     return stumpff0(x), stumpff1(x), stumpff2(x), stumpff3(x)
 
 
-def euler_rotation_matrix(inc, omega, Omega, degrees=False):
-    '''Generate the rotation matrix for the intrinsic rotation sequence Z-X-Z
+def euler_rotation_matrix(inc, omega, Omega, degrees: bool = False):
+    """Generate the rotation matrix for the intrinsic rotation sequence Z-X-Z
     used by keplerian orbital elements of (i, Omega, omega), see [1]_ for
     more information.
 
@@ -1638,7 +1663,7 @@ def euler_rotation_matrix(inc, omega, Omega, degrees=False):
     .. [1] Appendix I (p. 483) of: Roithmayr, Carlos M.; Hodges, Dewey H. (2016),
         Dynamics: Theory and Application of Kane's Method (1st ed.),
         Cambridge University Press
-    '''
+    """
     if isinstance(inc, np.ndarray):
         R = np.empty((3, 3, inc.size), dtype=np.float64)
     elif isinstance(omega, np.ndarray):
@@ -1667,25 +1692,25 @@ def euler_rotation_matrix(inc, omega, Omega, degrees=False):
     s3 = np.sin(_omega)
 
     # col 0
-    R[0, 0, ...] = c1*c3 - c2*s1*s3
-    R[1, 0, ...] = c3*s1 + c1*c2*s3
-    R[2, 0, ...] = s2*s3
+    R[0, 0, ...] = c1 * c3 - c2 * s1 * s3
+    R[1, 0, ...] = c3 * s1 + c1 * c2 * s3
+    R[2, 0, ...] = s2 * s3
 
     # col 1
-    R[0, 1, ...] = -c1*s3 - c2*c3*s1
-    R[1, 1, ...] = c1*c2*c3 - s1*s3
-    R[2, 1, ...] = c3*s2
+    R[0, 1, ...] = -c1 * s3 - c2 * c3 * s1
+    R[1, 1, ...] = c1 * c2 * c3 - s1 * s3
+    R[2, 1, ...] = c3 * s2
 
     # col 2
-    R[0, 2, ...] = s1*s2
-    R[1, 2, ...] = -c1*s2
+    R[0, 2, ...] = s1 * s2
+    R[1, 2, ...] = -c1 * s2
     R[2, 2, ...] = c2
 
     return R
 
 
-def kep_to_cart(kep, mu=GM_sol, degrees=False):
-    '''Converts set of Keplerian orbital elements to set of Cartesian state
+def kep_to_cart(kep, mu=GM_sol, degrees: bool = False):
+    """Converts set of Keplerian orbital elements to set of Cartesian state
     vectors.
 
     Parameters
@@ -1709,21 +1734,22 @@ def kep_to_cart(kep, mu=GM_sol, degrees=False):
         (6, N) or (6, ) array of cartesian state vector(s) where rows
         correspond to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`,
         :math:`v_y`, :math:`v_z` and columns correspond to different objects.
-    '''
+    """
     if not isinstance(kep, np.ndarray):
-        raise TypeError('Input type {} not supported: must be {}'.format(
-            type(kep), np.ndarray))
+        raise TypeError("Input type {} not supported: must be {}".format(type(kep), np.ndarray))
     if kep.shape[0] != 6:
-        raise ValueError(f'Input data must have at least 6 variables \
-            along axis 0: input shape is {kep.shape}')
+        raise ValueError(
+            f"Input data must have at least 6 variables \
+            along axis 0: input shape is {kep.shape}"
+        )
 
     if len(kep.shape) < 2:
         input_is_vector = True
         try:
             kep.shape = (6, 1)
         except ValueError as e:
-            print(f'Error {e} while trying to cast vector into single column.')
-            print(f'Input array shape: {kep.shape}')
+            print(f"Error {e} while trying to cast vector into single column.")
+            print(f"Input array shape: {kep.shape}")
             raise
     else:
         input_is_vector = False
@@ -1757,23 +1783,23 @@ def kep_to_cart(kep, mu=GM_sol, degrees=False):
 
     R = euler_rotation_matrix(inc, omega, asc_node, degrees=False)
     if len(R.shape) < 3:
-        R.shape = R.shape + (1, )
+        R.shape = R.shape + (1,)
 
-    rx = rn*np.cos(nu)
-    ry = rn*np.sin(nu)
+    rx = rn * np.cos(nu)
+    ry = rn * np.sin(nu)
     r = np.zeros((3, kep.shape[1]), dtype=kep.dtype)
-    r[0, :] = R[0, 0, ...]*rx + R[0, 1, ...]*ry
-    r[1, :] = R[1, 0, ...]*rx + R[1, 1, ...]*ry
-    r[2, :] = R[2, 0, ...]*rx + R[2, 1, ...]*ry
+    r[0, :] = R[0, 0, ...] * rx + R[0, 1, ...] * ry
+    r[1, :] = R[1, 0, ...] * rx + R[1, 1, ...] * ry
+    r[2, :] = R[2, 0, ...] * rx + R[2, 1, ...] * ry
 
-    vn = mu/h
-    vx = -vn*np.sin(nu)
-    vy = vn*(e + np.cos(nu))
+    vn = mu / h
+    vx = -vn * np.sin(nu)
+    vy = vn * (e + np.cos(nu))
 
     v = np.zeros((3, kep.shape[1]), dtype=kep.dtype)
-    v[0, :] = R[0, 0, ...]*vx + R[0, 1, ...]*vy
-    v[1, :] = R[1, 0, ...]*vx + R[1, 1, ...]*vy
-    v[2, :] = R[2, 0, ...]*vx + R[2, 1, ...]*vy
+    v[0, :] = R[0, 0, ...] * vx + R[0, 1, ...] * vy
+    v[1, :] = R[1, 0, ...] * vx + R[1, 1, ...] * vy
+    v[2, :] = R[2, 0, ...] * vx + R[2, 1, ...] * vy
 
     x[:3, :] = r
     x[3:, :] = v

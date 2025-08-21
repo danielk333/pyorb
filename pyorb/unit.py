@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-'''Unit handling
-
-'''
+"""Unit handling"""
 
 import numpy as np
 
@@ -10,15 +8,15 @@ from .const import G as G_SI
 from .const import M_sol, AU
 
 
-def get_G(length, mass, time):
+def get_G(length: float | str, mass: float | str, time: float | str):
 
     if isinstance(mass, str):
-        mass = mass.lower().replace('_', '').replace(' ', '').replace('-', '')
-        if mass == 'kg':
+        mass = mass.lower().replace("_", "").replace(" ", "").replace("-", "")
+        if mass == "kg":
             _mass = 1.0
-        elif mass == 'g':
+        elif mass == "g":
             _mass = 1e-3
-        elif mass == 'msun' or mass == 'msol':
+        elif mass == "msun" or mass == "msol":
             _mass = M_sol
         else:
             raise TypeError(f'Unit "{mass}" not recognized')
@@ -29,14 +27,14 @@ def get_G(length, mass, time):
 
     if isinstance(time, str):
         time = time.lower()
-        if time == 's':
+        if time == "s":
             _time = 1.0
-        elif time == 'h':
+        elif time == "h":
             _time = 3600.0
-        elif time == 'd':
-            _time = 3600.0*24
-        elif time == 'y':
-            _time = 3600.0*24*365.25
+        elif time == "d":
+            _time = 3600.0 * 24
+        elif time == "y":
+            _time = 3600.0 * 24 * 365.25
         else:
             raise TypeError(f'Unit "{time}" not recognized')
     elif isinstance(time, float):
@@ -46,15 +44,15 @@ def get_G(length, mass, time):
 
     if isinstance(length, str):
         length = length.lower()
-        if length == 'm':
+        if length == "m":
             _length = 1.0
-        elif length == 'cm':
+        elif length == "cm":
             _length = 1e-2
-        elif length == 'km':
+        elif length == "km":
             _length = 1e3
-        elif length == 'au':
+        elif length == "au":
             _length = AU
-        elif length == 'pc':
+        elif length == "pc":
             _length = 3.08567758149137e16  # IAU 2012 exact SI def
         else:
             raise TypeError(f'Unit "{length}" not recognized')
@@ -63,18 +61,20 @@ def get_G(length, mass, time):
     else:
         raise TypeError(f'Type "{type(length)}" for length not supported')
 
-    return G_SI*(_mass*_time**2/_length**3)
+    return G_SI * (_mass * _time**2 / _length**3)
 
 
-def angle_units(in_arg_inds, in_arg_keys, out_arg_inds, degrees=False):
-    '''Wrapper to automatically convert input arguments from degrees to radians
+def angle_units(
+    in_arg_inds: list[int], in_arg_keys: list[str], out_arg_inds: list[int], degrees: bool = False
+):
+    """Wrapper to automatically convert input arguments from degrees to radians
     and back to degrees if the keyword argument `degrees = True`. The default
     behavior is dictated by the wrapper `degrees` keyword argument.
-    '''
+    """
 
     def angle_converter_warpper(func):
         def wrapped_func(*args, **kwargs):
-            if not kwargs.pop('degrees', degrees):
+            if not kwargs.pop("degrees", degrees):
                 return func(*args, **kwargs)
 
             args = list(args)
@@ -98,5 +98,7 @@ def angle_units(in_arg_inds, in_arg_keys, out_arg_inds, degrees=False):
                     ret = tuple(ret)
 
             return ret
+
         return wrapped_func
+
     return angle_converter_warpper
