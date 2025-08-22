@@ -35,13 +35,18 @@ class TestKeplerSolver(unittest.TestCase):
     def test_laguerre_solve_hyperbolic_kepler(self):
         E = np.linspace(0.0, np.pi, num=300, dtype=np.float64)
         e = np.linspace(1.001, 10, num=500, dtype=np.float64)
+        opts = kep.LaguerreOptions(
+            tol=1e-12,
+            max_iter=5000,
+            degree=5,
+        ) 
 
         for eit in e:
             for Eit in E:
                 M = kep.eccentric_to_mean(Eit, eit)
 
                 E0 = kep.kepler_guess(M, eit)
-                E_calc, it = kep.laguerre_solve_kepler(E0, M, eit, tol=1e-12)
+                E_calc, it = kep.laguerre_solve_kepler(E0, M, eit, options=opts)
                 M_calc = kep.eccentric_to_mean(E_calc, eit)
                 fun_err = np.abs(M - M_calc)
 
@@ -69,13 +74,18 @@ class TestKeplerSolver(unittest.TestCase):
     def test_laguerre_solve_kepler(self):
         E = np.linspace(0.0, 2.0*np.pi, num=300, dtype=np.float64)
         e = np.linspace(0, 0.99, num=500, dtype=np.float64)
+        opts = kep.LaguerreOptions(
+            tol=1e-12,
+            max_iter=5000,
+            degree=5,
+        ) 
 
         for eit in e:
             for Eit in E:
                 M = kep.eccentric_to_mean(Eit, eit)
 
                 E0 = kep.kepler_guess(M, eit)
-                E_calc, it = kep.laguerre_solve_kepler(E0, M, eit, tol=1e-12)
+                E_calc, it = kep.laguerre_solve_kepler(E0, M, eit, options=opts)
                 fun_err = np.abs(M - E_calc + eit*np.sin(E_calc))
 
                 nt.assert_almost_equal(Eit, E_calc, decimal = 1e-9)
