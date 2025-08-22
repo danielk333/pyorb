@@ -223,7 +223,7 @@ def cart_to_equi(
 def equi_to_cart(
     equi: NDArray_6 | NDArray_6xN,
     mu: NDArray_N | float = GM_sol,
-    solver_options: LaguerreOptions | None = None,
+    solver_options: LaguerreOptions = laguerre_defaults,
     degrees: bool = False,
 ) -> NDArray_6 | NDArray_6xN:
     """Converts set of Equinoctial orbital elements to set of Cartesian state
@@ -1256,16 +1256,13 @@ def mean_to_eccentric(
     -----
     - For parabolic orbits the equation is analytic and solvable, see [^1]
     - For hyperbolic orbits the hyperbolic sine is used in the Kepler equation.
-    - Uses :func:`~pyorb.kepler.laguerre_solve_kepler`
-    - Uses the internal functions called by :func:`~pyorb.kepler.kepler_guess`
+    - Uses `pyorb.kepler.laguerre_solve_kepler`
+    - Uses the internal functions called by `pyorb.kepler.kepler_guess`
 
     [^1]: Montenbruck, Oliver; Pfleger, Thomas (2009). Astronomy on the
         Personal Computer. Springer-Verlag Berlin Heidelberg.
         ISBN 978-3-540-67221-0. p 64
     """
-    if solver_options is None:
-        solver_options = {}
-
     if degrees:
         _M = np.radians(M)
     else:
@@ -1297,14 +1294,14 @@ def mean_to_eccentric(
 
             if ec > 1:
                 E0 = _get_hyperbolic_kepler_guess(Mc, ec)
-                E_calc, it_num = laguerre_solve_kepler(E0, Mc, ec, **solver_options)
+                E_calc, it_num = laguerre_solve_kepler(E0, Mc, ec, options=solver_options)
             elif ec == 1:
                 A = 3.0 / 2.0 * Mc
                 B = np.cbrt(A + np.sqrt(A**2 + 1))
                 E_calc = B - 1.0 / B
             else:
                 E0 = _get_kepler_guess(Mc, ec)
-                E_calc, it_num = laguerre_solve_kepler(E0, Mc, ec, **solver_options)
+                E_calc, it_num = laguerre_solve_kepler(E0, Mc, ec, options=solver_options)
 
             Ec[...] = E_calc
 
@@ -1314,14 +1311,14 @@ def mean_to_eccentric(
 
         if e > 1:
             E0 = _get_hyperbolic_kepler_guess(_M, e)
-            E, it_num = laguerre_solve_kepler(E0, _M, e, **solver_options)
+            E, it_num = laguerre_solve_kepler(E0, _M, e, options=solver_options)
         elif e == 1:
             A = 3.0 / 2.0 * _M
             B = np.cbrt(A + np.sqrt(A**2 + 1))
             E = B - 1.0 / B
         else:
             E0 = _get_kepler_guess(_M, e)
-            E, it_num = laguerre_solve_kepler(E0, _M, e, **solver_options)
+            E, it_num = laguerre_solve_kepler(E0, _M, e, options=solver_options)
 
     if degrees:
         E = np.degrees(E)
