@@ -5,6 +5,8 @@ but not too verbose in the code itself.
 
 import numpy.typing as npt
 
+NDArray = npt.NDArray
+
 NDArray_N = npt.NDArray
 "(n,) shaped ndarray"
 

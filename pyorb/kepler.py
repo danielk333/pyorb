@@ -1,123 +1,136 @@
-#!/usr/bin/env python
-
 """Functions related to Keplerian and equinoctial orbital elements, and
 transformations between these and inertial system Cartesian state vectors.
 
-    Notes
-    -----
-    Transforms
-        Basic functionality is largely based on standard literature like [1]_.
-        Some open source material is avalible like these
-        `Orbital-mechanics notes on GitHub <https://orbital-mechanics.space/intro.html>`_ .
+## Notes
 
-    Arbitrary constants used
-       * :mod:`~pyorb.kepler.e_lim`: Used to determine circular orbits
-       * :mod:`~pyorb.kepler.i_lim`: Used to determine non-inclined orbits
+### Transforms
 
-    Additional parameters
-       * :math:`\\mu`: Standard gravitational parameter for the two body problem: :math:`G(M_1 + M_2)`.
+Basic functionality is largely based on standard literature like [^1].
+Some open source material is available like these
+[Orbital-mechanics notes on GitHub](https://orbital-mechanics.space/intro.html).
 
-    Keplerian elements
-        * :math:`a`: Semi-major axis
-        * :math:`e`: Eccentricity
-        * :math:`i`: Inclination
-        * :math:`\\omega`: Argument of periapsis
-        * :math:`\\Omega`: Longitude of ascending node
-        * :math:`\\nu`: True anomaly
+### Constants and variables
 
-        Elements for one object are given as a 6-vector, with the elements in
-        this order. For a collection of objects, a (6, N) array where the
-        first index selects the element and the second index selects the
-        object.
+Arbitrary constants used
 
-    Units
-       Using default standard gravitational parameter :code:`mu`
-       (:math:`\\mu`), all variables are in `SI Units
-       <https://www.nist.gov/pml/weights-and-measures/metric-si/si-units>`_
-       If a :code:`mu` is given in other units, all other input variables
-       should also use the same unit system. Angles are by default given as
-       radians, all angles are radians internally in functions, input and
-       output angles can be both radians and degrees depending on the
-       :code:`degrees` boolean.
+ - `pyorb.kepler.e_lim`: Used to determine circular orbits
+ - `pyorb.kepler.i_lim`: Used to determine non-inclined orbits
+
+Additional parameters
+
+ - `mu` ($\\mu$): Standard gravitational parameter for the two body problem: $G(M_1 + M_2)$.
+
+Keplerian elements
+
+ - `a` ($a$): Semi-major axis
+ - `e` ($e$): Eccentricity
+ - `i` ($i$): Inclination
+ - `omega` ($\\omega$): Argument of periapsis
+ - `Omega` ($\\Omega$): Longitude of ascending node
+ - `anom` ($\\nu, E, M$): True, eccentric, or mean anomaly
+
+Elements for one object are given as a 6-vector, with the elements in
+this order. For a collection of objects, a (6, N) array where the
+first index selects the element and the second index selects the
+object.
+
+### Units
+
+Using default standard gravitational parameter `mu`
+($\\mu$), all variables are in [SI
+Units](https://www.nist.gov/pml/weights-and-measures/metric-si/si-units).
+
+If a `mu` is given in other units, all other input variables
+should also use the same unit system. Angles are by default given as
+radians, all angles are radians internally in functions, input and
+output angles can be both radians and degrees depending on the
+`degrees` boolean.
 
 
-    Orientation of the ellipse in the coordinate system [2]_
-        For 0 inclination :math:`i`: the ellipse is located in the x-y plane.
+### Coordinate system
 
-        The direction of motion as True anomaly :math:`\\nu`: increases for a
-        zero inclination :math:`i`: orbit is anti-clockwise, i.e. from +x
-        towards +y.
+Orientation of the ellipse in the coordinate system [^2]
 
-        The eccentricity is defined so that 0 corresponds to a circular orbit,
-        values between 0 and 1 correspond to elliptic orbits, e = 1 is a
-        parabolic escape trajectory and e > 1 is a hyperbolic trajectory.
+For 0 inclination $i$: the ellipse is located in the x-y plane.
 
-        An elliptic orbit with :math:`\\omega` and :math:`\\Omega` both zero
-        will have its periapsis (point of closest approach) on the positive
-        :math:`x` axis.
+The direction of motion as True anomaly $\\nu$: increases for a
+zero inclination $i$: orbit is anti-clockwise, i.e. from +x
+towards +y.
 
-        As the inclination :math:`i`: increases, the plane containing the orbit rotates
-        around the x-axis, so that +y is rotated towards +z.
+The eccentricity is defined so that 0 corresponds to a circular orbit,
+values between 0 and 1 correspond to elliptic orbits, $e = 1$ is a
+parabolic escape trajectory and $e > 1$ is a hyperbolic trajectory.
 
-        As the Longitude of ascending node :math:`\\Omega` increases,
-        the plane containing the orbit is rotated around the z-axis so that +x
-        is rotated towards +y.
+An elliptic orbit with $\\omega$ and $\\Omega$ both zero
+will have its periapsis (point of closest approach) on the positive
+x axis.
 
-        Changing argument of periapsis :math:`\\omega`: will not change the
-        plane of the orbit, it will rotate the orbit in the plane,  shifting
-        the periapsis the direction of motion.
+As the inclination $i$: increases, the plane containing the orbit rotates
+around the x-axis, so that +y is rotated towards +z.
 
-        In solar system orbits, the periapsis may instead be called the
-        perihelion.  In Earth orbits, it may be called the perigee.
+As the Longitude of ascending node $\\Omega$ increases,
+the plane containing the orbit is rotated around the z-axis so that +x
+is rotated towards +y.
 
-    Equinoctial elements
-        When inclination and/or eccentricity is close to zero, the argument of
-        periapsis and the ascending node become ill-formed. In these cases, an
-        alternative parametrization called the equinoctial elements can be used
-        instead.  Different variations exist, we are using the definitions from
-        [3].
+Changing argument of periapsis $\\omega$: will not change the
+plane of the orbit, it will rotate the orbit in the plane,  shifting
+the periapsis the direction of motion.
 
-        * :math:`a`: Semi-major axis, same as for Keplerian elements
-        * :math:`h = e \\sin(\\omega + \\Omega)`:
-        * :math:`k = e \\cos(\\omega + \\Omega)`:
-        * :math:`p = \\tan(i/2) \\sin\\Omega`:
-        * :math:`q = \\tan(i/2) \\cos\\Omega`:
-        * :math:`\\lambda_0 = \\omega + \\Omega + \\nu`,
+In solar system orbits, the periapsis may instead be called the
+perihelion.  In Earth orbits, it may be called the perigee.
 
-        As for the Keplerian case, elements for one object are given as a
-        6-vector, with the elements in this order. For a collection of objects,
-        a (6, N) array where the first index selects the element and the second
-        index selects the object.
+#### Equinoctial elements
 
-        This assumes the anomaly type is Mean for the above varibale naming to be correct,
-        e.g. if the anomaly type is true the sixth element will be the true longitude (:math:`L`)
-        instead of the mean longitude (:math:`\\lambda_0`).
+When inclination and/or eccentricity is close to zero, the argument of
+periapsis and the ascending node become ill-formed. In these cases, an
+alternative parametrization called the equinoctial elements can be used
+instead.  Different variations exist, we are using the definitions from
+[^3].
 
-    .. [1] A.E. Roy. "Orbital Motion"
-    .. [2] D.A. Vallado. "Fundamentals of Astrodynamics and Applications"
-    .. [3] Broucke, R.A., Cefola, P.J., 1972. On the equinoctial orbit elements.
+ - $a$: Semi-major axis, same as for Keplerian elements
+ - $h = e \\sin(\\omega + \\Omega)$:
+ - $k = e \\cos(\\omega + \\Omega)$:
+ - $p = \\tan(i/2) \\sin\\Omega$:
+ - $q = \\tan(i/2) \\cos\\Omega$:
+ - $\\lambda_0 = \\omega + \\Omega + \\nu$,
+
+As for the Keplerian case, elements for one object are given as a
+6-vector, with the elements in this order. For a collection of objects,
+a `(6, N)` array where the first index selects the element and the second
+index selects the object.
+
+This assumes the anomaly type is Mean for the above variable naming to be correct,
+e.g. if the anomaly type is true the sixth element will be the true longitude ($L$)
+instead of the mean longitude ($\\lambda_0$).
+
+[^1]: A.E. Roy. "Orbital Motion"
+
+[^2]: D.A. Vallado. "Fundamentals of Astrodynamics and Applications"
+
+[^3]: Broucke, R.A., Cefola, P.J., 1972. On the equinoctial orbit elements.
         "Celestial Mechanics" 5, 303–310. https://doi.org/10.1007/BF01228432
 
-    Examples
-    --------
+## Examples
 
-    Example of using the base conversion function to transform from
-    kepler elements to cartesian coordinates
+Example of using the base conversion function to transform from
+kepler elements to cartesian coordinates
 
-    >>> import pyorb
-    >>> import numpy as np
-    >>> G = pyorb.get_G(length='AU', mass='Msol', time='y')
-    >>> G
-    39.47812018693255
-    >>> cart = np.array([
-    ...     0.70710678,  0.70710678, 0.,
-    ...     -4.4428662, 4.4428662, 0.,
-    ... ])
-    >>> kep = pyorb.cart_to_kep(
-    ...     cart,
-    ...     mu=1*G,
-    ...     degrees=True,
-    ... )
+```python
+>>> import pyorb
+>>> import numpy as np
+>>> G = pyorb.get_G(length='AU', mass='Msol', time='y')
+>>> G
+39.47812018693255
+>>> cart = np.array([
+...     0.70710678,  0.70710678, 0.,
+...     -4.4428662, 4.4428662, 0.,
+... ])
+>>> kep = pyorb.cart_to_kep(
+...     cart,
+...     mu=1*G,
+...     degrees=True,
+... )
+```
 
 """
 
@@ -128,7 +141,7 @@ import typing
 import numpy as np
 
 from .types import NDArray_N, NDArray_3xN, NDArray_6xN
-from .types import NDArray_3, NDArray_6
+from .types import NDArray_3, NDArray_6, NDArray
 
 # Shorthands for indices into vectors of elements:
 from .const import K_a, K_e, K_i, K_om, K_OM, K_nu
@@ -161,6 +174,8 @@ laguerre_defaults = LaguerreOptions(
     max_iter=5000,
     degree=5,
 )
+"""Default options for the Laguerre Kepler equation solver
+"""
 
 
 def cart_to_equi(
@@ -171,25 +186,25 @@ def cart_to_equi(
 
     Parameters
     ----------
-    cart : numpy.ndarray
+    cart
         (6, N) or (6, ) array of Cartesian state vectors where rows correspond
-        to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`, :math:`v_y`,
-        :math:`v_z` and columns correspond to different objects.
-    mu : float or numpy.ndarray
+        to $x$, $y$, $z$, $v_x$, $v_y$,
+        $v_z` and columns correspond to different objects.
+    mu
         Float or (N, ) array with the standard gravitational parameter of
-        objects. If :code:`mu` is a numpy vector, the element corresponding to
-        each column of :code:`cart` will be used for its element calculation,
+        objects. If `mu` is a numpy vector, the element corresponding to
+        each column of `cart` will be used for its element calculation,
         Default value is in SI units a massless object orbiting the Sun.
-    degrees : bool
-        If :code:`True`, use degrees. Else (default) all angles are given in
+    degrees
+        If `True`, use degrees. Else (default) all angles are given in
         radians.
 
     Returns
     -------
     numpy.ndarray
         (6, N) or (6, ) array of Equinoctial orbital elements where rows
-        correspond to :math:`a`, :math:`h`, :math:`k`, :math:`p`,
-        :math:`q`, :math:`\\lambda_0` and columns correspond to different
+        correspond to $a$, $h$, $k$, $p$,
+        $q$, $\\lambda_0$ and columns correspond to different
         objects.
 
     Notes
@@ -216,26 +231,26 @@ def equi_to_cart(
 
     Parameters
     ----------
-    equi : numpy.ndarray
+    equi
         (6, N) or (6, ) array of Equinoctial orbital elements where rows
-        correspond to :math:`a`, :math:`h`, :math:`k`, :math:`p`,
-        :math:`q`, :math:`\\lambda_0` and columns correspond to different
+        correspond to $a$, $h$, $k$, $p$,
+        $q$, $\\lambda_0$ and columns correspond to different
         objects.
-    mu : float or numpy.ndarray
+    mu
         Float or (N, ) array with the standard gravitational parameter of
-        objects. If :code:`mu` is a numpy vector, the element corresponding to
-        each column of :code:`cart` will be used for its element calculation,
+        objects. If `mu` is a numpy vector, the element corresponding to
+        each column of `cart` will be used for its element calculation,
         Default value is in SI units a massless object orbiting the Sun.
-    degrees : bool
-        If :code:`True`, use degrees. Else (default) all angles are given in
+    degrees
+        If `True`, use degrees. Else (default) all angles are given in
         radians.
 
     Returns
     -------
     numpy.ndarray
         (6, N) or (6, ) array of Cartesian state vectors where rows correspond
-        to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`, :math:`v_y`,
-        :math:`v_z` and columns correspond to different objects.
+        to $x$, $y$, $z$, $v_x$, $v_y$,
+        $v_z$ and columns correspond to different objects.
 
     Notes
     -----
@@ -260,22 +275,22 @@ def kep_to_equi(kep: NDArray_6 | NDArray_6xN, degrees: bool = False) -> NDArray_
 
     Parameters
     ----------
-    kep : numpy.ndarray kep
+    kep
         (6, N) or (6, ) array of Keplerian orbital elements where rows
-        correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\\omega`,
-        :math:`\\Omega`, :math:`\\nu`, and columns correspond to different
+        correspond to $a$, $e$, $i$, $\\omega$,
+        $\\Omega$, $\\nu$, and columns correspond to different
         objects.
-    degrees : bool
-        If :code:`True`, use degrees. Else (default) all angles are given in
+    degrees
+        If `True`, use degrees. Else (default) all angles are given in
         radians.
 
     Returns
     -------
     numpy.ndarray
         (6, N) or (6, ) array of equinoctial element(s) where rows
-        correspond to :math:`a`, :math:`h`, :math:`k`, :math:`p`,
-        :math:`q`, :math:`\\lambda_0`, and columns correspond to different
-        objects.  If input is in degrees, :math:`\\lambda_0` is in degrees.
+        correspond to $a$, $h$, $k$, $p$,
+        $q$, $\\lambda_0$, and columns correspond to different
+        objects.  If input is in degrees, $\\lambda_0$ is in degrees.
     """
     _circ = 360.0 if degrees else _2pi
     om_bar = kep[K_om, ...] + kep[K_OM, ...]
@@ -309,20 +324,20 @@ def equi_to_kep(equi: NDArray_6 | NDArray_6xN, degrees: bool = False) -> NDArray
     ----------
     equi : numpy.ndarray equi
         (6, N) or (6, ) array of Equinoctial orbital elements where rows
-        correspond to :math:`a`, :math:`h`, :math:`k`, :math:`p`,
-        :math:`q`, :math:`\\lambda_0` and columns correspond to different
+        correspond to $a$, $h$, $k$, $p$,
+        $q$, $\\lambda_0$ and columns correspond to different
         objects.
     degrees : bool
-        If :code:`True`, use degrees. Else (default) all angles are given in
+        If `True`, use degrees. Else (default) all angles are given in
         radians.
 
     Returns
     -------
     numpy.ndarray
-        (6, N) or (6, ) array of Keplerian element(s) where rows
-        correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\\omega`,
-        :math:`\\Omega`, :math:`\\nu`
-        and columns correspond to different objects.
+        (6, N) or (6, ) array of Keplerian orbital elements where rows
+        correspond to $a$, $e$, $i$, $\\omega$,
+        $\\Omega$, $\\nu$, and columns correspond to different
+        objects.
 
     """
 
@@ -365,24 +380,24 @@ def cart_to_kep(
 
     Parameters
     ----------
-    cart : numpy.ndarray
+    cart
         (6, N) or (6, ) array of Cartesian state vectors where rows correspond
-        to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`, :math:`v_y`,
-        :math:`v_z` and columns correspond to different objects.
-    mu : float or numpy.ndarray
+        to $x$, $y$, $z$, $v_x$, $v_y$,
+        $v_z$ and columns correspond to different objects.
+    mu
         Float or (N, ) array with the standard gravitational parameter of
-        objects. If :code:`mu` is a numpy vector, the element corresponding to
-        each column of :code:`cart` will be used for its element calculation,
+        objects. If `mu` is a numpy vector, the element corresponding to
+        each column of `cart` will be used for its element calculation,
         Default value is in SI units a massless object orbiting the Sun.
-    degrees : bool
-        If :code:`True`, use degrees. Else all angles are given in radians.
+    degrees
+        If `True`, use degrees. Else all angles are given in radians.
 
     Returns
     -------
     numpy.ndarray
         (6, N) or (6, ) array of Keplerian orbital elements where rows
-        correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\\omega`,
-        :math:`\\Omega`, :math:`\\nu` and columns correspond to different
+        correspond to $a$, $e$, $i$, $\\omega$,
+        $\\Omega$, $\\nu$, and columns correspond to different
         objects.
 
     See Also
@@ -608,17 +623,12 @@ def orbit_total_angular_momentum(
 
     Parameters
     ----------
-    a : numpy.ndarray or float
+    a
         Semi-major axis of (>0) ellipse or (<0) hyperbola.
-    e : numpy.ndarray or float
+    e
         Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
-    mu : numpy.ndarray or float
-        Standard gravitation parameter :math:`\\mu = G(m_1 + m_2)` of the orbit.
-
-    Returns
-    -------
-    numpy.ndarray or float
-        Total angular momentum.
+    mu
+        Standard gravitation parameter $\\mu = G(m_1 + m_2)$ of the orbit.
 
     """
     return np.sqrt(mu * a * (1 - e**2))
@@ -629,15 +639,10 @@ def parabolic_total_angular_momentum(q: NDArray_N | float, mu: NDArray_N | float
 
     Parameters
     ----------
-    q : numpy.ndarray or float
+    q
         Periapsis-distance of parabola.
-    mu : numpy.ndarray or float
-        Standard gravitation parameter :math:`\\mu = G(m_1 + m_2)` of the orbit.
-
-    Returns
-    -------
-    numpy.ndarray or float
-        Total angular momentum.
+    mu
+        Standard gravitation parameter $\\mu = G(m_1 + m_2)$ of the orbit.
 
     """
     return np.sqrt(mu * 2 * q)
@@ -645,22 +650,17 @@ def parabolic_total_angular_momentum(q: NDArray_N | float, mu: NDArray_N | float
 
 def true_to_eccentric(
     nu: NDArray_N | float, e: NDArray_N | float, degrees: bool = False
-) -> NDArray_N | float:
+) -> NDArray_N | np.float64:
     """Calculates the eccentric anomaly from the true anomaly.
 
     Parameters
     ----------
-    nu : numpy.ndarray or float
+    nu
         True anomaly.
-    e : numpy.ndarray or float
+    e
         Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
-    degrees : bool
+    degrees
         If true degrees are used, else all angles are given in radians
-
-    Returns
-    -------
-    numpy.ndarray or float
-        Eccentric anomaly.
 
     """
     if degrees:
@@ -705,17 +705,12 @@ def eccentric_to_true(E: NDArray_N | float, e: NDArray_N | float, degrees: bool 
 
     Parameters
     ----------
-    E : numpy.ndarray or float
+    E
         elliptic, parabolic or hyperbolic eccentric anomaly.
-    e : numpy.ndarray or float
+    e
         Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
-    degrees : bool
+    degrees
         If true degrees are used, else all angles are given in radians
-
-    Returns
-    -------
-    numpy.ndarray or float
-        True anomaly.
 
     """
     if degrees:
@@ -760,17 +755,12 @@ def eccentric_to_mean(E: NDArray_N | float, e: NDArray_N | float, degrees: bool 
 
     Parameters
     ----------
-    E : numpy.ndarray or float
+    E
         elliptic, parabolic or hyperbolic eccentric anomaly.
-    e : numpy.ndarray or float
+    e
         Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
-    degrees : bool
+    degrees
         If true degrees are used, else all angles are given in radians
-
-    Returns
-    -------
-    numpy.ndarray or float
-        Mean anomaly.
 
     """
     if degrees:
@@ -812,17 +802,12 @@ def true_to_mean(nu: NDArray_N | float, e: NDArray_N | float, degrees: bool = Fa
 
     Parameters
     ----------
-    nu : numpy.ndarray or float
+    nu
         True anomaly.
-    e : numpy.ndarray or float
+    e
         Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
-    degrees : bool
+    degrees
         If true degrees are used, else all angles are given in radians
-
-    Returns
-    -------
-    numpy.ndarray or float
-        Mean anomaly.
 
     """
     if degrees:
@@ -851,27 +836,21 @@ def orbital_distance(
 
     Parameters
     ----------
-    h : numpy.ndarray or float
+    h
         Orbit total angular momentum.
-    mu : numpy.ndarray or float
-        Standard gravitation parameter :math:`\\mu = G(m_1 + m_2)` of the orbit.
-    e : numpy.ndarray or float
+    mu
+        Standard gravitation parameter $\\mu = G(m_1 + m_2)$ of the orbit.
+    e
         Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
-    nu : numpy.ndarray or float
+    nu
         True anomaly.
-    degrees : bool
+    degrees
         If true degrees are used, else all angles are given in radians
-
-    Returns
-    -------
-    numpy.ndarray or float
-        Radius from left focus point.
-
     """
     if degrees:
         _nu = np.radians(nu)
     else:
-        _nu = nu
+        _nu = nu  # type: ignore
 
     return h**2 / (mu * (1 + e * np.cos(_nu)))
 
@@ -884,25 +863,20 @@ def elliptic_radius(
 
     Parameters
     ----------
-    E : numpy.ndarray or float
+    E
         Eccentric anomaly.
-    a : numpy.ndarray or float
+    a
         Semi-major axis of ellipse.
-    e : numpy.ndarray or float
+    e
         Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
-    degrees : bool
+    degrees
         If true degrees are used, else all angles are given in radians
-
-    Returns
-    -------
-    numpy.ndarray or float
-        Radius from left focus point.
 
     """
     if degrees:
         _E = np.radians(E)
     else:
-        _E = E
+        _E = E  # type: ignore
 
     return a * (1.0 - e * np.cos(_E))
 
@@ -913,17 +887,12 @@ def parabolic_radius(nu, q, degrees: bool = False):
 
     Parameters
     ----------
-    nu : numpy.ndarray or float
+    nu
         True anomaly.
-    q : numpy.ndarray or float
+    q
         Periapsis-distance of parabola.
-    degrees : bool
+    degrees
         If true degrees are used, else all angles are given in radians
-
-    Returns
-    -------
-    numpy.ndarray or float
-        Radius from left focus point.
 
     """
     if degrees:
@@ -940,19 +909,14 @@ def hyperbolic_radius(nu, a, e, degrees: bool = False):
 
     Parameters
     ----------
-    nu : numpy.ndarray or float
+    nu
         True anomaly.
-    a : numpy.ndarray or float
+    a
         Semi-major axis of ellipse.
-    e : numpy.ndarray or float
+    e
         Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
-    degrees : bool
+    degrees
         If true degrees are used, else all angles are given in radians
-
-    Returns
-    -------
-    numpy.ndarray or float
-        Radius from left focus point.
 
     """
     if degrees:
@@ -963,14 +927,14 @@ def hyperbolic_radius(nu, a, e, degrees: bool = False):
     return a * (e**2 - 1.0) / (1.0 + e * np.cos(_nu))
 
 
-def rot_mat_x(theta, dtype=np.float64):
+def rot_mat_x(theta: float, dtype: np.dtype = np.float64):
     """Generates the 3D transformation matrix for rotation around X-axis.
 
     Parameters
     ----------
-    theta : float
+    theta
         Angle to rotate in radians.
-    dtype : np.dtype
+    dtype
         The data-type of the output matrix.
 
     Returns
@@ -988,14 +952,14 @@ def rot_mat_x(theta, dtype=np.float64):
     return R
 
 
-def rot_mat_y(theta, dtype=np.float64):
+def rot_mat_y(theta: float, dtype: np.dtype = np.float64):
     """Generates the 3D transformation matrix for rotation around Y-axis.
 
     Parameters
     ----------
-    theta : float
+    theta
         Angle to rotate in radians.
-    dtype : np.dtype
+    dtype
         The data-type of the output matrix.
 
     Returns
@@ -1013,14 +977,14 @@ def rot_mat_y(theta, dtype=np.float64):
     return R
 
 
-def rot_mat_z(theta, dtype=np.float64):
+def rot_mat_z(theta: float, dtype: np.dtype = np.float64):
     """Generates the 3D transformation matrix for rotation around Z-axis.
 
     Parameters
     ----------
-    theta : float
+    theta
         Angle to rotate in radians.
-    dtype : np.dtype
+    dtype
         The data-type of the output matrix.
 
     Returns
@@ -1038,15 +1002,19 @@ def rot_mat_z(theta, dtype=np.float64):
     return R
 
 
-def laguerre_solve_kepler(E0, M, e, options: LaguerreOptions = laguerre_defaults):
+def laguerre_solve_kepler(E0: float, M: float, e: float, options: LaguerreOptions = laguerre_defaults):
     """Solve the Kepler equation using the The Laguerre Algorithm, a algorithm
-    that guarantees global convergence [1]_.
+    that guarantees global convergence [^1].
 
-    Absolute numerical tolerance is defined as :math:`|f(E)| < tol` where
-    :math:`f(E) = M - E + e \\sin(E)` or where
-    :math:`f(E) = M + E - e \\sinh(E)`.
+    Absolute numerical tolerance is defined as $|f(E)| < tol$ where
+    $f(E) = M - E + e \\sin(E)$ or where
+    $f(E) = M + E - e \\sinh(E)$.
 
-    # TODO: implement in C and bind using ctypes
+    TODO: implement in C and bind using ctypes
+
+    [^1]: Conway, B. A. (1986). An improved algorithm due to Laguerre
+        for the solution of Kepler's equation.
+        Celestial mechanics, 39(2), 199-211.
 
     Notes
     -----
@@ -1054,43 +1022,37 @@ def laguerre_solve_kepler(E0, M, e, options: LaguerreOptions = laguerre_defaults
 
     Parameters
     ----------
-    E0 : float
+    E0
         Initial guess for eccentric anomaly in radians.
-    M : float
+    M
         Mean anomaly in radians.
-    e : float
+    e
         Eccentricity of ellipse or hyperbola.
-    tol : float
-        Absolute numerical tolerance eccentric anomaly in radians.
-    max_iter : int
-        Maximum number of iterations before solver is aborted.
-    degree : int
-        Polynomial degree in derivation of Laguerre Algorithm.
+    options
+        Options that will be passed down to the Laguerre solver used in solving the Kepler equation
 
     Returns
     -------
     tuple of (float, int)
         Eccentric anomaly in radians and number of iterations.
 
-    .. [1] Conway, B. A. (1986). An improved algorithm due to Laguerre
-        for the solution of Kepler's equation.
-        Celestial mechanics, 39(2), 199-211.
+    Examples
+    --------
 
-    **Example:**
+    ```python
+    import pyorb.kepler
+    M = 3.14
+    e = 0.8
 
-    .. code-block:: python
+    # Use mean anomaly as initial guess
+    E, iterations = pyorb.kepler.laguerre_solve_kepler(
+      E0 = M,
+      M = M,
+      e = e,
+      tol = 1e-12,
+    )
+    ```
 
-       import pyorb.kepler
-       M = 3.14
-       e = 0.8
-
-       # Use mean anomaly as initial guess
-       E, iterations = pyorb.kepler.laguerre_solve_kepler(
-          E0 = M,
-          M = M,
-          e = e,
-          tol = 1e-12,
-       )
     """
     tol = options["tol"]
     max_iter = options["max_iter"]
@@ -1149,49 +1111,41 @@ def laguerre_solve_kepler(E0, M, e, options: LaguerreOptions = laguerre_defaults
     return E, it_num
 
 
-def _get_hyperbolic_kepler_guess(M, e):
+def _get_hyperbolic_kepler_guess(M: NDArray_N | float, e: NDArray_N | float) -> NDArray_N | float:
     """Initial guesses for solving the Kepler equation for
-    hyperbolic orbits based on input mean anomaly from [1]_.
+    hyperbolic orbits based on input mean anomaly from [^1].
+
+    [^1]: T. M. Burkardt and J. M. A. Danby, “The solutions of Kepler’s
+        equation. II,” Celestial Mechanics, vol. 31, pp. 317–328, Nov. 1983,
+        doi: 10.1007/BF01844230.
 
     Parameters
     ----------
-    M : numpy.ndarray or float
+    M
         Mean anomaly in radians.
-    e : numpy.ndarray or float
+    e
         Eccentricity of hyperbola.
 
-    Returns
-    -------
-    numpy.ndarray or float
-        Guess for eccentric anomaly in radians.
-
-    .. [1] T. M. Burkardt and J. M. A. Danby, “The solutions of Kepler’s
-        equation. II,” Celestial Mechanics, vol. 31, pp. 317–328, Nov. 1983,
-        doi: 10.1007/BF01844230.
     """
     E0 = np.log(2 * M / e + 1.8)
     return E0
 
 
-def _get_kepler_guess(M, e):
+def _get_kepler_guess(M: float, e: float) -> float:
     """Initial guesses for solving the Kepler equation for
-    elliptic orbits based on input mean anomaly from [1]_.
+    elliptic orbits based on input mean anomaly from [^1].
+
+    [^1]: Esmaelzadeh, R., & Ghadiri, H. (2014). Appropriate starter for
+        solving the Kepler's equation.
+        International Journal of Computer Applications, 89(7).
 
     Parameters
     ----------
-    M : float
+    M
         Mean anomaly in radians.
-    e : float
+    e
         Eccentricity of ellipse.
 
-    Returns
-    -------
-    float
-        Guess for eccentric anomaly in radians.
-
-    .. [1] Esmaelzadeh, R., & Ghadiri, H. (2014). Appropriate starter for
-        solving the Kepler's equation.
-        International Journal of Computer Applications, 89(7).
     """
     if M > np.pi:
         _M = 2.0 * np.pi - M
@@ -1211,15 +1165,23 @@ def _get_kepler_guess(M, e):
     return E0
 
 
-def kepler_guess(M, e):
+def kepler_guess(M: NDArray_N | float, e: NDArray_N | float) -> NDArray_N | float:
     """Guess the initial iteration point for newtons method using
-    guessing formulas from [1]_ and [2]_.
+    guessing formulas from [^1] and [^2].
+
+    [^1]: Esmaelzadeh, R., & Ghadiri, H. (2014). Appropriate starter for
+        solving the Kepler's equation.
+        International Journal of Computer Applications, 89(7).
+
+    [^2]: T. M. Burkardt and J. M. A. Danby, “The solutions of Kepler’s
+        equation. II,” Celestial Mechanics, vol. 31, pp. 317–328, Nov. 1983,
+        doi: 10.1007/BF01844230.
 
     Parameters
     ----------
-    M : numpy.ndarray or float
+    M
         Mean anomaly in radians.
-    e : numpy.ndarray or float
+    e
         Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
 
     Returns
@@ -1227,12 +1189,6 @@ def kepler_guess(M, e):
     numpy.ndarray or float
         Guess for eccentric anomaly in radians.
 
-    .. [1] Esmaelzadeh, R., & Ghadiri, H. (2014). Appropriate starter for
-        solving the Kepler's equation.
-        International Journal of Computer Applications, 89(7).
-    .. [2] T. M. Burkardt and J. M. A. Danby, “The solutions of Kepler’s
-        equation. II,” Celestial Mechanics, vol. 31, pp. 317–328, Nov. 1983,
-        doi: 10.1007/BF01844230.
     """
 
     if isinstance(M, np.ndarray) or isinstance(e, np.ndarray):
@@ -1271,20 +1227,24 @@ def kepler_guess(M, e):
     return E0
 
 
-def mean_to_eccentric(M, e, solver_options=None, degrees: bool = False):
+def mean_to_eccentric(
+    M: NDArray_N | float,
+    e: NDArray_N | float,
+    solver_options: LaguerreOptions = laguerre_defaults,
+    degrees: bool = False,
+) -> NDArray_N | float:
     """Calculates the eccentric anomaly from the mean anomaly by solving the
     Kepler equation.
 
     Parameters
     ----------
-    M : numpy.ndarray or float
+    M
         Mean anomaly.
-    e : numpy.ndarray or float
+    e
         Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
-    solver_options : dict
+    solver_options
         Options for the numerical solution of Kepler's equation.
-        See :func:`~pyorb.kepler.laguerre_solve_kepler` for information.
-    degrees : bool
+    degrees
         If true degrees are used, else all angles are given in radians
 
     Returns
@@ -1294,12 +1254,12 @@ def mean_to_eccentric(M, e, solver_options=None, degrees: bool = False):
 
     Notes
     -----
-    - For parabolic orbits the equation is analytic and solvable, see [1]_
+    - For parabolic orbits the equation is analytic and solvable, see [^1]
     - For hyperbolic orbits the hyperbolic sine is used in the Kepler equation.
     - Uses :func:`~pyorb.kepler.laguerre_solve_kepler`
     - Uses the internal functions called by :func:`~pyorb.kepler.kepler_guess`
 
-    .. [1] Montenbruck, Oliver; Pfleger, Thomas (2009). Astronomy on the
+    [^1]: Montenbruck, Oliver; Pfleger, Thomas (2009). Astronomy on the
         Personal Computer. Springer-Verlag Berlin Heidelberg.
         ISBN 978-3-540-67221-0. p 64
     """
@@ -1369,25 +1329,24 @@ def mean_to_eccentric(M, e, solver_options=None, degrees: bool = False):
     return E
 
 
-def mean_to_true(M, e, solver_options=None, degrees: bool = False):
+def mean_to_true(
+    M: NDArray_N | float,
+    e: NDArray_N | float,
+    solver_options: LaguerreOptions = laguerre_defaults,
+    degrees: bool = False,
+) -> NDArray_N | float:
     """Transforms mean anomaly to true anomaly.
 
     Parameters
     ----------
-    M : numpy.ndarray or float
+    M
         Mean anomaly.
-    e : numpy.ndarray or float
+    e
         Eccentricity of ellipse (e<1), parabola (e==1) or hyperbola (e>1).
     solver_options : dict
         Options for the numerical solution of Kepler's equation.
-        See :func:`~pyorb.kepler.laguerre_solve_kepler` for information.
-    degrees : bool
+    degrees
         If true degrees are used, else all angles are given in radians
-
-    Returns
-    -------
-    numpy.ndarray or float
-        True anomaly.
 
     """
     if degrees:
@@ -1404,84 +1363,65 @@ def mean_to_true(M, e, solver_options=None, degrees: bool = False):
     return nu
 
 
-def orbital_speed(r, a, mu):
+def orbital_speed(r: NDArray_N | float, a: NDArray_N | float, mu: NDArray_N | float) -> NDArray_N | float:
     """Calculates the orbital speed at a given radius for an Keplerian orbit
-    :math:`v = \\sqrt{\\mu \\left (\\frac{2}{r} - \\frac{1}{a} \\right )}`.
+    $v = \\sqrt{\\mu \\left (\\frac{2}{r} - \\frac{1}{a} \\right )}$.
 
     Parameters
     ----------
-    r : numpy.ndarray or float
+    r
         Radius from the pericenter.
-    a : numpy.ndarray or float
+    a
         Semi-major axis of (>0) ellipse or (<0) hyperbola.
-    mu : numpy.ndarray or float
-        Standard gravitation parameter :math:`\\mu = G(m_1 + m_2)` of the orbit.
-
-    Returns
-    -------
-    numpy.ndarray or float
-        Orbital speed.
+    mu
+        Standard gravitation parameter $\\mu = G(m_1 + m_2)$ of the orbit.
 
     """
     return np.sqrt(mu * (2.0 / r - 1.0 / a))
 
 
-def orbital_period(a, mu):
+def orbital_period(a: NDArray_N | float, mu: NDArray_N | float) -> NDArray_N | float:
     """Calculates the orbital period of an Keplerian orbit based on the
-    semi-major axis :math:`P = 2\\pi\\sqrt{\\frac{a^3}{\\mu}}`.
+    semi-major axis $P = 2\\pi\\sqrt{\\frac{a^3}{\\mu}}$.
 
     Parameters
     ----------
-    a : numpy.ndarray or float
+    a
         Semi-major axis of ellipse.
-    mu : numpy.ndarray or float
-        Standard gravitation parameter :math:`\\mu = G(m_1 + m_2)` of the orbit.
+    mu
+        Standard gravitation parameter $\\mu = G(m_1 + m_2)$ of the orbit.
 
-    Returns
-    -------
-    numpy.ndarray or float
-        Orbital period.
 
     """
     return 2.0 * np.pi * np.sqrt(a**3.0 / mu)
 
 
-def semi_major_axis(P, mu):
+def semi_major_axis(P: NDArray_N | float, mu: NDArray_N | float) -> NDArray_N | float:
     """Calculates the orbital semi-major axis of an Keplerian orbit based on
-    the orbital period :math:`a = \\mu^{\\frac{1}{3}}
-    (\\frac{P}{2\\pi})^{\\frac{2}{3}}`.
+    the orbital period $a = \\mu^{\\frac{1}{3}}
+    (\\frac{P}{2\\pi})^{\\frac{2}{3}}$.
 
     Parameters
     ----------
-    P : numpy.ndarray or float
+    P
         Orbital period
-    mu : numpy.ndarray or float
-        Standard gravitation parameter :math:`\\mu = G(m_1 + m_2)` of the orbit.
-
-    Returns
-    -------
-    numpy.ndarray or float
-        Semi-major axis.
+    mu
+        Standard gravitation parameter $\\mu = G(m_1 + m_2)$ of the orbit.
 
     """
     a = np.cbrt((P / (2.0 * np.pi)) ** 2 * mu)
     return a
 
 
-def true_of_the_asymptote(e, degrees: bool = False):
+def true_of_the_asymptote(e: NDArray_N | float, degrees: bool = False):
     """Calculate the True anomaly of the hyperbolic asymptotes.
 
     Parameters
     ----------
-    e : numpy.ndarray or float
+    e
         Eccentricity of hyperbola (e>1).
-    degrees : bool
+    degrees
         If true degrees are used, else all angles are given in radians
-
-    Returns
-    -------
-    numpy.ndarray or float
-        True anomaly of the hyperbolic asymptote.
 
     """
     theta_inf = np.arccos(-1.0 / e)
@@ -1492,20 +1432,10 @@ def true_of_the_asymptote(e, degrees: bool = False):
     return theta_inf
 
 
-def stumpff0(x):
-    """Calculates the Stumpff function number 0 value [1]_.
+def stumpff0(x: NDArray_N | float) -> NDArray_N | float:
+    """Calculates the Stumpff function number 0 value [^1].
 
-    Parameters
-    ----------
-    x : numpy.ndarray or float
-        Stumpff input variable.
-
-    Returns
-    -------
-    numpy.ndarray or float
-        Stumpff function value.
-
-    .. [1] Fundamentals of Celestial Mechanics
+    [^1]: Fundamentals of Celestial Mechanics
         (Second Edition) (Hardback) [J.M.A. Danby - 1992]
 
     """
@@ -1520,20 +1450,10 @@ def stumpff0(x):
     return c0
 
 
-def stumpff1(x):
-    """Calculates the Stumpff function number 1 value [1]_.
+def stumpff1(x: NDArray_N | float) -> NDArray_N | float:
+    """Calculates the Stumpff function number 1 value [^1].
 
-    Parameters
-    ----------
-    x : numpy.ndarray or float
-        Stumpff input variable.
-
-    Returns
-    -------
-    numpy.ndarray or float
-        Stumpff function value.
-
-    .. [1] Fundamentals of Celestial Mechanics
+    [^1]: Fundamentals of Celestial Mechanics
         (Second Edition) (Hardback) [J.M.A. Danby - 1992]
 
     """
@@ -1548,22 +1468,11 @@ def stumpff1(x):
     return c1
 
 
-def stumpff2(x):
-    """Calculates the Stumpff function number 2 value [1]_.
+def stumpff2(x: NDArray_N | float) -> NDArray_N | float:
+    """Calculates the Stumpff function number 2 value [^1].
 
-    Parameters
-    ----------
-    x : numpy.ndarray or float
-        Stumpff input variable.
-
-    Returns
-    -------
-    numpy.ndarray or float
-        Stumpff function value.
-
-    .. [1] Fundamentals of Celestial Mechanics
+    [^1]: Fundamentals of Celestial Mechanics
         (Second Edition) (Hardback) [J.M.A. Danby - 1992]
-
     """
     c2 = np.empty_like(x)
     inds = x > 0
@@ -1576,20 +1485,10 @@ def stumpff2(x):
     return c2
 
 
-def stumpff3(x):
-    """Calculates the Stumpff function number 3 value [1]_.
+def stumpff3(x: NDArray_N | float) -> NDArray_N | float:
+    """Calculates the Stumpff function number 3 value [^1].
 
-    Parameters
-    ----------
-    x : numpy.ndarray or float
-        Stumpff input variable.
-
-    Returns
-    -------
-    numpy.ndarray or float
-        Stumpff function value.
-
-    .. [1] Fundamentals of Celestial Mechanics
+    [^1]: Fundamentals of Celestial Mechanics
         (Second Edition) (Hardback) [J.M.A. Danby - 1992]
 
     """
@@ -1606,7 +1505,7 @@ def stumpff3(x):
     return c3
 
 
-def stumpff(x):
+def stumpff(x: NDArray_N | float) -> NDArray_N | float:
     """Calculate the 0-3 stumpff functions.
 
     Notes
@@ -1615,17 +1514,12 @@ def stumpff(x):
     formulation of the kepler orbit.
 
     The `n`'th' Stumpff function is defined as:
-    :math:`c_{n}(x) = \\sum^{\\infty}_{j=0} \\frac{(-1)^j x^j}{(n + 2j)!}`.
+    $c_{n}(x) = \\sum^{\\infty}_{j=0} \\frac{(-1)^j x^j}{(n + 2j)!}$.
 
     However, it can be found that the first Stumpff functions can be expressed
     in terms of trigonometric functions,
     as this is implemented here and only `c0, c1, c2, c3` are used in the
     universal variable formulation of a kepler orbit.
-
-    Parameters
-    ----------
-    x : numpy.ndarray or float
-        Stumpff input variable.
 
     Returns
     -------
@@ -1636,23 +1530,29 @@ def stumpff(x):
     return stumpff0(x), stumpff1(x), stumpff2(x), stumpff3(x)
 
 
-def euler_rotation_matrix(inc, omega, Omega, degrees: bool = False):
+def euler_rotation_matrix(
+    inc: NDArray_N | float, omega: NDArray_N | float, Omega: NDArray_N | float, degrees: bool = False
+) -> NDArray:
     """Generate the rotation matrix for the intrinsic rotation sequence Z-X-Z
-    used by keplerian orbital elements of (i, Omega, omega), see [1]_ for
+    used by keplerian orbital elements of (i, Omega, omega), see [^1] for
     more information.
 
     If any of the input angles are vectors the matrix will expand along a the
     remaining axis.
 
+    [^1]: Appendix I (p. 483) of: Roithmayr, Carlos M.; Hodges, Dewey H. (2016),
+        Dynamics: Theory and Application of Kane's Method (1st ed.),
+        Cambridge University Press
+
     Parameters
     ----------
-    inc : numpy.ndarray or float
+    inc
         Inclination
-    omega : numpy.ndarray or float
+    omega
         Argument of periapsis
-    Omega : numpy.ndarray or float
+    Omega
         Longitude of ascending node
-    degrees : bool
+    degrees
         If true degrees are used, else all angles are given in radians
 
     Returns
@@ -1660,9 +1560,6 @@ def euler_rotation_matrix(inc, omega, Omega, degrees: bool = False):
     (3, 3, ...) numpy.ndarray
         Rotation matrix
 
-    .. [1] Appendix I (p. 483) of: Roithmayr, Carlos M.; Hodges, Dewey H. (2016),
-        Dynamics: Theory and Application of Kane's Method (1st ed.),
-        Cambridge University Press
     """
     if isinstance(inc, np.ndarray):
         R = np.empty((3, 3, inc.size), dtype=np.float64)
@@ -1709,31 +1606,33 @@ def euler_rotation_matrix(inc, omega, Omega, degrees: bool = False):
     return R
 
 
-def kep_to_cart(kep, mu=GM_sol, degrees: bool = False):
+def kep_to_cart(
+    kep: NDArray_6 | NDArray_6xN, mu: NDArray_N | float = GM_sol, degrees: bool = False
+) -> NDArray_6 | NDArray_6xN:
     """Converts set of Keplerian orbital elements to set of Cartesian state
     vectors.
 
     Parameters
     ----------
-    kep : numpy.ndarray kep
+    kep
         (6, N) or (6, ) array of Keplerian orbital elements where rows
-        correspond to :math:`a`, :math:`e`, :math:`i`, :math:`\\omega`,
-        :math:`\\Omega`, :math:`\\nu` and columns correspond to different
+        correspond to $a$, $e$, $i$, $\\omega$,
+        $\\Omega$, $\\nu$ and columns correspond to different
         objects.
-    mu : float or numpy.ndarray
+    mu
         Float or (N, ) array with the standard gravitational parameter of
-        objects. If :code:`mu` is a numpy vector, the element corresponding to
-        each column of :code:`cart` will be used for its element calculation,
+        objects. If `mu` is a numpy vector, the element corresponding to
+        each column of `cart` will be used for its element calculation,
         Default value is in SI units a massless object orbiting the Sun.
-    degrees : bool
-        If :code:`True`, use degrees. Else all angles are given in radians.
+    degrees
+        If `True`, use degrees. Else all angles are given in radians.
 
     Returns
     -------
     numpy.ndarray
         (6, N) or (6, ) array of cartesian state vector(s) where rows
-        correspond to :math:`x`, :math:`y`, :math:`z`, :math:`v_x`,
-        :math:`v_y`, :math:`v_z` and columns correspond to different objects.
+        correspond to $x$, $y$, $z$, $v_x$,
+        $v_y$, $v_z$ and columns correspond to different objects.
     """
     if not isinstance(kep, np.ndarray):
         raise TypeError("Input type {} not supported: must be {}".format(type(kep), np.ndarray))
