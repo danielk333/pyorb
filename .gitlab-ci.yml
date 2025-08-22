@@ -18,7 +18,6 @@ stages:
     # install the package and develop dependancies
     - pip install .[develop]
     - apt update
-    - apt install -y pandoc
 
 # Prepare the nominal usage enviornment
 .setup:
@@ -39,22 +38,19 @@ stages:
 #Template for testing on python images,
 # extend this for each python-platform
 # the package is intended to work on
-.pytest:
+test:
   stage: test
   extends: .setup
   allow_failure: true
+  image: python:${PYTHON_VERSION}
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
   script:
-    - pip install pytest pytest-cov
     - pytest
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
 
-python:
-  extends: .pytest
-
-python3.10:
-  extends: .pytest
-  image: python:3.10
 
 ###############
 ## Releasing ##
@@ -64,9 +60,7 @@ pages:
   stage: release
   extends: .devsetup
   script:
-    - cd docs
-    - make html
-    - mv build ../public
+    - mkdocs build --site-dir public
   artifacts:
     paths:
       - public

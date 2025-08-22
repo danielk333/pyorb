@@ -1,0 +1,94 @@
+theme:
+  name: "material"
+  logo: assets/logo.png
+  favicon: assets/favicon.png
+  features:
+    - navigation.instant
+    - navigation.path
+    - navigation.top
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: "#002d72"
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: "#002d72"
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+  icon:
+    repo: fontawesome/brands/github
+
+site_name: pyorb
+nav:
+  - Home: index.md
+  - Notebooks:
+    - getting_started_tutorial: notebooks/getting_started_tutorial.ipynb
+  - Examples:
+    - anomaly_types: examples/anomaly_types.py
+    - array_orbits: examples/array_orbits.py
+    - distribution_transform: examples/distribution_transform.py
+    - equinoctial_orbits: examples/equinoctial_orbits.py
+    - hyperbolic_orbits: examples/hyperbolic_orbits.py
+    - interactive_orbit: examples/interactive_orbit.py
+    - logo_plot: examples/logo_plot.py
+    - performance: examples/performance.py
+    - perturbation: examples/perturbation.py
+    - propagation: examples/propagation.py
+    - transfer: examples/transfer.py
+  - API Reference: 
+    - api_reference/orbit.md
+    - api_reference/kepler.md
+    - api_reference/unit.md
+    - api_reference/const.md
+    - api_reference/types.md
+
+extra_css:
+  - css/style.css
+
+extra_javascript:
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+markdown_extensions:
+  - attr_list
+  - admonition
+  - footnotes
+  - pymdownx.arithmatex:
+      generic: true
+  - toc:
+      permalink: true
+      toc_depth: 4
+
+plugins:
+  - search
+  - mkdocstrings:
+      enable_inventory: true
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: numpy
+            show_docstring_functions: true
+            show_docstring_modules: true
+            show_docstring_description: true
+            separate_signature: true
+            show_signature_annotations: true
+            show_root_heading: true
+            show_overloads: true
+            show_source: true
+            show_signature: true
+            show_submodules: true
+            show_root_toc_entry: true
+            show_root_full_path: false
+            heading_level: 2
+  - mkdocs-jupyter:
+      execute: true
+      include_source: True
+      include: ["*.py", "*.ipynb"]
+      ignore: ["_wip*"]

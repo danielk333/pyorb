@@ -1,3 +1,58 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyorb"
+version = "0.6.1"
+requires-python = ">=3.0"
+dependencies = [
+    "numpy >= 1.18.4",
+]
+description = "Keplerian orbit functions in Python"
+readme = { file = "README.md", content-type = "text/markdown" }
+authors = [
+    { name = "Daniel Kastinen", email = "daniel.kastinen@irf.se" },
+]
+maintainers = [
+    { name = "Daniel Kastinen", email = "daniel.kastinen@irf.se" },
+]
+license = "MIT"
+license-files = [ "LICENSE" ]
+classifiers = [
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Physics",
+  "Operating System :: OS Independent",
+]
+
+
+[project.optional-dependencies]
+develop = [
+    "pytest >= 6.2.5",
+    "pytest-cov >= 4.1.0",
+    "flake8 >= 4.0.1",
+    "wheel >= 0.37.0",
+    "build >= 0.7.0",
+    "twine >= 3.4.2",
+    "matplotlib >= 3.5.1",
+    "numpydoc >= 1.2",
+    "black >= 23.3.0",
+    "mkdocs-material >= 9.6.18",
+    "mkdocs >= 1.6.1",
+    "mkdocs-gen-files >= 0.5.0",
+    "mkdocstrings[python] >= 0.30.0",
+    "mkdocs-section-index >= 0.3.10",
+    "mkdocs-literate-nav >= 0.6.2",
+    "jupytext >= 1.17.2",
+    "mkdocs-jupyter >= 0.25.1",
+]
+
+[project.urls]
+Homepage = "https://danielk.developer.irf.se/pyorb/"
+Documentation = "https://danielk.developer.irf.se/pyorb/"
+Repository = "https://github.com/danielk333/pyorb"
+Issues = "https://github.com/danielk333/pyorb/issues"
+
 [tool.black]
 line-length = 110
-target_version = ['py35', 'py36', 'py37', 'py38', 'py39', 'py310']

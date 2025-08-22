@@ -2,9 +2,7 @@
 
 PyOrb is a lightweight package designed to convert back and forth between cartesian and kepler coordinates seamlessly and in a physically consistent manner, following defined rules. It provides a convenience class for handling orbits and is tested for special cases such as planar and circular orbits.
 
-See full documentation [here](https://danielk.developer.irf.se/pyorb/).
-
-![Example interactive orbit](/docs/assets/example.gif)
+![Example interactive orbit](assets/example.gif)
 
 ## Feature list
 
@@ -175,3 +173,4 @@ The very excellent multi-purpose N-body integrator [rebound](https://github.com/
 - Longitude of ascending node can become negative
 
 otherwise the orbit routines should produce identical results.
+
