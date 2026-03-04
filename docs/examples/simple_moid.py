@@ -7,6 +7,9 @@ Simple moid
 import matplotlib.pyplot as plt
 import numpy as np
 import pyorb
+import time
+
+t0 = time.time()
 
 res = 100
 orb_1 = pyorb.Orbit(
@@ -19,7 +22,7 @@ orb_1 = pyorb.Orbit(
     omega=0,
     Omega=0,
     anom=np.linspace(0, 360, num=res),
-    type="mean",
+    type="true",
 )
 orb_2 = pyorb.Orbit(
     M0=pyorb.M_sol,
@@ -31,7 +34,7 @@ orb_2 = pyorb.Orbit(
     omega=180,
     Omega=0,
     anom=np.linspace(0, 360, num=res),
-    type="mean",
+    type="true",
 )
 
 
@@ -41,6 +44,9 @@ flat_dist = dist.flatten()
 flat_ind = np.argmin(flat_dist)
 final_ind = np.unravel_index(flat_ind, dist.shape)
 
+dt = time.time() - t0
+
+print(f"Execution time: {dt} s")
 print(final_ind, np.sqrt(flat_dist[flat_ind]) / pyorb.AU)
 
 fig, ax = plt.subplots()
