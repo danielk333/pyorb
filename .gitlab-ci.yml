@@ -29,7 +29,7 @@ stages:
     - virtualenv venv
     - source venv/bin/activate
     # install the package
-    - pip install .
+    - pip install .[test]
 
 
 #######################
@@ -45,9 +45,8 @@ test:
   image: python:${PYTHON_VERSION}
   parallel:
     matrix:
-      - PYTHON_VERSION: ["3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+      - PYTHON_VERSION: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
   script:
-    - pip install pytest
     - pytest
   rules:
     - if: $CI_COMMIT_BRANCH == "main"

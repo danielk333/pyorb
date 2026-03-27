@@ -46,6 +46,10 @@ develop = [
     "jupytext >= 1.17.2",
     "mkdocs-jupyter >= 0.25.1",
 ]
+test = [
+    "pytest",
+    "pytest-cov >= 4.1.0",
+]
 
 [project.urls]
 Homepage = "https://danielk.developer.irf.se/pyorb/"
