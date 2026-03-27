@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pyorb"
 version = "0.6.2"
-requires-python = ">=3.0"
+requires-python = ">=3.10"
 dependencies = [
     "numpy >= 1.18.4",
 ]
@@ -17,8 +17,7 @@ authors = [
 maintainers = [
     { name = "Daniel Kastinen", email = "daniel.kastinen@irf.se" },
 ]
-license = "MIT"
-license-files = [ "LICENSE" ]
+license = { file = "LICENSE" }
 classifiers = [
   "Intended Audience :: Science/Research",
   "Programming Language :: Python :: 3",
