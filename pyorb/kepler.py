@@ -1639,6 +1639,8 @@ def kep_to_cart(
             along axis 0: input shape is {kep.shape}"
         )
 
+    kep = kep.copy()
+
     if len(kep.shape) < 2:
         input_is_vector = True
         try:
