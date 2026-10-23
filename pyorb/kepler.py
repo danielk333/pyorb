@@ -1704,9 +1704,5 @@ def kep_to_cart(
 
     if input_is_vector:
         x.shape = (6,)
-        kep.shape = (6,)
-
-    if degrees:
-        kep[2:, ...] = np.degrees(kep[2:, ...])
 
     return x
