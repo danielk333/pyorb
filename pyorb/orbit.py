@@ -191,6 +191,8 @@ class Orbit:
 
         tmp_orb._cart = self._cart[:, inds].copy()
         tmp_orb._kep = self._kep[:, inds].copy()
+        tmp_orb.__cart_calculated = np.atleast_1d(self.__cart_calculated[inds]).copy()
+        tmp_orb.__kep_calculated = np.atleast_1d(self.__kep_calculated[inds]).copy()
 
         if len(tmp_orb._cart.shape) == 1:
             tmp_orb._cart.shape = (6, 1)
