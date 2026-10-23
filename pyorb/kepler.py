@@ -1639,6 +1639,8 @@ def kep_to_cart(
             along axis 0: input shape is {kep.shape}"
         )
 
+    kep = kep.copy()
+
     if len(kep.shape) < 2:
         input_is_vector = True
         try:
@@ -1702,9 +1704,5 @@ def kep_to_cart(
 
     if input_is_vector:
         x.shape = (6,)
-        kep.shape = (6,)
-
-    if degrees:
-        kep[2:, ...] = np.degrees(kep[2:, ...])
 
     return x
