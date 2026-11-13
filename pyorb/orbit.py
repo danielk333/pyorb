@@ -1049,11 +1049,11 @@ class Orbit:
         return functions.orbital_period(self.a, self.G*(self.M0 + self.m))
 
     @period.setter
-    def period(self):
+    def period(self, value):
         if self.kepler_read_only:
             raise AttributeError('Cannot update read only Kepler elements')
         self.a = functions.semi_major_axis(
-            self.period,
+            value,
             self.G*(self.M0 + self.m),
         )
         if self.direct_update:
